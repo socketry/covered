@@ -43,6 +43,6 @@ RSpec.describe Covered::Source do
 		io = StringIO.new
 		report.print_summary(io)
 		
-		expect(io.string).to include("100.0% covered")
+		expect(io.string).to include("** 3/3 lines executed; 100.0% covered.")
 	end
 end
