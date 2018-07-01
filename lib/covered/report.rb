@@ -63,6 +63,11 @@ module Covered
 							output.write Rainbow(line).green
 						end
 						
+						# If there was no newline at end of file, we add one:
+						unless line.end_with? $/
+							output.puts
+						end
+						
 						line_offset += 1
 					end
 				end
