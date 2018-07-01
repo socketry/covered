@@ -24,8 +24,8 @@ require_relative 'ast'
 
 module Covered
 	class Report
-		def initialize(files)
-			@files = files
+		def initialize(source)
+			@source = source
 		end
 		
 		def expand(node, lines)
@@ -42,8 +42,7 @@ module Covered
 		
 		# A coverage array gives, for each line, the number of line execution by the interpreter. A nil value means coverage is disabled for this line (lines like else and end).
 		def print_summary(output = $stdout)
-			@files.each do |path, counts|
-				ast = RubyVM::AST::parse_file(path)
+			@source.each do |path, ast, counts|
 				expand(ast, counts)
 				
 				line_offset = 1

@@ -22,6 +22,7 @@ module Covered
 	class Files
 		def initialize
 			@paths = {}
+			@map = {}
 		end
 		
 		attr :paths

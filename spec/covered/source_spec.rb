@@ -18,61 +18,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-module Kernel
-	class << self
-		alias_method :original_eval, :eval
+require 'covered/source'
+require 'covered/eval'
+
+require 'trenni/template'
+
+RSpec.describe Covered::Source do
+	let(:template_path) {File.expand_path("template.trenni", __dir__)}
+	let(:template) {Trenni::Template.load_file(template_path)}
+	
+	let(:files) {Covered::Files.new}
+	let(:source) {Covered::Source.new(files)}
+	let(:capture) {Covered::Capture.new(source)}
+	
+	let(:report) {Covered::Report.new(source)}
+	
+	it "correctly generates coverage for template" do
+		$source = source
+		capture.enable
+		template.to_string
+		capture.disable
+		$source = nil
 		
-		def eval(*args)
-			if source = $source
-				source.map(*args)
-			end
-			
-			original_eval(*args)
-		end
-	end
-	
-	private
-	
-	alias_method :original_eval, :eval
-	
-	def eval(*args)
-		if source = $source
-			source.map(*args)
-		end
+		io = StringIO.new
+		report.print_summary(io)
 		
-		original_eval(*args)
+		expect(io.string).to include("100.0% covered")
 	end
 end
-
-class Binding
-	alias_method :original_eval, :eval
-	
-	def eval(*args)
-		if source = $source
-			source.map(*args)
-		end
-		
-		original_eval(*args)
-	end
-end
-
-# class BasicObject
-# 	alias_method :original_instance_eval, :instance_eval
-# 
-# 	def instance_eval(*args, &block)
-# 		puts args.inspect
-# 		original_instance_eval(*args, &block)
-# 	end
-# end
-# 
-# class Module
-# 	alias_method :original_module_eval, :module_eval
-# 
-# 	def module_eval(*args, &block)
-# 		puts args.inspect
-# 		original_module_eval(*args, &block)
-# 	end
-# 
-# 	remove_method :class_eval
-# 	alias_method :class_eval, :module_eval
-# end

@@ -18,61 +18,39 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-module Kernel
-	class << self
-		alias_method :original_eval, :eval
-		
-		def eval(*args)
-			if source = $source
-				source.map(*args)
-			end
+module Covered
+	class Source
+		def initialize(files)
+			@files = files
+			@paths = {}
 			
-			original_eval(*args)
-		end
-	end
-	
-	private
-	
-	alias_method :original_eval, :eval
-	
-	def eval(*args)
-		if source = $source
-			source.map(*args)
+			@mutex = Mutex.new
 		end
 		
-		original_eval(*args)
-	end
-end
-
-class Binding
-	alias_method :original_eval, :eval
-	
-	def eval(*args)
-		if source = $source
-			source.map(*args)
+		# [String -> Source]
+		attr :paths
+		
+		def map(string, binding = nil, filename = nil, lineno = 1)
+			return unless filename
+			
+			# TODO replace with Concurrent::Map
+			@mutex.synchronize do
+				@paths[filename] = string
+			end
 		end
 		
-		original_eval(*args)
+		def mark(path, lineno)
+			@files.mark(path, lineno)
+		end
+		
+		def each(&block)
+			@files.each do |path, lines|
+				if source = @paths[path]
+					yield path, RubyVM::AST.parse(source), lines
+				else
+					yield path, RubyVM::AST.parse_file(path), lines
+				end
+			end
+		end
 	end
 end
-
-# class BasicObject
-# 	alias_method :original_instance_eval, :instance_eval
-# 
-# 	def instance_eval(*args, &block)
-# 		puts args.inspect
-# 		original_instance_eval(*args, &block)
-# 	end
-# end
-# 
-# class Module
-# 	alias_method :original_module_eval, :module_eval
-# 
-# 	def module_eval(*args, &block)
-# 		puts args.inspect
-# 		original_module_eval(*args, &block)
-# 	end
-# 
-# 	remove_method :class_eval
-# 	alias_method :class_eval, :module_eval
-# end

@@ -23,14 +23,15 @@ require_relative '../covered'
 files = Covered::Files.new
 root = Dir.pwd
 output = Covered::Relative.new(root, files)
+$source = output = Covered::Source.new(output)
 output = Covered::Ignore.new(/spec/, output)
 
 report = Covered::Report.new(files)
 capture = Covered::Capture.new(output)
 
 capture.enable
-
-at_exit do
-	capture.disable
-	report.print_summary
-end
+# 
+# at_exit do
+# 	capture.disable
+# 	report.print_summary
+# end
