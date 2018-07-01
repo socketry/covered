@@ -2,9 +2,7 @@
 
 Covered uses modern Ruby features to generate comprehensive coverage, including support for templates which are compiled into Ruby.
 
-[![covered Status](https://secure.travis-ci.org/ioquatix/covered.svg)](http://travis-ci.org/ioquatix/covered)
-[![Code Climate](https://codeclimate.com/github/ioquatix/covered.svg)](https://codeclimate.com/github/ioquatix/covered)
-[![Coverage Status](https://coveralls.io/repos/ioquatix/covered/badge.svg)](https://coveralls.io/r/ioquatix/covered)
+[![Build Status](https://travis-ci.com/ioquatix/covered.svg)](hhttps://travis-ci.com/ioquatix/covered)
 
 ## Installation
 
