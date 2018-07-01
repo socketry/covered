@@ -28,6 +28,7 @@ module Covered
 		
 		def mark(path, lineno)
 			file = @paths[path] ||= []
+			
 			if file[lineno]
 				file[lineno] += 1
 			else

@@ -18,8 +18,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-class RubyVM::AST::Node
-	def executable?
-		self.type =~ /NODE_(CALL|IVAR|LVAR|IASGN)/
+RSpec.describe Covered::Files do
+	context '#mark' do
+		it "can mark lines" do
+			subject.mark("program.rb", 2)
+			
+			expect(subject.paths["program.rb"][2]).to be == 1
+		end
+		
+		it "can mark the same line twice" do
+			2.times do
+				subject.mark("program.rb", 2)
+			end
+			
+			expect(subject.paths["program.rb"][2]).to be == 2
+		end
+	end
+	
+	context '#each' do
+		it "enumerates all paths" do
+			subject.mark("program.rb", 2)
+			
+			enumerator = subject.each
+			expect(enumerator.next).to be == ["program.rb", [nil, nil, 1]]
+		end
 	end
 end

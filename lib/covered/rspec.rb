@@ -23,6 +23,7 @@ require_relative '../covered'
 files = Covered::Files.new
 root = Dir.pwd
 output = Covered::Relative.new(root, files)
+output = Covered::Ignore.new(/spec/, output)
 
 report = Covered::Report.new(files)
 capture = Covered::Capture.new(output)

@@ -29,7 +29,7 @@ module Covered
 		end
 		
 		def expand(node, lines)
-			# puts "#{node.inspect} #{node.first_lineno} #{node.last_lineno}"
+			# puts "#{node.first_lineno}: #{node.inspect}"
 			
 			lines[node.first_lineno] ||= 0 if node.executable?
 			
@@ -42,20 +42,22 @@ module Covered
 		
 		# A coverage array gives, for each line, the number of line execution by the interpreter. A nil value means coverage is disabled for this line (lines like else and end).
 		def print_summary(output = $stdout)
-			output.puts "* Summary "
 			@files.each do |path, counts|
 				ast = RubyVM::AST::parse_file(path)
 				expand(ast, counts)
 				
 				line_offset = 1
-				output.puts "** #{path}"
+				output.puts Rainbow(path).bold.underline
 				
 				File.open(path, "r") do |file|
-					file.each_line do |line, index|
+					file.each_line do |line|
 						count = counts[line_offset]
 						
+						output.write("#{line_offset}".rjust(4))
+						output.write(" #{count}|".rjust(4))
+						
 						if count == nil
-							output.write line
+							output.write Rainbow(line).faint
 						elsif count == 0
 							output.write Rainbow(line).red
 						else
@@ -67,7 +69,9 @@ module Covered
 				end
 				
 				covered = counts.compact
-				output.puts "** Coverage: #{covered.reject(&:zero?).count}/#{covered.count}"
+				hits = covered.reject(&:zero?)
+				percentage = Rational(hits.count, covered.count) * 100
+				output.puts "** #{hits.count}/#{covered.count} lines executed; #{percentage.to_f.round(2)}% covered."
 			end
 		end
 	end
