@@ -18,64 +18,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'node'
+require 'covered/report'
+require 'covered/files'
 
-module Covered
-	class Source
-		def initialize(files)
-			@files = files
-			@paths = {}
-			
-			@mutex = Mutex.new
-		end
+RSpec.describe Covered::Report do
+	let(:files) {Covered::Files.new}
+	let(:report) {Covered::Report.new(files)}
+	
+	let(:io) {StringIO.new}
+	
+	it "can generate source code listing" do
+		files.mark(__FILE__, 24)
+		files.paths[__FILE__][25] = 0
 		
-		attr :paths
+		report.print_summary(io)
 		
-		def map(string, binding = nil, filename = nil, lineno = 1)
-			return unless filename
-			
-			# TODO replace with Concurrent::Map
-			@mutex.synchronize do
-				@paths[filename] = string
-			end
-		end
-		
-		def mark(path, lineno)
-			@files.mark(path, lineno)
-		end
-		
-		def expand(node, lines)
-			# puts "#{node.first_lineno}: #{node.inspect}"
-			
-			lines[node.first_lineno] ||= 0 if node.executable?
-			
-			node.children.each do |child|
-				next if child.nil? or child.ignore?
-				
-				expand(child, lines)
-			end
-		end
-		
-		def parse(path)
-			if source = @paths[path]
-				RubyVM::AST.parse(source)
-			elsif File.exist?(path)
-				RubyVM::AST.parse_file(path)
-			else
-				warn "Couldn't parse #{path}, file doesn't exist?"
-			end
-		end
-		
-		def each(&block)
-			@files.each do |path, lines|
-				lines = lines.dup
-				
-				if top = parse(path)
-					expand(top, lines)
-				end
-				
-				yield path, lines
-			end
-		end
+		expect(io.string).to include("  24  1|RSpec.describe Covered::Report do")
 	end
 end

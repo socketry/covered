@@ -20,59 +20,38 @@
 
 module Kernel
 	class << self
-		alias_method :original_eval, :eval
+		alias_method :__eval__, :eval
 		
 		def eval(*args)
 			if source = $source
 				source.map(*args)
 			end
 			
-			original_eval(*args)
+			__eval__(*args)
 		end
 	end
 	
 	private
 	
-	alias_method :original_eval, :eval
+	alias_method :__eval__, :eval
 	
 	def eval(*args)
 		if source = $source
 			source.map(*args)
 		end
 		
-		original_eval(*args)
+		__eval__(*args)
 	end
 end
 
 class Binding
-	alias_method :original_eval, :eval
+	alias_method :__eval__, :eval
 	
 	def eval(*args)
 		if source = $source
 			source.map(*args)
 		end
 		
-		original_eval(*args)
+		__eval__(*args)
 	end
 end
-
-# class BasicObject
-# 	alias_method :original_instance_eval, :instance_eval
-# 
-# 	def instance_eval(*args, &block)
-# 		puts args.inspect
-# 		original_instance_eval(*args, &block)
-# 	end
-# end
-# 
-# class Module
-# 	alias_method :original_module_eval, :module_eval
-# 
-# 	def module_eval(*args, &block)
-# 		puts args.inspect
-# 		original_module_eval(*args, &block)
-# 	end
-# 
-# 	remove_method :class_eval
-# 	alias_method :class_eval, :module_eval
-# end

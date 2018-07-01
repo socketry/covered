@@ -20,31 +20,15 @@
 
 require 'rainbow'
 
-require_relative 'ast'
-
 module Covered
 	class Report
 		def initialize(source)
 			@source = source
 		end
 		
-		def expand(node, lines)
-			# puts "#{node.first_lineno}: #{node.inspect}"
-			
-			lines[node.first_lineno] ||= 0 if node.executable?
-			
-			node.children.each do |child|
-				next if child.nil?
-				
-				expand(child, lines)
-			end
-		end
-		
 		# A coverage array gives, for each line, the number of line execution by the interpreter. A nil value means coverage is disabled for this line (lines like else and end).
 		def print_summary(output = $stdout)
-			@source.each do |path, ast, counts|
-				expand(ast, counts)
-				
+			@source.each do |path, counts|
 				line_offset = 1
 				output.puts Rainbow(path).bold.underline
 				

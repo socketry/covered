@@ -25,32 +25,21 @@ module Covered
 		def initialize(output)
 			@paths = {}
 			
-			@line_trace = TracePoint.new(:line) do |trace_point|
+			@trace = TracePoint.new(:line, :call) do |trace_point|
 				if path = trace_point.path
-					# if path =~ /\.xnode$/
-					# 	binding.pry
-					# end
-					# 
 					output.mark(path, trace_point.lineno)
 				end
 			end
-			# 
-			# @call_trace = TracePoint.new(:c_call) do |trace_point|
-			# 	if trace_point.method_id == :eval
-			# 	end
-			# end
 		end
 		
 		attr :paths
 		
 		def enable
-			# @call_trace.enable
-			@line_trace.enable
+			@trace.enable
 		end
 		
 		def disable
-			@line_trace.disable
-			# @call_trace.disable
+			@trace.disable
 		end
 	end
 end

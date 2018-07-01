@@ -20,6 +20,11 @@
 
 class RubyVM::AST::Node
 	def executable?
-		self.type =~ /NODE_(CALL|IVAR|LVAR|IASGN)/
+		self.type =~ /NODE_(CALL|.VAR|IASGN)/
+	end
+	
+	def ignore?
+		# NODE_ARGS Ruby doesn't report execution of arguments in :line tracepoint.
+		self.type =~ /NODE_(ARGS)/
 	end
 end
