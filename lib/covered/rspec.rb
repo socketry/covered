@@ -33,7 +33,7 @@ capture = Covered::Capture.new(output)
 
 capture.enable
 
-# at_exit do
-# 	capture.disable
-# 	report.print_summary
-# end
+at_exit do
+	capture.disable
+	report.print_summary
+end

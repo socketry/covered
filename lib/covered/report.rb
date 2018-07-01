@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 
 require 'rainbow'
+require_relative 'statistics'
 
 module Covered
 	class Report
@@ -28,7 +29,12 @@ module Covered
 		
 		# A coverage array gives, for each line, the number of line execution by the interpreter. A nil value means coverage is disabled for this line (lines like else and end).
 		def print_summary(output = $stdout)
+			statistics = Statistics.new
+			
 			@source.each do |path, counts|
+				coverage = Coverage.new(path, counts)
+				statistics << coverage
+				
 				line_offset = 1
 				output.puts Rainbow(path).bold.underline
 				
@@ -56,11 +62,10 @@ module Covered
 					end
 				end
 				
-				covered = counts.compact
-				hits = covered.reject(&:zero?)
-				percentage = Rational(hits.count, covered.count) * 100
-				output.puts "** #{hits.count}/#{covered.count} lines executed; #{percentage.to_f.round(2)}% covered."
+				coverage.print_summary(output)
 			end
+			
+			statistics.print_summary(output)
 		end
 	end
 end
