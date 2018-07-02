@@ -18,13 +18,54 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-class RubyVM::AST::Node
-	def executable?
-		self.type =~ /NODE_(CALL|.VAR|IASGN)/
+require 'covered/statistics'
+
+RSpec.describe Covered::Statistics do
+	context 'initial state' do
+		it "is zero" do
+			expect(subject.count).to be 0
+			expect(subject.executable_count).to be 0
+			expect(subject.executed_count).to be 0
+		end
+		
+		it "is complete" do
+			expect(subject).to be_complete
+		end
 	end
 	
-	def ignore?
-		# NODE_ARGS Ruby doesn't report execution of arguments in :line tracepoint.
-		self.type =~ /NODE_(ARGS)/
+	context 'after adding full coverage' do
+		let(:coverage) {Covered::Coverage.new("foo.rb", [nil, 1])}
+		
+		before(:each) do
+			subject << coverage
+		end
+		
+		it "has one entry" do
+			expect(subject.count).to be 1
+			expect(subject.executable_count).to be 1
+			expect(subject.executed_count).to be 1
+		end
+		
+		it "is complete" do
+			expect(subject).to be_complete
+		end
+	end
+	
+	context 'after adding partial coverage' do
+		let(:coverage) {Covered::Coverage.new("foo.rb", [nil, 1, 0])}
+		
+		before(:each) do
+			subject << coverage
+		end
+		
+		it "has one entry" do
+			expect(subject.count).to be 1
+			expect(subject.executable_count).to be 2
+			expect(subject.executed_count).to be 1
+		end
+		
+		it "is not complete" do
+			expect(subject).to_not be_complete
+		end
 	end
 end

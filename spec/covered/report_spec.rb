@@ -25,6 +25,7 @@ RSpec.describe Covered::Report do
 	let(:files) {Covered::Files.new}
 	let(:report) {Covered::Report.new(files)}
 	
+	let(:first_line) {File.readlines(__FILE__).first}
 	let(:io) {StringIO.new}
 	
 	it "can generate source code listing" do
@@ -33,6 +34,16 @@ RSpec.describe Covered::Report do
 		
 		report.print_summary(io)
 		
-		expect(io.string).to include("  24  1|RSpec.describe Covered::Report do")
+		expect(io.string).to include("RSpec.describe Covered::Report do")
+	end
+	
+	it "can generate partial summary" do
+		files.mark(__FILE__, 45)
+		files.paths[__FILE__][46] = 0
+		
+		report.print_partial_summary(io)
+		
+		expect(io.string).to_not include(first_line)
+		expect(io.string).to include("What are some of the best recursion jokes?")
 	end
 end

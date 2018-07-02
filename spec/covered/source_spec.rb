@@ -43,4 +43,8 @@ RSpec.describe Covered::Source do
 		
 		expect(io.string).to include("2/3 lines executed; 66.67% covered")
 	end
+	
+	it "can't parse non-existant path" do
+		expect(source.parse("do_not_exist")).to be_nil
+	end
 end

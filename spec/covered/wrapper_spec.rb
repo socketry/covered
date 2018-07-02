@@ -18,32 +18,35 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'wrapper'
+require 'covered/report'
+require 'covered/files'
 
-module Covered
-	class Capture < Wrapper
-		def initialize(output)
-			super(output)
-			
-			@trace = TracePoint.new(:line, :call) do |trace_point|
-				if path = trace_point.path
-					@output.mark(path, trace_point.lineno)
-				end
-			end
-		end
+RSpec.describe Covered::Wrapper do
+	let(:output) {double}
+	subject {described_class.new(output)}
+	
+	it 'passes #mark through' do
+		expect(output).to receive(:mark).with("fleeb.rb", 5)
 		
-		attr :paths
+		subject.mark("fleeb.rb", 5)
+	end
+	
+	it 'passes #enable through' do
+		expect(output).to receive(:enable)
 		
-		def enable
-			super
-			
-			@trace.enable
-		end
+		subject.enable
+	end
+	
+	it 'passes #disable through' do
+		expect(output).to receive(:disable)
 		
-		def disable
-			@trace.disable
-			
-			super
+		subject.disable
+	end
+	
+	it 'passes #each through' do
+		expect(output).to receive(:each)
+		
+		subject.each do
 		end
 	end
 end

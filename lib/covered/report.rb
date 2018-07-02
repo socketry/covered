@@ -33,6 +33,8 @@ module Covered
 				coverage = Coverage.new(path, counts)
 				statistics << coverage
 				
+				next if coverage.complete?
+				
 				line_offset = 1
 				output.puts Rainbow(path).bold.underline
 				
@@ -64,6 +66,58 @@ module Covered
 			end
 			
 			statistics.print_summary(output)
+			
+			return statistics
+		end
+		
+		def print_partial_summary(output = $stdout, before: 4, after: 4)
+			statistics = Statistics.new
+			
+			@output.each do |path, counts|
+				coverage = Coverage.new(path, counts)
+				statistics << coverage
+				
+				next if coverage.complete?
+				
+				line_offset = 1
+				output.puts Rainbow(path).bold.underline
+				
+				printing = false
+				
+				File.open(path, "r") do |file|
+					file.each_line do |line|
+						range = Range.new([line_offset - before, 0].max, line_offset+after)
+						
+						if counts[range]&.include?(0)
+							count = counts[line_offset]
+							
+							output.write("#{line_offset}|".rjust(8))
+							output.write("#{count}:".rjust(8))
+							
+							if count == nil
+								output.write Rainbow(line).faint
+							elsif count == 0
+								output.write Rainbow(line).red
+							else
+								output.write Rainbow(line).green
+							end
+							
+							# If there was no newline at end of file, we add one:
+							unless line.end_with? $/
+								output.puts
+							end
+						end
+						
+						line_offset += 1
+					end
+				end
+				
+				coverage.print_summary(output)
+			end
+			
+			statistics.print_summary(output)
+			
+			return statistics
 		end
 	end
 end

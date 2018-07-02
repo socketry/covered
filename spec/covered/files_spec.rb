@@ -44,3 +44,91 @@ RSpec.describe Covered::Files do
 		end
 	end
 end
+
+RSpec.describe Covered::Filter do
+	it "accepts everything" do
+		expect(subject.accept?("foo")).to be_truthy
+	end
+end
+
+RSpec.describe Covered::Include do
+	let(:files) {Covered::Files.new}
+	let(:pattern) {File.join(__dir__, "**", "*.rb")}
+	subject {described_class.new(files, pattern)}
+	
+	it "should match some files" do
+		expect(subject.glob).to_not be_empty
+	end
+	
+	let(:path) {subject.glob.first}
+	
+	it "should defer to existing files" do
+		files.mark(path, 5)
+		
+		paths = subject.to_enum(:each).to_h
+		
+		expect(paths).to include(path)
+		expect(paths[path]).to be == [nil, nil, nil, nil, nil, 1]
+	end
+	
+	it "should enumerate paths" do
+		enumerator = subject.to_enum(:each)
+		
+		path, counts = enumerator.next
+		expect(counts).to be == []
+	end
+end
+
+RSpec.describe Covered::Skip do
+	let(:files) {Covered::Files.new}
+	subject {described_class.new(files, "file.rb")}
+	
+	it "should ignore files which match given pattern" do
+		subject.mark("file.rb", 1)
+		
+		expect(files).to be_empty
+	end
+	
+	let(:paths) {subject.to_enum(:each).to_h}
+	
+	it "should include files which don't match given pattern" do
+		subject.mark("foo.rb", 1)
+		
+		expect(files).to_not be_empty
+		expect(paths).to include("foo.rb")
+	end
+end
+
+RSpec.describe Covered::Only do
+	let(:files) {Covered::Files.new}
+	subject {described_class.new(files, "file.rb")}
+	
+	it "should ignore files which don't match given pattern" do
+		subject.mark("foo.rb", 1)
+		
+		expect(files).to be_empty
+	end
+	
+	it "should include files which match given pattern" do
+		subject.mark("file.rb", 1)
+		
+		expect(files).to_not be_empty
+	end
+end
+
+RSpec.describe Covered::Root do
+	let(:files) {Covered::Files.new}
+	subject {described_class.new(files, "lib/")}
+	
+	it "should ignore files which don't match root" do
+		subject.mark("foo.rb", 1)
+		
+		expect(files).to be_empty
+	end
+	
+	it "should include files which match root" do
+		subject.mark("lib/foo.rb", 1)
+		
+		expect(files).to_not be_empty
+	end
+end

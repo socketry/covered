@@ -18,19 +18,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'node'
 require_relative 'eval'
 require_relative 'wrapper'
 
 require 'thread'
 
 module Covered
+	# The source map, loads the source file, parses the AST to generate which lines contain executable code.
 	class Source < Wrapper
-		def initialize(output)
-			super
+		EXECUTABLE = /NODE_(.?CALL|.VAR|.ASGN|DEFN)/.freeze
+		
+		# Deviate from the standard policy above, because all the files are already loaded, so we skip NODE_FCALL.
+		DOGFOOD = /NODE_([V]?CALL|.VAR|.ASGN|DEFN)/.freeze
+		
+		# Ruby trace points don't trigger for argument execution.
+		# Constants are loaded when the file loads, so they are less interesting.
+		IGNORE = /NODE_(ARGS|CDECL)/.freeze
+		
+		def initialize(output, executable: EXECUTABLE, ignore: IGNORE)
+			super(output)
 			
 			@paths = {}
 			@mutex = Mutex.new
+			
+			@executable = executable
+			@ignore = ignore
 		end
 		
 		def enable
@@ -56,19 +68,30 @@ module Covered
 			end
 		end
 		
+		def executable?(node)
+			node.type =~ @executable
+		end
+		
+		def ignore?(node)
+			# NODE_ARGS Ruby doesn't report execution of arguments in :line tracepoint.
+			node.type =~ @ignore
+		end
+		
 		def expand(node, lines)
 			# puts "#{node.first_lineno}: #{node.inspect}"
 			
-			lines[node.first_lineno] ||= 0 if node.executable?
+			lines[node.first_lineno] ||= 0 if executable?(node)
 			
 			node.children.each do |child|
-				next if child.nil? or child.ignore?
+				next if child.nil? or ignore?(child)
 				
 				expand(child, lines)
 			end
 		end
 		
 		def parse(path)
+			# puts "Parse #{path}"
+			
 			if source = @paths[path]
 				RubyVM::AST.parse(source)
 			elsif File.exist?(path)

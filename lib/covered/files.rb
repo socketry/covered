@@ -18,16 +18,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+require 'set'
+
 module Covered
 	class Files < Wrapper
 		def initialize(output = nil)
 			super(output)
 			
 			@paths = {}
-			@map = {}
 		end
 		
 		attr :paths
+		
+		def empty?
+			@paths.empty?
+		end
 		
 		def mark(path, lineno)
 			file = @paths[path] ||= []
@@ -44,41 +49,97 @@ module Covered
 		end
 	end
 	
-	class Ignore < Wrapper
-		def initialize(pattern, output)
+	class Include < Wrapper
+		def initialize(output, pattern)
 			super(output)
 			
 			@pattern = pattern
 		end
 		
-		def mark(path, lineno)
-			super unless @pattern === path
-		end
-	end
-	
-	class Only < Wrapper
-		def initialize(pattern, output)
-			super(output)
-			
-			@pattern = pattern
-		end
+		attr :pattern
 		
-		def mark(path, lineno)
-			super if @pattern === path
-		end
-	end
-	
-	class Relative < Wrapper
-		def initialize(root, output)
-			super(output)
+		def glob
+			paths = Set.new
 			
-			@root = root
-		end
-		
-		def mark(path, lineno)
-			if path.start_with? @root
-				super
+			Dir.glob(@pattern) do |path|
+				unless File.directory?(path)
+					paths << File.realpath(path)
+				end
 			end
+			
+			return paths
+		end
+		
+		def each(&block)
+			paths = glob
+			
+			super do |path, lines|
+				paths.delete(path)
+				
+				yield path, lines
+			end
+			
+			paths.each do |path|
+				yield path, []
+			end
+		end
+	end
+	
+	class Filter < Wrapper
+		def accept?(path)
+			true
+		end
+		
+		def mark(path, lineno)
+			super if accept?(path)
+		end
+		
+		def each(&block)
+			super do |path, counts|
+				yield path, counts if accept?(path)
+			end
+		end
+	end
+	
+	class Skip < Filter
+		def initialize(output, pattern)
+			super(output)
+			
+			@pattern = pattern
+		end
+		
+		attr :pattern
+		
+		def accept? path
+			!(@pattern === path)
+		end
+	end
+	
+	class Only < Filter
+		def initialize(output, pattern)
+			super(output)
+			
+			@pattern = pattern
+		end
+		
+		attr :pattern
+		
+		def accept?(path)
+			@pattern === path
+		end
+	end
+	
+	class Root < Filter
+		def initialize(output, path)
+			super(output)
+			
+			@path = path
+		end
+		
+		attr :path
+		
+		def accept?(path)
+			path.start_with?(@path)
 		end
 	end
 end

@@ -20,7 +20,4 @@
 
 require_relative "covered/version"
 
-require_relative "covered/report"
-require_relative "covered/files"
-require_relative "covered/source"
-require_relative "covered/capture"
+require_relative "covered/policy"

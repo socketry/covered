@@ -19,9 +19,18 @@
 # THE SOFTWARE.
 
 require "bundler/setup"
-require "covered"
-
 require "covered/rspec"
+
+$covered = Covered.policy do
+	root Dir.pwd
+	
+	include "lib/**/*.rb"
+	
+	skip /spec|capture.rb|eval.rb|rspec.rb/
+	
+	# This needs to be added last, otherwise it won't be exposed to te additional files of the above `include` directive.
+	source executable: Covered::Source::DOGFOOD
+end
 
 RSpec.configure do |config|
 	# Enable flags like --only-failures and --next-failure

@@ -24,6 +24,8 @@ module Covered
 			@output = output
 		end
 		
+		attr :output
+		
 		def mark(path, lineno)
 			@output.mark(path, lineno) if @output
 		end

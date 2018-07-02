@@ -18,32 +18,74 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'wrapper'
+require_relative "report"
+require_relative "files"
+require_relative "source"
+require_relative "capture"
 
 module Covered
-	class Capture < Wrapper
-		def initialize(output)
-			super(output)
-			
-			@trace = TracePoint.new(:line, :call) do |trace_point|
-				if path = trace_point.path
-					@output.mark(path, trace_point.lineno)
-				end
-			end
+	def self.policy(&block)
+		policy = Policy.new
+		
+		policy.instance_eval(&block)
+		
+		policy.freeze
+		
+		return policy
+	end
+	
+	class Policy < Wrapper
+		def initialize
+			super(Files.new)
 		end
 		
-		attr :paths
+		def freeze
+			return if frozen?
+			
+			capture
+			report
+			
+			super
+		end
+		
+		def source(*args)
+			@output = Source.new(@output, *args)
+		end
+		
+		def include(*args)
+			@output = Include.new(@output, *args)
+		end
+		
+		def skip(*args)
+			@output = Skip.new(@output, *args)
+		end
+		
+		def only(*args)
+			@output = Only.new(@output, *args)
+		end
+		
+		def root(*args)
+			@output = Root.new(@output, *args)
+		end
+		
+		def capture
+			@capture ||= Capture.new(@output)
+		end
 		
 		def enable
-			super
-			
-			@trace.enable
+			capture.enable
 		end
 		
 		def disable
-			@trace.disable
-			
-			super
+			capture.disable
+		end
+		
+		def report
+			@report ||= Report.new(@output)
+		end
+		
+		def print_summary(*args)
+			report.print_partial_summary(*args)
 		end
 	end
 end

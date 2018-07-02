@@ -42,7 +42,13 @@ module Covered
 		end
 		
 		def percentage
+			return nil if executable_count.zero?
+			
 			Rational(executed_count, executable_count) * 100
+		end
+		
+		def complete?
+			executed_count == executable_count
 		end
 		
 		def print_summary(output)
@@ -77,8 +83,14 @@ module Covered
 			executed_lines.count
 		end
 		
+		def complete?
+			executed_count == executable_count
+		end
+		
 		def percentage
-			Rational(executed_lines.count, executable_lines.count) * 100
+			return nil if executable_count.zero?
+			
+			Rational(executed_count, executable_count) * 100
 		end
 		
 		def print_summary(output)

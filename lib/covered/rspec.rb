@@ -18,22 +18,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+require 'pry'
 require_relative '../covered'
 
-output = Covered::Files.new
-root = Dir.pwd
+$covered = Covered.policy do
+	root Dir.pwd
+	
+	include "lib/**/*.rb"
+	
+	source
+end
 
-$source = output = Covered::Source.new(output)
-report = Covered::Report.new(output)
-
-output = Covered::Relative.new(root, output)
-output = Covered::Ignore.new(/spec/, output)
-
-capture = Covered::Capture.new(output)
-
-capture.enable
-
-at_exit do
-	capture.disable
-	report.print_summary
+RSpec.configure do |config|
+	config.before(:suite) do
+		$covered.enable
+	end
+	
+	config.after(:suite) do |context|
+		$covered.disable
+		
+		statistics = $covered.print_summary
+		expect(statistics).to be_complete
+	end
 end
