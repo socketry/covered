@@ -18,20 +18,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'rainbow'
 require_relative 'statistics'
+require_relative 'wrapper'
+
+require 'rainbow'
 
 module Covered
-	class Report
-		def initialize(source)
-			@source = source
-		end
-		
+	class Report < Wrapper
 		# A coverage array gives, for each line, the number of line execution by the interpreter. A nil value means coverage is disabled for this line (lines like else and end).
 		def print_summary(output = $stdout)
 			statistics = Statistics.new
 			
-			@source.each do |path, counts|
+			@output.each do |path, counts|
 				coverage = Coverage.new(path, counts)
 				statistics << coverage
 				
@@ -42,8 +40,8 @@ module Covered
 					file.each_line do |line|
 						count = counts[line_offset]
 						
-						output.write("#{line_offset}".rjust(4))
-						output.write(" #{count}|".rjust(4))
+						output.write("#{line_offset}|".rjust(8))
+						output.write("#{count}:".rjust(8))
 						
 						if count == nil
 							output.write Rainbow(line).faint

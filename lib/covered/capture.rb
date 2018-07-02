@@ -18,16 +18,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'rainbow'
+require_relative 'wrapper'
 
 module Covered
-	class Capture
+	class Capture < Wrapper
 		def initialize(output)
+			super(output)
+			
 			@paths = {}
 			
 			@trace = TracePoint.new(:line, :call) do |trace_point|
 				if path = trace_point.path
-					output.mark(path, trace_point.lineno)
+					@output.mark(path, trace_point.lineno)
 				end
 			end
 		end
@@ -35,11 +37,15 @@ module Covered
 		attr :paths
 		
 		def enable
+			super
+			
 			@trace.enable
 		end
 		
 		def disable
 			@trace.disable
+			
+			super
 		end
 	end
 end

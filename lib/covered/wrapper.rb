@@ -18,61 +18,27 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'thread'
-
 module Covered
-	module Eval
-		@mutex = Mutex.new
-		@handler = nil
-		
-		def self.enable(handler)
-			@mutex.synchronize do
-				@handler = handler
-			end
+	class Wrapper
+		def initialize(output = nil)
+			@output = output
 		end
 		
-		def self.disable(handler)
-			@mutex.synchronize do
-				@handler = nil
-			end
+		def mark(path, lineno)
+			@output.mark(path, lineno) if @output
 		end
 		
-		def self.intercept_eval(*args)
-			@mutex.synchronize do
-				@handler.intercept_eval(*args) if @handler
-			end
+		def enable
+			@output.enable if @output
 		end
-	end
-end
-
-module Kernel
-	class << self
-		alias_method :__eval__, :eval
 		
-		def eval(*args)
-			Covered::Eval.intercept_eval(*args)
-			
-			__eval__(*args)
+		def disable
+			@output.disable if @output
 		end
-	end
-	
-	private
-	
-	alias_method :__eval__, :eval
-	
-	def eval(*args)
-		Covered::Eval.intercept_eval(*args)
 		
-		__eval__(*args)
-	end
-end
-
-class Binding
-	alias_method :__eval__, :eval
-	
-	def eval(*args)
-		Covered::Eval.intercept_eval(*args)
-		
-		__eval__(*args)
+		# @yield [path, counts] the path to the file, and the execution counts.
+		def each(&block)
+			@output.each(&block)
+		end
 	end
 end

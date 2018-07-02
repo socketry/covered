@@ -19,7 +19,6 @@
 # THE SOFTWARE.
 
 require 'covered/source'
-require 'covered/eval'
 
 require 'trenni/template'
 
@@ -28,21 +27,20 @@ RSpec.describe Covered::Source do
 	let(:template) {Trenni::Template.load_file(template_path)}
 	
 	let(:files) {Covered::Files.new}
+	let(:only) {Covered::Only.new(template_path, files)}
 	let(:source) {Covered::Source.new(files)}
 	let(:capture) {Covered::Capture.new(source)}
 	
 	let(:report) {Covered::Report.new(source)}
 	
 	it "correctly generates coverage for template" do
-		$source = source
 		capture.enable
 		template.to_string
 		capture.disable
-		$source = nil
 		
 		io = StringIO.new
 		report.print_summary(io)
 		
-		expect(io.string).to include("2/2 lines executed; 100.0% covered")
+		expect(io.string).to include("2/3 lines executed; 66.67% covered")
 	end
 end

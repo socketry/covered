@@ -19,29 +19,41 @@
 # THE SOFTWARE.
 
 require_relative 'node'
+require_relative 'eval'
+require_relative 'wrapper'
+
+require 'thread'
 
 module Covered
-	class Source
-		def initialize(files)
-			@files = files
-			@paths = {}
+	class Source < Wrapper
+		def initialize(output)
+			super
 			
+			@paths = {}
 			@mutex = Mutex.new
+		end
+		
+		def enable
+			super
+			
+			Eval::enable(self)
+		end
+		
+		def disable
+			Eval::disable(self)
+			
+			super
 		end
 		
 		attr :paths
 		
-		def map(string, binding = nil, filename = nil, lineno = 1)
+		def intercept_eval(string, binding = nil, filename = nil, lineno = 1)
 			return unless filename
 			
 			# TODO replace with Concurrent::Map
 			@mutex.synchronize do
 				@paths[filename] = string
 			end
-		end
-		
-		def mark(path, lineno)
-			@files.mark(path, lineno)
 		end
 		
 		def expand(node, lines)
@@ -67,7 +79,7 @@ module Covered
 		end
 		
 		def each(&block)
-			@files.each do |path, lines|
+			@output.each do |path, lines|
 				lines = lines.dup
 				
 				if top = parse(path)

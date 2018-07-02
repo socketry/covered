@@ -19,8 +19,10 @@
 # THE SOFTWARE.
 
 module Covered
-	class Files
-		def initialize
+	class Files < Wrapper
+		def initialize(output = nil)
+			super(output)
+			
 			@paths = {}
 			@map = {}
 		end
@@ -42,41 +44,40 @@ module Covered
 		end
 	end
 	
-	class Ignore
+	class Ignore < Wrapper
 		def initialize(pattern, output)
-			@pattern = pattern
-			@output = output
-		end
-		
-		def mark(path, lineno)
-			@output.mark(path, lineno) unless @pattern.match? path
-		end
-	end
-	
-	class Group
-		def initialize(patterns, output)
-			@patterns = patterns
-			@output = output
-		end
-		
-		def mark(path, lineno)
-			@patterns.each do |pattern, output|
-				return output.mark(path, lineno) if pattern.match? path
-			end
+			super(output)
 			
-			@output.mark(path, lineno) if @output
+			@pattern = pattern
+		end
+		
+		def mark(path, lineno)
+			super unless @pattern === path
 		end
 	end
 	
-	class Relative
+	class Only < Wrapper
+		def initialize(pattern, output)
+			super(output)
+			
+			@pattern = pattern
+		end
+		
+		def mark(path, lineno)
+			super if @pattern === path
+		end
+	end
+	
+	class Relative < Wrapper
 		def initialize(root, output)
+			super(output)
+			
 			@root = root
-			@output = output
 		end
 		
 		def mark(path, lineno)
 			if path.start_with? @root
-				@output.mark(path, lineno)
+				super
 			end
 		end
 	end
