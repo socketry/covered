@@ -1,22 +1,22 @@
-# Covered
+# Covered [![Build Status](https://travis-ci.com/ioquatix/covered.svg)](hhttps://travis-ci.com/ioquatix/covered)
 
 Covered uses modern Ruby features to generate comprehensive coverage, including support for templates which are compiled into Ruby.
 
-[![Build Status](https://travis-ci.com/ioquatix/covered.svg)](hhttps://travis-ci.com/ioquatix/covered)
+![Screenshot](media/example.png)
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'covered'
+	gem 'covered'
 
 And then execute:
 
-    $ bundle
+	$ bundle
 
 Or install it yourself as:
 
-    $ gem install covered
+	$ gem install covered
 
 ## Usage
 
