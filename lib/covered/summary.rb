@@ -25,13 +25,12 @@ require 'rainbow'
 
 module Covered
 	class Summary < Wrapper
-		def initialize(output, soft: 1.0, hard: 0.9)
+		def initialize(output, threshold: 1.0)
 			super(output)
 			
 			@statistics = nil
 			
-			@soft = soft
-			@hard = hard
+			@threshold = threshold
 		end
 		
 		def each
@@ -40,7 +39,7 @@ module Covered
 			super do |coverage|
 				@statistics << coverage
 				
-				if coverage.ratio < @soft
+				if coverage.ratio < @threshold
 					yield coverage
 				end
 			end
