@@ -77,15 +77,15 @@ module Covered
 			node.type =~ @ignore
 		end
 		
-		def expand(node, lines)
+		def expand(node, counts)
 			# puts "#{node.first_lineno}: #{node.inspect}"
 			
-			lines[node.first_lineno] ||= 0 if executable?(node)
+			counts[node.first_lineno] ||= 0 if executable?(node)
 			
 			node.children.each do |child|
 				next if child.nil? or ignore?(child)
 				
-				expand(child, lines)
+				expand(child, counts)
 			end
 		end
 		
@@ -102,14 +102,13 @@ module Covered
 		end
 		
 		def each(&block)
-			@output.each do |path, lines|
-				lines = lines.dup
-				
-				if top = parse(path)
-					expand(top, lines)
+			@output.each do |coverage|
+				# This is a little bit inefficient, perhaps add a cache layer?
+				if top = parse(coverage.path)
+					expand(top, coverage.counts)
 				end
 				
-				yield path, lines
+				yield coverage.freeze
 			end
 		end
 	end

@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative "report"
+require_relative "summary"
 require_relative "files"
 require_relative "source"
 require_relative "capture"
@@ -43,7 +43,7 @@ module Covered
 			return if frozen?
 			
 			capture
-			report
+			summary
 			
 			super
 		end
@@ -80,12 +80,12 @@ module Covered
 			capture.disable
 		end
 		
-		def report
-			@report ||= Report.new(@output)
+		def summary(*args)
+			@summary ||= Summary.new(@output, *args)
 		end
 		
 		def print_summary(*args)
-			report.print_partial_summary(*args)
+			summary.print_partial_summary(*args)
 		end
 	end
 end

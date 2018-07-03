@@ -18,8 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'covered/report'
-require 'covered/files'
+require 'covered/policy'
 
 RSpec.describe Covered::Policy do
 	let(:pattern) {"**/*.rb"}
@@ -78,6 +77,6 @@ RSpec.describe Covered::Policy do
 		
 		subject.print_summary(io)
 		
-		expect(io.string).to include("* 0 files checked; 0/0 lines executed; 0.0% covered.")
+		expect(io.string).to include("* 0 files checked; 0/0 lines executed; 100.0% covered.")
 	end
 end

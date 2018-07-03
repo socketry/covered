@@ -18,8 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+require_relative 'wrapper'
+require_relative 'coverage'
+
 module Covered
-	class Statistics
+	class Statistics < Wrapper
 		def initialize
 			@count = 0
 			@executable_count = 0
@@ -41,60 +44,10 @@ module Covered
 			@executed_count += coverage.executed_count
 		end
 		
-		def percentage
-			return nil if executable_count.zero?
-			
-			Rational(executed_count, executable_count) * 100
-		end
-		
-		def complete?
-			executed_count == executable_count
-		end
+		include Ratio
 		
 		def print_summary(output)
 			output.puts "* #{count} files checked; #{executed_count}/#{executable_count} lines executed; #{percentage.to_f.round(2)}% covered."
-		end
-	end
-	
-	class Coverage
-		def initialize(path, lines)
-			@path = path
-			@lines = lines
-			
-			@executable_lines = nil
-			@executed_lines = nil
-		end
-		
-		attr :lines
-		
-		def executable_lines
-			@executable_lines ||= @lines.compact
-		end
-		
-		def executable_count
-			executable_lines.count
-		end
-		
-		def executed_lines
-			@executed_lines ||= executable_lines.reject(&:zero?)
-		end
-		
-		def executed_count
-			executed_lines.count
-		end
-		
-		def complete?
-			executed_count == executable_count
-		end
-		
-		def percentage
-			return nil if executable_count.zero?
-			
-			Rational(executed_count, executable_count) * 100
-		end
-		
-		def print_summary(output)
-			output.puts "** #{executed_count}/#{executable_count} lines executed; #{percentage.to_f.round(2)}% covered."
 		end
 	end
 end

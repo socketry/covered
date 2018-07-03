@@ -20,14 +20,16 @@
 
 module Covered
 	class Wrapper
+		include Enumerable
+		
 		def initialize(output = nil)
 			@output = output
 		end
 		
 		attr :output
 		
-		def mark(path, lineno)
-			@output.mark(path, lineno) if @output
+		def mark(*args)
+			@output.mark(*args) if @output
 		end
 		
 		def enable
@@ -38,9 +40,13 @@ module Covered
 			@output.disable if @output
 		end
 		
-		# @yield [path, counts] the path to the file, and the execution counts.
+		# @yield [Coverage] the path to the file, and the execution counts.
 		def each(&block)
 			@output.each(&block)
+		end
+		
+		def to_h
+			collect{|coverage| [coverage.path, coverage]}.to_h
 		end
 	end
 end

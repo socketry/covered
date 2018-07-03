@@ -18,32 +18,77 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'covered/report'
-require 'covered/files'
-
-RSpec.describe Covered::Report do
-	let(:files) {Covered::Files.new}
-	let(:report) {Covered::Report.new(files)}
-	
-	let(:first_line) {File.readlines(__FILE__).first}
-	let(:io) {StringIO.new}
-	
-	it "can generate source code listing" do
-		files.mark(__FILE__, 24)
-		files.paths[__FILE__][25] = 0
+module Covered
+	module Ratio
+		def ratio
+			return 1 if executable_count.zero?
+			
+			Rational(executed_count, executable_count)
+		end
 		
-		report.print_summary(io)
+		def complete?
+			executed_count == executable_count
+		end
 		
-		expect(io.string).to include("RSpec.describe Covered::Report do")
+		def percentage
+			ratio * 100
+		end
 	end
 	
-	it "can generate partial summary" do
-		files.mark(__FILE__, 45)
-		files.paths[__FILE__][46] = 0
+	class Coverage
+		def initialize(path, counts = [])
+			@path = path
+			@counts = counts
+			
+			@executable_lines = nil
+			@executed_lines = nil
+		end
 		
-		report.print_partial_summary(io)
+		attr :path
+		attr :counts
 		
-		expect(io.string).to_not include(first_line)
-		expect(io.string).to include("What are some of the best recursion jokes?")
+		def freeze
+			return if frozen?
+			
+			@counts.freeze
+			executable_lines
+			executed_lines
+			
+			super
+		end
+		
+		def [] lineno
+			@counts[lineno]
+		end
+		
+		def mark(lineno, value = 1)
+			if @counts[lineno]
+				@counts[lineno] += value
+			else
+				@counts[lineno] = value
+			end
+		end
+		
+		def executable_lines
+			@executable_lines ||= @counts.compact
+		end
+		
+		def executable_count
+			executable_lines.count
+		end
+		
+		def executed_lines
+			@executed_lines ||= executable_lines.reject(&:zero?)
+		end
+		
+		def executed_count
+			executed_lines.count
+		end
+		
+		include Ratio
+		
+		def print_summary(output)
+			output.puts "** #{executed_count}/#{executable_count} lines executed; #{percentage.to_f.round(2)}% covered."
+		end
 	end
 end

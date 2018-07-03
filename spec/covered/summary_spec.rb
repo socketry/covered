@@ -18,34 +18,32 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'covered/source'
 require 'covered/summary'
+require 'covered/files'
 
-require 'trenni/template'
-
-RSpec.describe Covered::Source do
-	let(:template_path) {File.expand_path("template.trenni", __dir__)}
-	let(:template) {Trenni::Template.load_file(template_path)}
-	
+RSpec.describe Covered::Summary do
 	let(:files) {Covered::Files.new}
-	let(:only) {Covered::Only.new(template_path, files)}
-	let(:source) {Covered::Source.new(files)}
-	let(:capture) {Covered::Capture.new(source)}
+	let(:summary) {Covered::Summary.new(files)}
 	
-	let(:summary) {Covered::Summary.new(source)}
+	let(:first_line) {File.readlines(__FILE__).first}
+	let(:io) {StringIO.new}
 	
-	it "correctly generates coverage for template" do
-		capture.enable
-		template.to_string
-		capture.disable
+	it "can generate source code listing" do
+		files.mark(__FILE__, 24)
+		files.mark(__FILE__, 25, 0)
 		
-		io = StringIO.new
 		summary.print_summary(io)
 		
-		expect(io.string).to include("2/3 lines executed; 66.67% covered")
+		expect(io.string).to include("RSpec.describe Covered::Summary do")
 	end
 	
-	it "can't parse non-existant path" do
-		expect(source.parse("do_not_exist")).to be_nil
+	it "can generate partial summary" do
+		files.mark(__FILE__, 45)
+		files.mark(__FILE__, 46, 0)
+		
+		summary.print_partial_summary(io)
+		
+		expect(io.string).to_not include(first_line)
+		expect(io.string).to include("What are some of the best recursion jokes?")
 	end
 end

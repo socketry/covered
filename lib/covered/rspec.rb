@@ -18,8 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'pry'
 require_relative '../covered'
+require 'rspec/core/formatters'
 
 $covered = Covered.policy do
 	root Dir.pwd
@@ -29,15 +29,30 @@ $covered = Covered.policy do
 	source
 end
 
+module Covered
+	module RSpec
+		class Formatter
+			::RSpec::Core::Formatters.register self, :dump_summary
+			
+			def initialize(output)
+				@output = output
+			end
+			
+			def dump_summary notification
+				$covered.print_summary(@output)
+			end
+		end
+	end
+end
+
 RSpec.configure do |config|
+	config.add_formatter(Covered::RSpec::Formatter)
+	
 	config.before(:suite) do
 		$covered.enable
 	end
 	
-	config.after(:suite) do |context|
+	config.after(:suite) do
 		$covered.disable
-		
-		statistics = $covered.print_summary
-		expect(statistics).to be_complete
 	end
 end

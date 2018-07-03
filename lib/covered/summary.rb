@@ -24,21 +24,37 @@ require_relative 'wrapper'
 require 'rainbow'
 
 module Covered
-	class Report < Wrapper
+	class Summary < Wrapper
+		def initialize(output, soft: 1.0, hard: 0.9)
+			super(output)
+			
+			@statistics = nil
+			
+			@soft = soft
+			@hard = hard
+		end
+		
+		def each
+			@statistics = Statistics.new
+			
+			super do |coverage|
+				@statistics << coverage
+				
+				if coverage.ratio < @soft
+					yield coverage
+				end
+			end
+		end
+		
 		# A coverage array gives, for each line, the number of line execution by the interpreter. A nil value means coverage is disabled for this line (lines like else and end).
 		def print_summary(output = $stdout)
-			statistics = Statistics.new
-			
-			@output.each do |path, counts|
-				coverage = Coverage.new(path, counts)
-				statistics << coverage
-				
-				next if coverage.complete?
-				
+			self.each do |coverage|
 				line_offset = 1
-				output.puts Rainbow(path).bold.underline
+				output.puts "", Rainbow(coverage.path).bold.underline
 				
-				File.open(path, "r") do |file|
+				counts = coverage.counts
+				
+				File.open(coverage.path, "r") do |file|
 					file.each_line do |line|
 						count = counts[line_offset]
 						
@@ -65,40 +81,35 @@ module Covered
 				coverage.print_summary(output)
 			end
 			
-			statistics.print_summary(output)
-			
-			return statistics
+			@statistics.print_summary(output)
 		end
 		
 		def print_partial_summary(output = $stdout, before: 4, after: 4)
 			statistics = Statistics.new
 			
-			@output.each do |path, counts|
-				coverage = Coverage.new(path, counts)
-				statistics << coverage
-				
-				next if coverage.complete?
-				
+			self.each do |coverage|
 				line_offset = 1
-				output.puts Rainbow(path).bold.underline
+				output.puts "", Rainbow(coverage.path).bold.underline
 				
-				printing = false
+				counts = coverage.counts
 				
-				File.open(path, "r") do |file|
+				File.open(coverage.path, "r") do |file|
 					file.each_line do |line|
 						range = Range.new([line_offset - before, 0].max, line_offset+after)
 						
 						if counts[range]&.include?(0)
 							count = counts[line_offset]
 							
-							output.write("#{line_offset}|".rjust(8))
-							output.write("#{count}:".rjust(8))
+							prefix = "#{line_offset} ".rjust(8) + "#{count} ".rjust(8)
 							
 							if count == nil
+								output.write prefix
 								output.write Rainbow(line).faint
 							elsif count == 0
+								output.write Rainbow(prefix).background(:darkred)
 								output.write Rainbow(line).red
 							else
+								output.write Rainbow(prefix).background(:darkgreen)
 								output.write Rainbow(line).green
 							end
 							
@@ -115,9 +126,8 @@ module Covered
 				coverage.print_summary(output)
 			end
 			
-			statistics.print_summary(output)
-			
-			return statistics
+			output.puts
+			@statistics.print_summary(output)
 		end
 	end
 end

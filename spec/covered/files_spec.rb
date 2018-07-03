@@ -37,10 +37,10 @@ RSpec.describe Covered::Files do
 	
 	context '#each' do
 		it "enumerates all paths" do
-			subject.mark("program.rb", 2)
+			coverage = subject.mark("program.rb", 2)
 			
 			enumerator = subject.each
-			expect(enumerator.next).to be == ["program.rb", [nil, nil, 1]]
+			expect(enumerator.next).to be coverage
 		end
 	end
 end
@@ -65,7 +65,7 @@ RSpec.describe Covered::Include do
 	it "should defer to existing files" do
 		files.mark(path, 5)
 		
-		paths = subject.to_enum(:each).to_h
+		paths = subject.collect{|coverage| [coverage.path, coverage.counts]}.to_h
 		
 		expect(paths).to include(path)
 		expect(paths[path]).to be == [nil, nil, nil, nil, nil, 1]
@@ -74,8 +74,7 @@ RSpec.describe Covered::Include do
 	it "should enumerate paths" do
 		enumerator = subject.to_enum(:each)
 		
-		path, counts = enumerator.next
-		expect(counts).to be == []
+		expect(enumerator.next).to be_kind_of Covered::Coverage
 	end
 end
 
@@ -89,13 +88,11 @@ RSpec.describe Covered::Skip do
 		expect(files).to be_empty
 	end
 	
-	let(:paths) {subject.to_enum(:each).to_h}
-	
 	it "should include files which don't match given pattern" do
 		subject.mark("foo.rb", 1)
 		
 		expect(files).to_not be_empty
-		expect(paths).to include("foo.rb")
+		expect(subject.to_h).to include("foo.rb")
 	end
 end
 

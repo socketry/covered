@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+require_relative 'coverage'
+
 require 'set'
 
 module Covered
@@ -34,18 +36,20 @@ module Covered
 			@paths.empty?
 		end
 		
-		def mark(path, lineno)
-			file = @paths[path] ||= []
+		def mark(path, *args)
+			coverage = (@paths[path] ||= Coverage.new(path))
 			
-			if file[lineno]
-				file[lineno] += 1
-			else
-				file[lineno] = 1
-			end
+			coverage.mark(*args)
+			
+			return coverage
 		end
 		
-		def each(&block)
-			@paths.each(&block)
+		def each
+			return to_enum unless block_given?
+			
+			@paths.each do |path, coverage|
+				yield coverage
+			end
 		end
 	end
 	
@@ -73,14 +77,14 @@ module Covered
 		def each(&block)
 			paths = glob
 			
-			super do |path, lines|
-				paths.delete(path)
+			super do |coverage|
+				paths.delete(coverage.path)
 				
-				yield path, lines
+				yield coverage
 			end
 			
 			paths.each do |path|
-				yield path, []
+				yield Coverage.new(path)
 			end
 		end
 	end
@@ -90,13 +94,13 @@ module Covered
 			true
 		end
 		
-		def mark(path, lineno)
+		def mark(path, *args)
 			super if accept?(path)
 		end
 		
 		def each(&block)
-			super do |path, counts|
-				yield path, counts if accept?(path)
+			super do |coverage|
+				yield coverage if accept?(coverage.path)
 			end
 		end
 	end
