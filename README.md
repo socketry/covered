@@ -1,4 +1,4 @@
-# Covered [![Build Status](https://travis-ci.com/ioquatix/covered.svg)](hhttps://travis-ci.com/ioquatix/covered)
+# Covered [![Build Status](https://travis-ci.com/ioquatix/covered.svg)](https://travis-ci.com/ioquatix/covered)
 
 Covered uses modern Ruby features to generate comprehensive coverage, including support for templates which are compiled into Ruby. **This only works with Ruby 2.6 and it's experimental support for RubyVM::AST**
 
