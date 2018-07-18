@@ -6,7 +6,7 @@ Covered uses modern Ruby features to generate comprehensive coverage, including 
 
 ## Motivation
 
-Existing Ruby coverage tools are unable to handle `eval`ed code. This is because the `coverage` module built into Ruby doesn't expose the necessary hooks to capture it. With Ruby 2.6, `RubyVM::AST.parse(source)` came in to existence, which gives us a fine grained tool for computing initial source coverage (i.e. what lines are executable), and thus making it possible to compute coverage for "templates".
+Existing Ruby coverage tools are unable to handle `eval`ed code. This is because the `coverage` module built into Ruby doesn't expose the necessary hooks to capture it. With Ruby 2.6, `RubyVM::AST.parse(source)` came into existence, which gives us a fine grained tool for computing initial source coverage (i.e. what lines are executable), and thus making it possible to compute coverage for "templates".
 
 It's still tricky to do it correctly, but it is feasible now to compute coverage of web application "views" by using this technique. This gem is an exploration to see what is possible.
 
