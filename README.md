@@ -1,6 +1,6 @@
 # Covered [![Build Status](https://travis-ci.com/ioquatix/covered.svg)](https://travis-ci.com/ioquatix/covered)
 
-Covered uses modern Ruby features to generate comprehensive coverage, including support for templates which are compiled into Ruby. **This only works with Ruby 2.6 and its experimental support for RubyVM::AST**
+Covered uses modern Ruby features to generate comprehensive coverage, including support for templates which are compiled into Ruby. **This only works with Ruby 2.6 and its experimental support for RubyVM::AbstractSyntaxTree**
 
 ![Screenshot](media/example.png)
 
