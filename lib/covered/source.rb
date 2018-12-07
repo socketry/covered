@@ -62,7 +62,6 @@ module Covered
 		def intercept_eval(string, binding = nil, filename = nil, lineno = 1)
 			return unless filename
 			
-			# TODO replace with Concurrent::Map
 			@mutex.synchronize do
 				@paths[filename] = string
 			end
@@ -77,18 +76,18 @@ module Covered
 			node.nil? or node.type.to_s =~ @ignore
 		end
 		
-		def expand(node, counts)
+		def expand(node, counts, level = 0)
 			# puts "#{node.first_lineno}: #{node.inspect}"
 			
 			counts[node.first_lineno] ||= 0 if executable?(node)
 			
-			# puts "#{node.inspect} #{node.to_s} -> #{node.children.inspect}"
+			# puts "#{"\t"*level}#{node.type} (#{node.first_lineno})"
 			node.children.each do |child|
 				next unless child.is_a? RubyVM::AbstractSyntaxTree::Node
 				
 				next if ignore?(child)
 				
-				expand(child, counts)
+				expand(child, counts, level + 1)
 			end
 		end
 		

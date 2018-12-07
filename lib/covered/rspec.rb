@@ -22,8 +22,13 @@ require_relative '../covered'
 require 'rspec/core/formatters'
 
 $covered = Covered.policy do
+	# Only files in the root would be tracked:
 	root Dir.pwd
 	
+	# We will ignore any files in the spec directory:
+	skip /spec/
+	
+	# We will include all files under lib, even if they aren't loaded:
 	include "lib/**/*.rb"
 	
 	source
@@ -49,10 +54,11 @@ RSpec.configure do |config|
 	config.add_formatter(Covered::RSpec::Formatter)
 	
 	config.before(:suite) do
-		$covered.enable
 	end
 	
 	config.after(:suite) do
 		$covered.disable
 	end
 end
+
+$covered.enable
