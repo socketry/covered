@@ -26,14 +26,14 @@ require 'thread'
 module Covered
 	# The source map, loads the source file, parses the AST to generate which lines contain executable code.
 	class Source < Wrapper
-		EXECUTABLE = /NODE_(.?CALL|.VAR|.ASGN|DEFN)/.freeze
+		EXECUTABLE = /(.?CALL|.VAR|.ASGN|DEFN)/.freeze
 		
 		# Deviate from the standard policy above, because all the files are already loaded, so we skip NODE_FCALL.
-		DOGFOOD = /NODE_([V]?CALL|.VAR|.ASGN|DEFN)/.freeze
+		DOGFOOD = /([V]?CALL|.VAR|.ASGN|DEFN)/.freeze
 		
 		# Ruby trace points don't trigger for argument execution.
 		# Constants are loaded when the file loads, so they are less interesting.
-		IGNORE = /NODE_(ARGS|CDECL)/.freeze
+		IGNORE = /(ARGS|CDECL)/.freeze
 		
 		def initialize(output, executable: EXECUTABLE, ignore: IGNORE)
 			super(output)
@@ -69,21 +69,24 @@ module Covered
 		end
 		
 		def executable?(node)
-			node.type =~ @executable
+			node.type.to_s =~ @executable
 		end
 		
 		def ignore?(node)
 			# NODE_ARGS Ruby doesn't report execution of arguments in :line tracepoint.
-			node.type =~ @ignore
+			node.nil? or node.type.to_s =~ @ignore
 		end
 		
 		def expand(node, counts)
-			# puts "#{node.first_lineno}: #{node.inspect}"
+			puts "#{node.first_lineno}: #{node.inspect}"
 			
 			counts[node.first_lineno] ||= 0 if executable?(node)
 			
+			# puts "#{node.inspect} #{node.to_s} -> #{node.children.inspect}"
 			node.children.each do |child|
-				next if child.nil? or ignore?(child)
+				next unless child.is_a? RubyVM::AbstractSyntaxTree::Node
+				
+				next if ignore?(child)
 				
 				expand(child, counts)
 			end
@@ -93,9 +96,9 @@ module Covered
 			# puts "Parse #{path}"
 			
 			if source = @paths[path]
-				RubyVM::AST.parse(source)
+				RubyVM::AbstractSyntaxTree.parse(source)
 			elsif File.exist?(path)
-				RubyVM::AST.parse_file(path)
+				RubyVM::AbstractSyntaxTree.parse_file(path)
 			else
 				warn "Couldn't parse #{path}, file doesn't exist?"
 			end
