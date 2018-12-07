@@ -78,7 +78,7 @@ module Covered
 		end
 		
 		def expand(node, counts)
-			puts "#{node.first_lineno}: #{node.inspect}"
+			# puts "#{node.first_lineno}: #{node.inspect}"
 			
 			counts[node.first_lineno] ||= 0 if executable?(node)
 			
