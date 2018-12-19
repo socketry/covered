@@ -29,7 +29,7 @@ module Covered
 		EXECUTABLE = /(.?CALL|.VAR|.ASGN|DEFN)/.freeze
 		
 		# Deviate from the standard policy above, because all the files are already loaded, so we skip NODE_FCALL.
-		DOGFOOD = /([V]?CALL|.VAR|.ASGN|DEFN)/.freeze
+		DOGFOOD = /(^V?CALL|.VAR|.ASGN|DEFN)/.freeze
 		
 		# Ruby trace points don't trigger for argument execution.
 		# Constants are loaded when the file loads, so they are less interesting.
@@ -43,6 +43,8 @@ module Covered
 			
 			@executable = executable
 			@ignore = ignore
+			
+			@annotations = {}
 		end
 		
 		def enable
@@ -76,24 +78,30 @@ module Covered
 			node.nil? or node.type.to_s =~ @ignore
 		end
 		
-		def expand(node, counts, level = 0)
-			# puts "#{node.first_lineno}: #{node.inspect}"
-			
-			counts[node.first_lineno] ||= 0 if executable?(node)
-			
-			# puts "#{"\t"*level}#{node.type} (#{node.first_lineno})"
-			node.children.each do |child|
-				next unless child.is_a? RubyVM::AbstractSyntaxTree::Node
-				
-				next if ignore?(child)
-				
-				expand(child, counts, level + 1)
+		def expand(node, coverage, level = 0)
+			if node.is_a? RubyVM::AbstractSyntaxTree::Node
+				if ignore?(node)
+					coverage.annotate(node.first_lineno, "ignoring #{node.type}")
+				else
+					if executable?(node)
+						# coverage.annotate(node.first_lineno, "executable #{node.type}")
+						coverage.counts[node.first_lineno] ||= 0
+					else
+						# coverage.annotate(node.first_lineno, "not executable #{node.type}")
+					end
+					
+					expand(node.children, coverage, level + 1)
+				end
+			elsif node.is_a? Array
+				node.each do |child|
+					expand(child, coverage, level)
+				end
+			else
+				return false
 			end
 		end
 		
 		def parse(path)
-			# puts "Parse #{path}"
-			
 			if source = @paths[path]
 				RubyVM::AbstractSyntaxTree.parse(source)
 			elsif File.exist?(path)
@@ -107,7 +115,7 @@ module Covered
 			@output.each do |coverage|
 				# This is a little bit inefficient, perhaps add a cache layer?
 				if top = parse(coverage.path)
-					expand(top, coverage.counts)
+					self.expand(top, coverage)
 				end
 				
 				yield coverage.freeze
