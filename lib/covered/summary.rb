@@ -48,7 +48,7 @@ module Covered
 		def print_annotations(output, coverage, line, line_offset)
 			if annotations = coverage.annotations[line_offset]
 				output.write("#{line_offset}|".rjust(8))
-				output.write("*:".rjust(8))
+				output.write("*|".rjust(8))
 				
 				output.write line.match(/^\s+/)
 				output.write '# '
@@ -72,7 +72,7 @@ module Covered
 						print_annotations(output, coverage, line, line_offset)
 						
 						output.write("#{line_offset}|".rjust(8))
-						output.write("#{count}:".rjust(8))
+						output.write("#{count}|".rjust(8))
 						
 						if count == nil
 							output.write Rainbow(line).faint
@@ -114,16 +114,15 @@ module Covered
 						range = Range.new([line_offset - before, 0].max, line_offset+after)
 						
 						if counts[range]&.include?(0)
-							last_line ||= line_offset
 							count = counts[line_offset]
 							
-							if last_line < line_offset-1
-								output.puts "⋮".rjust(16)
+							if last_line and last_line != line_offset-1
+								output.puts ":".rjust(16)
 							end
 							
 							print_annotations(output, coverage, line, line_offset)
 							
-							prefix = "#{line_offset} ".rjust(8) + "#{count} ".rjust(8)
+							prefix = "#{line_offset}|".rjust(8) + "#{count}|".rjust(8)
 							
 							if count == nil
 								output.write prefix
@@ -140,6 +139,8 @@ module Covered
 							unless line.end_with? $/
 								output.puts
 							end
+							
+							last_line = line_offset
 						end
 						
 						line_offset += 1
