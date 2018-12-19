@@ -54,11 +54,10 @@ RSpec.configure do |config|
 	config.add_formatter(Covered::RSpec::Formatter)
 	
 	config.before(:suite) do
+		$covered.enable
 	end
 	
 	config.after(:suite) do
 		$covered.disable
 	end
 end
-
-$covered.enable
