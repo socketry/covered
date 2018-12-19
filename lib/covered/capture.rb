@@ -20,19 +20,19 @@
 
 require_relative 'wrapper'
 
+require 'coverage'
+
 module Covered
 	class Capture < Wrapper
 		def initialize(output)
 			super(output)
 			
-			@trace = TracePoint.new(:line, :call) do |trace_point|
-				if path = trace_point.path
-					@output.mark(path, trace_point.lineno)
+			@trace = TracePoint.new(:line, :call) do |event|
+				if path = event.path
+					@output.mark(path, event.lineno)
 				end
 			end
 		end
-		
-		attr :paths
 		
 		def enable
 			super
@@ -46,4 +46,55 @@ module Covered
 			super
 		end
 	end
+	
+	class Cache < Wrapper
+		def initialize(output)
+			super(output)
+			@marks = []
+		end
+		
+		def mark(path, lineno, count = 1)
+			@marks << path << lineno << count
+		end
+		
+		def enable
+			super
+		end
+		
+		def flush
+			@marks.each_slice(3) do |path, lineno, count|
+				@output.mark(path, lineno, count)
+			end
+			
+			@marks.clear
+		end
+		
+		def disable
+			super
+			
+			flush
+		end
+	end
+	
+	# class Capture < Wrapper
+	# 	def enable
+	# 		super
+	# 
+	# 		::Coverage.start
+	# 	end
+	# 
+	# 	def disable
+	# 		result = ::Coverage.result
+	# 
+	# 		puts result.inspect
+	# 
+	# 		result.each do |path, lines|
+	# 			lines.each_with_index do |lineno, count|
+	# 				@output.mark(path, lineno, count)
+	# 			end
+	# 		end
+	# 
+	# 		super
+	# 	end
+	# end
 end
