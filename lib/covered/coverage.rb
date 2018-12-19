@@ -39,6 +39,7 @@ module Covered
 		def initialize(path, counts = [])
 			@path = path
 			@counts = counts
+			@total = 0
 			
 			@annotations = {}
 			
@@ -48,6 +49,7 @@ module Covered
 		
 		attr :path
 		attr :counts
+		attr :total
 		
 		attr :annotations
 		
@@ -63,6 +65,10 @@ module Covered
 			super
 		end
 		
+		def zero?
+			@total.zero?
+		end
+		
 		def [] lineno
 			@counts[lineno]
 		end
@@ -73,6 +79,8 @@ module Covered
 		end
 		
 		def mark(lineno, value = 1)
+			@total += value
+			
 			if @counts[lineno]
 				@counts[lineno] += value
 			else
@@ -94,6 +102,10 @@ module Covered
 		
 		def executed_count
 			executed_lines.count
+		end
+		
+		def missing_count
+			executable_count - executed_count
 		end
 		
 		include Ratio
