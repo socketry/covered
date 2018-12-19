@@ -37,13 +37,19 @@ module Covered
 	class Policy < Wrapper
 		def initialize
 			super(Files.new)
+			
+			@threshold = 1.0
+			@summary_class = PartialSummary
 		end
+		
+		attr_accessor :summary_class
+		attr_accessor :threshold
 		
 		def freeze
 			return if frozen?
 			
 			capture
-			summary
+			summary(threshold: @threshold)
 			
 			super
 		end
@@ -69,7 +75,7 @@ module Covered
 		end
 		
 		def capture
-			@capture ||= Capture.new(@output)
+			@capture ||= Capture.new(Cache.new(@output))
 		end
 		
 		def enable
@@ -81,11 +87,11 @@ module Covered
 		end
 		
 		def summary(*args)
-			@summary ||= Summary.new(@output, *args)
+			@summary ||= @summary_class.new(@output, *args)
 		end
 		
 		def print_summary(*args)
-			summary.print_partial_summary(*args)
+			summary.print_summary(*args)
 		end
 	end
 end
