@@ -40,6 +40,8 @@ module Covered
 			@path = path
 			@counts = counts
 			
+			@annotations = {}
+			
 			@executable_lines = nil
 			@executed_lines = nil
 		end
@@ -47,10 +49,14 @@ module Covered
 		attr :path
 		attr :counts
 		
+		attr :annotations
+		
 		def freeze
 			return if frozen?
 			
 			@counts.freeze
+			@annotations.freeze
+			
 			executable_lines
 			executed_lines
 			
@@ -59,6 +65,11 @@ module Covered
 		
 		def [] lineno
 			@counts[lineno]
+		end
+		
+		def annotate(lineno, annotation)
+			@annotations[lineno] ||= []
+			@annotations[lineno] << annotation
 		end
 		
 		def mark(lineno, value = 1)
