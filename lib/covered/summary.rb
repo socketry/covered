@@ -39,7 +39,7 @@ module Covered
 			super do |coverage|
 				@statistics << coverage
 				
-				if @theadhold.nil? or coverage.ratio < @threshold
+				if @theshold.nil? or coverage.ratio < @threshold
 					yield coverage
 				end
 			end
