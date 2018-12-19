@@ -36,14 +36,4 @@ RSpec.describe Covered::Summary do
 		
 		expect(io.string).to include("RSpec.describe Covered::Summary do")
 	end
-	
-	it "can generate partial summary" do
-		files.mark(__FILE__, 45)
-		files.mark(__FILE__, 46, 0)
-		
-		summary.print_partial_summary(io)
-		
-		expect(io.string).to_not include(first_line)
-		expect(io.string).to include("What are some of the best recursion jokes?")
-	end
 end

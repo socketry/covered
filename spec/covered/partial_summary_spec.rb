@@ -18,32 +18,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require "bundler/setup"
-require "covered/rspec"
+require 'covered/summary'
+require 'covered/files'
 
-$covered = Covered.policy do
-	root Dir.pwd
+RSpec.describe Covered::PartialSummary do
+	let(:files) {Covered::Files.new}
+	let(:summary) {Covered::PartialSummary.new(files)}
 	
-	include "lib/**/*.rb"
+	let(:first_line) {File.readlines(__FILE__).first}
+	let(:io) {StringIO.new}
 	
-	skip /spec|capture.rb|eval.rb|rspec.rb/
-	
-	# This needs to be added last, otherwise it won't be exposed to te additional files of the above `include` directive.
-	source executable: Covered::Source::DOGFOOD
-	
-	# Print out all summaries.
-	self.threshold = nil
-	self.summary_class = Covered::Summary
-end
-
-RSpec.configure do |config|
-	# Enable flags like --only-failures and --next-failure
-	config.example_status_persistence_file_path = ".rspec_status"
-
-	# Disable RSpec exposing methods globally on `Module` and `main`
-	config.disable_monkey_patching!
-
-	config.expect_with :rspec do |c|
-		c.syntax = :expect
+	it "can generate partial summary" do
+		files.mark(__FILE__, 37)
+		files.mark(__FILE__, 38, 0)
+		
+		summary.print_summary(io)
+		
+		expect(io.string).to_not include(first_line)
+		expect(io.string).to include("What are some of the best recursion jokes?")
 	end
 end

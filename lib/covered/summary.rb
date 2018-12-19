@@ -39,9 +39,21 @@ module Covered
 			super do |coverage|
 				@statistics << coverage
 				
-				if coverage.ratio < @threshold
+				if @theadhold.nil? or coverage.ratio < @threshold
 					yield coverage
 				end
+			end
+		end
+		
+		def print_annotations(output, coverage, line, line_offset)
+			if annotations = coverage.annotations[line_offset]
+				output.write("#{line_offset}|".rjust(8))
+				output.write("*:".rjust(8))
+				
+				output.write line.match(/^\s+/)
+				output.write '# '
+				
+				output.puts Rainbow(annotations.join(", ")).bright
 			end
 		end
 		
@@ -56,6 +68,8 @@ module Covered
 				File.open(coverage.path, "r") do |file|
 					file.each_line do |line|
 						count = counts[line_offset]
+						
+						print_annotations(output, coverage, line, line_offset)
 						
 						output.write("#{line_offset}|".rjust(8))
 						output.write("#{count}:".rjust(8))
@@ -82,8 +96,10 @@ module Covered
 			
 			@statistics.print_summary(output)
 		end
-		
-		def print_partial_summary(output = $stdout, before: 4, after: 4)
+	end
+	
+	class PartialSummary < Summary
+		def print_summary(output = $stdout, before: 4, after: 4)
 			statistics = Statistics.new
 			
 			self.each do |coverage|
@@ -91,13 +107,21 @@ module Covered
 				output.puts "", Rainbow(coverage.path).bold.underline
 				
 				counts = coverage.counts
+				last_line = nil
 				
 				File.open(coverage.path, "r") do |file|
 					file.each_line do |line|
 						range = Range.new([line_offset - before, 0].max, line_offset+after)
 						
 						if counts[range]&.include?(0)
+							last_line ||= line_offset
 							count = counts[line_offset]
+							
+							if last_line < line_offset-1
+								output.puts "⋮".rjust(16)
+							end
+							
+							print_annotations(output, coverage, line, line_offset)
 							
 							prefix = "#{line_offset} ".rjust(8) + "#{count} ".rjust(8)
 							
