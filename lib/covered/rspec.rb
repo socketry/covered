@@ -32,6 +32,12 @@ $covered = Covered.policy do
 	include "lib/**/*.rb"
 	
 	source
+	
+	if coverage = ENV['COVERAGE']
+		self.summary_class = Covered.const_get(coverage)
+	else
+		self.summary_class = Covered::BriefSummary
+	end
 end
 
 module Covered

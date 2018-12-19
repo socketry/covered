@@ -32,8 +32,8 @@ $covered = Covered.policy do
 	source executable: Covered::Source::DOGFOOD
 	
 	# Print out all summaries.
-	self.threshold = nil
-	self.summary_class = Covered::Summary
+	# self.threshold = nil
+	# self.summary_class = Covered::Summary
 end
 
 RSpec.configure do |config|

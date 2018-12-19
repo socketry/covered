@@ -28,21 +28,21 @@ module Covered
 		def initialize(output, threshold: 1.0)
 			super(output)
 			
-			@statistics = nil
-			
 			@threshold = threshold
 		end
 		
 		def each
-			@statistics = Statistics.new
+			statistics = Statistics.new
 			
 			super do |coverage|
-				@statistics << coverage
+				statistics << coverage
 				
-				if @theshold.nil? or coverage.ratio < @threshold
+				if @threshold.nil? or coverage.ratio < @threshold
 					yield coverage
 				end
 			end
+			
+			return statistics
 		end
 		
 		def print_annotations(output, coverage, line, line_offset)
@@ -59,7 +59,7 @@ module Covered
 		
 		# A coverage array gives, for each line, the number of line execution by the interpreter. A nil value means coverage is disabled for this line (lines like else and end).
 		def print_summary(output = $stdout)
-			self.each do |coverage|
+			statistics = self.each do |coverage|
 				line_offset = 1
 				output.puts "", Rainbow(coverage.path).bold.underline
 				
@@ -94,56 +94,79 @@ module Covered
 				coverage.print_summary(output)
 			end
 			
-			@statistics.print_summary(output)
+			statistics.print_summary(output)
+		end
+	end
+	
+	class BriefSummary < Summary
+		def print_summary(output = $stdout, before: 4, after: 4)
+			ordered = []
+			
+			statistics = self.each do |coverage|
+				ordered << coverage unless coverage.complete?
+			end
+			
+			output.puts
+			statistics.print_summary(output)
+			
+			if ordered.any?
+				output.puts "", "Least Coverage:"
+				ordered.sort_by!(&:missing_count).reverse!
+				
+				ordered.first(5).each do |coverage|
+					output.write Rainbow(coverage.path).orange
+					output.puts ": #{coverage.missing_count} lines not executed!"
+				end
+			end
 		end
 	end
 	
 	class PartialSummary < Summary
 		def print_summary(output = $stdout, before: 4, after: 4)
-			statistics = Statistics.new
-			
-			self.each do |coverage|
+			statistics = self.each do |coverage|
 				line_offset = 1
 				output.puts "", Rainbow(coverage.path).bold.underline
 				
 				counts = coverage.counts
 				last_line = nil
 				
-				File.open(coverage.path, "r") do |file|
-					file.each_line do |line|
-						range = Range.new([line_offset - before, 0].max, line_offset+after)
-						
-						if counts[range]&.include?(0)
-							count = counts[line_offset]
+				unless coverage.zero?
+					File.open(coverage.path, "r") do |file|
+						file.each_line do |line|
+							range = Range.new([line_offset - before, 0].max, line_offset+after)
 							
-							if last_line and last_line != line_offset-1
-								output.puts ":".rjust(16)
+							if counts[range]&.include?(0)
+								count = counts[line_offset]
+								
+								if last_line and last_line != line_offset-1
+									output.puts ":".rjust(16)
+								end
+								
+								print_annotations(output, coverage, line, line_offset)
+								
+								prefix = "#{line_offset}|".rjust(8) + "#{count}|".rjust(8)
+								
+								if count == nil
+									output.write prefix
+									output.write Rainbow(line).faint
+								elsif count == 0
+									output.write Rainbow(prefix).background(:darkred)
+									output.write Rainbow(line).red
+								else
+									output.write Rainbow(prefix).background(:darkgreen)
+									output.write Rainbow(line).green
+								end
+								
+								# If there was no newline at end of file, we add one:
+								unless line.end_with? $/
+									output.puts
+								end
+								
+								last_line = line_offset
 							end
 							
-							print_annotations(output, coverage, line, line_offset)
-							
-							prefix = "#{line_offset}|".rjust(8) + "#{count}|".rjust(8)
-							
-							if count == nil
-								output.write prefix
-								output.write Rainbow(line).faint
-							elsif count == 0
-								output.write Rainbow(prefix).background(:darkred)
-								output.write Rainbow(line).red
-							else
-								output.write Rainbow(prefix).background(:darkgreen)
-								output.write Rainbow(line).green
-							end
-							
-							# If there was no newline at end of file, we add one:
-							unless line.end_with? $/
-								output.puts
-							end
-							
-							last_line = line_offset
+							line_offset += 1
 						end
-						
-						line_offset += 1
 					end
 				end
 				
@@ -151,7 +174,7 @@ module Covered
 			end
 			
 			output.puts
-			@statistics.print_summary(output)
+			statistics.print_summary(output)
 		end
 	end
 end
