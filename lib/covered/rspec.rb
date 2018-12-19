@@ -47,15 +47,29 @@ module Covered
 				$covered.print_summary(@output)
 			end
 		end
+		
+		module Policy
+			def load_spec_files
+				$covered.enable
+				
+				super
+			end
+			
+			def covered
+				$covered
+			end
+			
+			def covered= policy
+				$covered = policy
+			end
+		end
 	end
 end
 
+RSpec::Core::Configuration.prepend(Covered::RSpec::Policy)
+
 RSpec.configure do |config|
 	config.add_formatter(Covered::RSpec::Formatter)
-	
-	config.before(:suite) do
-		$covered.enable
-	end
 	
 	config.after(:suite) do
 		$covered.disable
