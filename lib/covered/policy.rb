@@ -74,8 +74,12 @@ module Covered
 			@output = Root.new(@output, *args)
 		end
 		
+		def cache!
+			@output = Cache.new(@output)
+		end
+		
 		def capture
-			@capture ||= Capture.new(Cache.new(@output))
+			@capture ||= Capture.new(@output)
 		end
 		
 		def enable

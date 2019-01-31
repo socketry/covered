@@ -22,6 +22,8 @@ require_relative '../covered'
 require 'rspec/core/formatters'
 
 $covered = Covered.policy do
+	cache!
+	
 	# Only files in the root would be tracked:
 	root Dir.pwd
 	
@@ -34,9 +36,7 @@ $covered = Covered.policy do
 	source
 	
 	if coverage = ENV['COVERAGE']
-		self.summary_class = Covered.const_get(coverage)
-	else
-		self.summary_class = Covered::BriefSummary
+		self.summary_class = Covered.const_get(coverage) || Covered::BriefSummary
 	end
 end
 
@@ -72,12 +72,14 @@ module Covered
 	end
 end
 
-RSpec::Core::Configuration.prepend(Covered::RSpec::Policy)
+if ENV['COVERAGE']
+	RSpec::Core::Configuration.prepend(Covered::RSpec::Policy)
 
-RSpec.configure do |config|
-	config.add_formatter(Covered::RSpec::Formatter)
-	
-	config.after(:suite) do
-		$covered.disable
+	RSpec.configure do |config|
+		config.add_formatter(Covered::RSpec::Formatter)
+		
+		config.after(:suite) do
+			$covered.disable
+		end
 	end
 end
