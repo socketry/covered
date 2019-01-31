@@ -23,6 +23,8 @@ require_relative 'wrapper'
 
 require 'thread'
 
+require 'parser/current'
+
 module Covered
 	# The source map, loads the source file, parses the AST to generate which lines contain executable code.
 	class Source < Wrapper
@@ -70,22 +72,21 @@ module Covered
 		end
 		
 		def executable?(node)
-			node.type.to_s =~ @executable
+			node.type == :send
 		end
 		
 		def ignore?(node)
-			# NODE_ARGS Ruby doesn't report execution of arguments in :line tracepoint.
-			node.nil? or node.type.to_s =~ @ignore
+			node.nil?
 		end
 		
 		def expand(node, coverage, level = 0)
-			if node.is_a? RubyVM::AbstractSyntaxTree::Node
+			if node.is_a? Parser::AST::Node
 				if ignore?(node)
-					coverage.annotate(node.first_lineno, "ignoring #{node.type}")
+					coverage.annotate(node.location.line, "ignoring #{node.type}")
 				else
 					if executable?(node)
 						# coverage.annotate(node.first_lineno, "executable #{node.type}")
-						coverage.counts[node.first_lineno] ||= 0
+						coverage.counts[node.location.line] ||= 0
 					else
 						# coverage.annotate(node.first_lineno, "not executable #{node.type}")
 					end
@@ -103,9 +104,9 @@ module Covered
 		
 		def parse(path)
 			if source = @paths[path]
-				RubyVM::AbstractSyntaxTree.parse(source)
+				Parser::CurrentRuby.parse(source)
 			elsif File.exist?(path)
-				RubyVM::AbstractSyntaxTree.parse_file(path)
+				Parser::CurrentRuby.parse_file(path)
 			else
 				warn "Couldn't parse #{path}, file doesn't exist?"
 			end
