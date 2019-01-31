@@ -76,7 +76,7 @@ module Covered
 		end
 		
 		def ignore?(node)
-			node.nil?
+			node.nil? or node.type == :arg
 		end
 		
 		def expand(node, coverage, level = 0)
