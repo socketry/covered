@@ -17,16 +17,15 @@ It's still tricky to do it correctly, but it is feasible now to compute coverage
 Add this line to your application's `Gemfile`:
 
 ```ruby
-group :test do
-	gem 'covered', require: 'covered/rspec'
-end
+gem 'covered'
 ```
+
+### RSpec Integration
 
 In your `spec/spec_helper.rb` add the following before loading any other code:
 
 ```ruby
-require 'bundler/setup'
-Bundler.require(:test)
+require 'covered/rspec'
 ```
 
 Ensure that you have a `.rspec` file with `--require spec_helper`:
@@ -35,6 +34,21 @@ Ensure that you have a `.rspec` file with `--require spec_helper`:
 --require spec_helper
 --format documentation
 --warnings
+```
+
+### Minitest Integration
+
+In your `test/test_helper.rb` add the following before loading any other code:
+
+```ruby
+require 'covered/minitest'
+require 'minitest/autorun'
+```
+
+In your test files, e.g. `test/dummy_test.rb` add the following at the top:
+
+```ruby
+require_relative 'test_helper'
 ```
 
 ## Usage

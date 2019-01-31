@@ -1,4 +1,5 @@
-# Copyright, 2019, by Samuel G. D. Williams. <http://www.codeotaku.com>
+
+# Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,21 +19,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-$covered = Covered.policy do
-	cache!
-	
-	# Only files in the root would be tracked:
-	root Dir.pwd
-	
-	# We will ignore any files in the test or spec directory:
-	skip /test|spec/
-	
-	# We will include all files under lib, even if they aren't loaded:
-	include "lib/**/*.rb"
-	
-	source
-	
-	if coverage = ENV['COVERAGE']
-		self.summary_class = Covered.const_get(coverage) || Covered::BriefSummary
+require_relative "test_helper"
+
+class DummyTest < Minitest::Test
+	def test_hello_world
+		assert_equal "Hello World", "Hello World"
 	end
 end

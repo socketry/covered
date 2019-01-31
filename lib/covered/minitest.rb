@@ -18,21 +18,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-$covered = Covered.policy do
-	cache!
+require_relative 'policy'
+require_relative 'policy/default'
+
+require 'minitest'
+
+module Covered
+	module Minitest
+		def run(*)
+			$covered.enable
+			
+			super
+		end
+	end
+end
+
+if ENV['COVERAGE']
+	class << Minitest
+		prepend Covered::Minitest
+	end
 	
-	# Only files in the root would be tracked:
-	root Dir.pwd
-	
-	# We will ignore any files in the test or spec directory:
-	skip /test|spec/
-	
-	# We will include all files under lib, even if they aren't loaded:
-	include "lib/**/*.rb"
-	
-	source
-	
-	if coverage = ENV['COVERAGE']
-		self.summary_class = Covered.const_get(coverage) || Covered::BriefSummary
+	Minitest.after_run do
+		$covered.disable
+		$covered.print_summary($stderr)
 	end
 end
