@@ -1,36 +1,66 @@
 # Covered [![Build Status](https://travis-ci.com/ioquatix/covered.svg)](https://travis-ci.com/ioquatix/covered)
 
-Covered uses modern Ruby features to generate comprehensive coverage, including support for templates which are compiled into Ruby. **This only works with Ruby 2.6 and its experimental support for RubyVM::AbstractSyntaxTree**
+Covered uses modern Ruby features to generate comprehensive coverage, including support for templates which are compiled into Ruby.
 
 ![Screenshot](media/example.png)
 
 ## Motivation
 
-Existing Ruby coverage tools are unable to handle `eval`ed code. This is because the `coverage` module built into Ruby doesn't expose the necessary hooks to capture it. With Ruby 2.6, `RubyVM::AST.parse(source)` came into existence, which gives us a fine grained tool for computing initial source coverage (i.e. what lines are executable), and thus making it possible to compute coverage for "templates".
+Existing Ruby coverage tools are unable to handle `eval`ed code. This is because the `coverage` module built into Ruby doesn't expose the necessary hooks to capture it. Using the [parser] gem allows us to do our own source code analysis to compute executable lines, thus making it possible to compute coverage for "templates".
 
 It's still tricky to do it correctly, but it is feasible now to compute coverage of web application "views" by using this technique. This gem is an exploration to see what is possible.
 
+[parser]: https://github.com/whitequark/parser
+
 ## Installation
 
-Add this line to your application's Gemfile:
+Add this line to your application's `Gemfile`:
 
-	gem 'covered'
+```ruby
+group :test do
+	gem 'covered', require: 'covered/rspec'
+end
+```
 
-And then execute:
+In your `spec/spec_helper.rb` add the following before loading any other code:
 
-	$ bundle
+```ruby
+require 'bundler/setup'
+Bundler.require(:test)
+```
 
-Or install it yourself as:
+Ensure that you have a `.rspec` file with `--require spec_helper`:
 
-	$ gem install covered
+```
+--require spec_helper
+--format documentation
+--warnings
+```
 
 ## Usage
 
-For `rspec`, simply include the following from your `spec_helper.rb`
+When running `rspec`, you can specify the kind of coverage analysis you would like:
 
-```ruby
-require 'covered/rspec'
 ```
+COVERAGE=Summary rspec
+```
+
+### Partial Summary
+
+```
+COVERAGE=PartialSummary rspec
+```
+
+This report only shows snippets of source code with incomplete coverage.
+
+### Brief Summary
+
+
+```
+COVERAGE=BriefSummary rspec
+```
+
+This report lists several files in order of least coverage.
 
 ## Contributing
 
