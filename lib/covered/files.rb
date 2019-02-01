@@ -117,8 +117,15 @@ module Covered
 		
 		attr :pattern
 		
-		def accept? path
-			!@pattern.match?(path)
+		if Regexp.instance_methods.include? :match?
+			# This is better as it doesn't allocate a MatchData instance which is essentially useless.
+			def accept? path
+				!@pattern.match?(path)
+			end
+		else
+			def accept? path
+				!(@pattern =~ path)
+			end
 		end
 	end
 	
