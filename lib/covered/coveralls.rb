@@ -90,12 +90,14 @@ module Covered
 						wrapper: Wrapper.new
 					)
 					
-					response = representation.post(body)
-					
-					output.puts "Got response: #{response.read}"
-					
-				ensure
-					representation.close
+					begin
+						response = representation.post(body)
+						
+						output.puts "Got response: #{response.read}"
+						
+					ensure
+						representation.close
+					end
 				end
 			end
 		end
