@@ -42,7 +42,7 @@ module Covered
 		
 		# @yield [Coverage] the path to the file, and the execution counts.
 		def each(&block)
-			@output.each(&block)
+			@output.each(&block) if @output
 		end
 		
 		def to_h

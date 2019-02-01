@@ -24,17 +24,15 @@ require_relative 'wrapper'
 require 'rainbow'
 
 module Covered
-	class Summary < Wrapper
-		def initialize(output, threshold: 1.0)
-			super(output)
-			
+	class Summary
+		def initialize(threshold: 1.0)
 			@threshold = threshold
 		end
 		
-		def each
+		def each(wrapper)
 			statistics = Statistics.new
 			
-			super do |coverage|
+			wrapper.each do |coverage|
 				statistics << coverage
 				
 				if @threshold.nil? or coverage.ratio < @threshold
@@ -58,8 +56,8 @@ module Covered
 		end
 		
 		# A coverage array gives, for each line, the number of line execution by the interpreter. A nil value means coverage is disabled for this line (lines like else and end).
-		def print_summary(output = $stdout)
-			statistics = self.each do |coverage|
+		def call(wrapper, output = $stdout)
+			statistics = self.each(wrapper) do |coverage|
 				line_offset = 1
 				output.puts "", Rainbow(coverage.path).bold.underline
 				
@@ -91,23 +89,23 @@ module Covered
 					end
 				end
 				
-				coverage.print_summary(output)
+				coverage.print(output)
 			end
 			
-			statistics.print_summary(output)
+			statistics.print(output)
 		end
 	end
 	
 	class BriefSummary < Summary
-		def print_summary(output = $stdout, before: 4, after: 4)
+		def call(wrapper, output = $stdout, before: 4, after: 4)
 			ordered = []
 			
-			statistics = self.each do |coverage|
+			statistics = self.each(wrapper) do |coverage|
 				ordered << coverage unless coverage.complete?
 			end
 			
 			output.puts
-			statistics.print_summary(output)
+			statistics.print(output)
 			
 			if ordered.any?
 				output.puts "", "Least Coverage:"
@@ -122,8 +120,8 @@ module Covered
 	end
 	
 	class PartialSummary < Summary
-		def print_summary(output = $stdout, before: 4, after: 4)
-			statistics = self.each do |coverage|
+		def call(wrapper, output = $stdout, before: 4, after: 4)
+			statistics = self.each(wrapper) do |coverage|
 				line_offset = 1
 				output.puts "", Rainbow(coverage.path).bold.underline
 				
@@ -170,11 +168,11 @@ module Covered
 					end
 				end
 				
-				coverage.print_summary(output)
+				coverage.print(output)
 			end
 			
 			output.puts
-			statistics.print_summary(output)
+			statistics.print(output)
 		end
 	end
 end

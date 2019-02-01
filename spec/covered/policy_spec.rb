@@ -72,10 +72,11 @@ RSpec.describe Covered::Policy do
 		expect(subject.output).to be_kind_of(Covered::Root)
 	end
 	
-	it 'can #print_summary' do
+	it 'can #call' do
 		io = StringIO.new
 		
-		subject.print_summary(io)
+		subject.reports << Covered::BriefSummary.new
+		subject.call(io)
 		
 		expect(io.string).to include("* 0 files checked; 0/0 lines executed; 100.0% covered.")
 	end

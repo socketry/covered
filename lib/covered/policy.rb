@@ -23,6 +23,8 @@ require_relative "files"
 require_relative "source"
 require_relative "capture"
 
+require_relative 'coveralls'
+
 module Covered
 	def self.policy(&block)
 		policy = Policy.new
@@ -38,18 +40,14 @@ module Covered
 		def initialize
 			super(Files.new)
 			
-			@threshold = 1.0
-			@summary_class = PartialSummary
+			@reports = []
 		end
-		
-		attr_accessor :summary_class
-		attr_accessor :threshold
 		
 		def freeze
 			return if frozen?
 			
 			capture
-			summary(threshold: @threshold)
+			@reports.freeze
 			
 			super
 		end
@@ -90,12 +88,28 @@ module Covered
 			capture.disable
 		end
 		
-		def summary(*args)
-			@summary ||= @summary_class.new(@output, *args)
+		attr :reports
+		
+		def reports!(coverage = ENV['COVERAGE'])
+			if coverage
+				names = coverage.split(',')
+				
+				names.each do |name|
+					if klass = Covered.const_get(name)
+						@reports << klass.new
+					else
+						warn "Could not find #{name} call Ignoring."
+					end
+				end
+			else
+				@reports << Covered::BriefSummary.new
+			end
 		end
 		
-		def print_summary(*args)
-			summary.print_summary(*args)
+		def call(*args)
+			@reports.each do |report|
+				report.call(self, *args)
+			end
 		end
 	end
 end

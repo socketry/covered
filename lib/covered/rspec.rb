@@ -26,6 +26,7 @@ require 'rspec/core/formatters'
 module Covered
 	module RSpec
 		class Formatter
+			# The name `dump_summary` of this method is significant:
 			::RSpec::Core::Formatters.register self, :dump_summary
 			
 			def initialize(output)
@@ -33,7 +34,7 @@ module Covered
 			end
 			
 			def dump_summary notification
-				$covered.print_summary(@output)
+				$covered.call(@output)
 			end
 		end
 		

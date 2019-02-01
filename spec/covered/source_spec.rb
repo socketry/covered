@@ -32,7 +32,7 @@ RSpec.describe Covered::Source do
 	let(:source) {Covered::Source.new(files)}
 	let(:capture) {Covered::Capture.new(source)}
 	
-	let(:summary) {Covered::Summary.new(source)}
+	let(:summary) {Covered::Summary.new}
 	
 	it "correctly generates coverage for template" do
 		capture.enable
@@ -40,7 +40,7 @@ RSpec.describe Covered::Source do
 		capture.disable
 		
 		io = StringIO.new
-		summary.print_summary(io)
+		summary.call(source, io)
 		
 		expect(io.string).to include("2/3 lines executed; 66.67% covered")
 	end

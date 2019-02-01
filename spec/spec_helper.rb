@@ -31,9 +31,7 @@ $covered = Covered.policy do
 	# This needs to be added last, otherwise it won't be exposed to te additional files of the above `include` directive.
 	source executable: Covered::Source::DOGFOOD
 	
-	# Print out all summaries.
-	# self.threshold = nil
-	# self.summary_class = Covered::Summary
+	reports!
 end
 
 RSpec.configure do |config|

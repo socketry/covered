@@ -32,7 +32,5 @@ $covered = Covered.policy do
 	
 	source
 	
-	if coverage = ENV['COVERAGE']
-		self.summary_class = Covered.const_get(coverage) || Covered::BriefSummary
-	end
+	reports!
 end

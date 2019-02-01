@@ -23,7 +23,7 @@ require 'covered/files'
 
 RSpec.describe Covered::Summary do
 	let(:files) {Covered::Files.new}
-	let(:summary) {Covered::Summary.new(files)}
+	let(:summary) {Covered::Summary.new}
 	
 	let(:first_line) {File.readlines(__FILE__).first}
 	let(:io) {StringIO.new}
@@ -32,7 +32,7 @@ RSpec.describe Covered::Summary do
 		files.mark(__FILE__, 24)
 		files.mark(__FILE__, 25, 0)
 		
-		summary.print_summary(io)
+		summary.call(files, io)
 		
 		expect(io.string).to include("RSpec.describe Covered::Summary do")
 	end

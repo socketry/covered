@@ -65,6 +65,10 @@ module Covered
 			super
 		end
 		
+		def to_a
+			@counts
+		end
+		
 		def zero?
 			@total.zero?
 		end
@@ -110,7 +114,7 @@ module Covered
 		
 		include Ratio
 		
-		def print_summary(output)
+		def print(output)
 			output.puts "** #{executed_count}/#{executable_count} lines executed; #{percentage.to_f.round(2)}% covered."
 		end
 	end

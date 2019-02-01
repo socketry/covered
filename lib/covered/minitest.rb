@@ -40,6 +40,6 @@ if ENV['COVERAGE']
 	
 	Minitest.after_run do
 		$covered.disable
-		$covered.print_summary($stderr)
+		$covered.call($stderr)
 	end
 end

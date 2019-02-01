@@ -19,8 +19,9 @@ Gem::Specification.new do |spec|
 	spec.require_paths = ["lib"]
 	
 	spec.add_dependency "rainbow"
-	
 	spec.add_dependency "parser"
+	
+	spec.add_dependency "async-rest"
 	
 	spec.add_development_dependency "trenni", "~> 3.6"
 	

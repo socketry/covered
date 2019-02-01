@@ -19,5 +19,4 @@
 # THE SOFTWARE.
 
 require_relative "covered/version"
-
 require_relative "covered/policy"
