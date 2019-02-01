@@ -117,5 +117,9 @@ module Covered
 		def print(output)
 			output.puts "** #{executed_count}/#{executable_count} lines executed; #{percentage.to_f.round(2)}% covered."
 		end
+		
+		def to_s
+			"\#<#{self.class} path=#{@path} #{percentage.to_f.round(2)}% covered>"
+		end
 	end
 end

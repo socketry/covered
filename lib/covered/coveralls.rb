@@ -19,10 +19,32 @@
 # THE SOFTWARE.
 
 require 'async'
-require 'async/rest/resource'
+require 'async/rest/representation'
+
+require 'securerandom'
 
 module Covered
 	class Coveralls
+		class Wrapper < Async::REST::Wrapper::JSON
+			def prepare_request(payload, headers)
+				headers['accept'] ||= @content_type
+				boundary = SecureRandom.hex(32)
+				
+				# This is a pretty messed up API. Don't change anything below. It's fragile.
+				if payload
+					headers['content-type'] = "multipart/form-data, boundary=#{boundary}"
+					
+					Async::HTTP::Body::Buffered.new([
+						"--#{boundary}\r\n",
+						"Content-Disposition: form-data; name=\"json_file\"; filename=\"body.json\"\r\n",
+						"Content-Type: text/plain\r\n\r\n",
+						::JSON.dump(payload),
+						"\r\n--#{boundary}--\r\n",
+					])
+				end
+			end
+		end
+		
 		URL = "https://coveralls.io/api/v1/jobs"
 		
 		def initialize(token: nil, service: nil, job_id: nil)
@@ -40,10 +62,10 @@ module Covered
 				warn "#{self.class} can't detect service! Please specify COVERALLS_REPO_TOKEN."
 			end
 			
-			return nil
+			return {}
 		end
 		
-		def call(wrapper, output = nil)
+		def call(wrapper, output = $stderr)
 			if body = detect_service
 				output.puts "Submitting data using #{body.inspect}..."
 				
@@ -51,6 +73,8 @@ module Covered
 				
 				wrapper.each do |coverage|
 					puts "Processing #{coverage}..."
+					next if coverage.nil?
+					
 					source_files << {
 						name: coverage.path,
 						source_digest: Digest::MD5.hexdigest(File.read(coverage.path)),
@@ -61,11 +85,17 @@ module Covered
 				body[:source_files] = source_files
 				
 				Async do
-					resource = Async::REST::Resource.for(URL)
+					representation = Async::REST::Representation.new(
+						Async::REST::Resource.for(URL),
+						wrapper: Wrapper.new
+					)
 					
-					response = client.post(body)
+					response = representation.post(body)
 					
-					output.puts "Got response: #{response.join}"
+					output.puts "Got response: #{response.read}"
+					
+				ensure
+					representation.close
 				end
 			end
 		end
