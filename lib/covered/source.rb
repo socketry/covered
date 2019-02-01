@@ -110,11 +110,12 @@ module Covered
 			else
 				warn "Couldn't parse #{path}, file doesn't exist?"
 			end
+		rescue
+			warn "Couldn't parse #{path}: #{$!}"
 		end
 		
 		def each(&block)
 			@output.each do |coverage|
-				# This is a little bit inefficient, perhaps add a cache layer?
 				if top = parse(coverage.path)
 					self.expand(top, coverage)
 				end

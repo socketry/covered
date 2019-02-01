@@ -44,7 +44,7 @@ module Covered
 		end
 		
 		def freeze
-			return if frozen?
+			return self if frozen?
 			
 			capture
 			@reports.freeze

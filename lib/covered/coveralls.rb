@@ -62,7 +62,7 @@ module Covered
 				warn "#{self.class} can't detect service! Please specify COVERALLS_REPO_TOKEN."
 			end
 			
-			return {}
+			return nil
 		end
 		
 		def call(wrapper, output = $stderr)
@@ -72,12 +72,11 @@ module Covered
 				source_files = []
 				
 				wrapper.each do |coverage|
-					puts "Processing #{coverage}..."
-					next if coverage.nil?
+					path = wrapper.relative_path(coverage.path)
 					
 					source_files << {
-						name: coverage.path,
-						source_digest: Digest::MD5.hexdigest(File.read(coverage.path)),
+						name: path,
+						source_digest: Digest::MD5.hexdigest(coverage.read),
 						coverage: coverage.to_a,
 					}
 				end

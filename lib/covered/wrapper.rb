@@ -45,6 +45,22 @@ module Covered
 			@output.each(&block) if @output
 		end
 		
+		def relative_path(path)
+			if @output
+				@output.relative_path(path)
+			else
+				path
+			end
+		end
+		
+		def expand_path(path)
+			if @output
+				@output.expand_path(path)
+			else
+				path
+			end
+		end
+		
 		def to_h
 			collect{|coverage| [coverage.path, coverage]}.to_h
 		end

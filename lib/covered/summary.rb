@@ -59,11 +59,13 @@ module Covered
 		def call(wrapper, output = $stdout)
 			statistics = self.each(wrapper) do |coverage|
 				line_offset = 1
-				output.puts "", Rainbow(coverage.path).bold.underline
+				
+				path = wrapper.relative_path(coverage.path)
+				output.puts "", Rainbow(path).bold.underline
 				
 				counts = coverage.counts
 				
-				File.open(coverage.path, "r") do |file|
+				coverage.read do |file|
 					file.each_line do |line|
 						count = counts[line_offset]
 						
@@ -112,7 +114,9 @@ module Covered
 				ordered.sort_by!(&:missing_count).reverse!
 				
 				ordered.first(5).each do |coverage|
-					output.write Rainbow(coverage.path).orange
+					path = wrapper.relative_path(coverage.path)
+					
+					output.write Rainbow(path).orange
 					output.puts ": #{coverage.missing_count} lines not executed!"
 				end
 			end
@@ -123,13 +127,15 @@ module Covered
 		def call(wrapper, output = $stdout, before: 4, after: 4)
 			statistics = self.each(wrapper) do |coverage|
 				line_offset = 1
-				output.puts "", Rainbow(coverage.path).bold.underline
+				
+				path = wrapper.relative_path(coverage.path)
+				output.puts "", Rainbow(path).bold.underline
 				
 				counts = coverage.counts
 				last_line = nil
 				
 				unless coverage.zero?
-					File.open(coverage.path, "r") do |file|
+					coverage.read do |file|
 						file.each_line do |line|
 							range = Range.new([line_offset - before, 0].max, line_offset+after)
 							

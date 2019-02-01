@@ -53,8 +53,16 @@ module Covered
 		
 		attr :annotations
 		
+		def read(&block)
+			if block_given?
+				File.open(@path, "r", &block)
+			else
+				File.read(@path)
+			end
+		end
+		
 		def freeze
-			return if frozen?
+			return self if frozen?
 			
 			@counts.freeze
 			@annotations.freeze

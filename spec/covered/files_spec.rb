@@ -65,10 +65,10 @@ RSpec.describe Covered::Include do
 	it "should defer to existing files" do
 		files.mark(path, 5)
 		
-		paths = subject.collect{|coverage| [coverage.path, coverage.counts]}.to_h
+		paths = subject.to_h
 		
 		expect(paths).to include(path)
-		expect(paths[path]).to be == [nil, nil, nil, nil, nil, 1]
+		expect(paths[path].counts).to be == [nil, nil, nil, nil, nil, 1]
 	end
 	
 	it "should enumerate paths" do

@@ -44,28 +44,27 @@ module Covered
 			return coverage
 		end
 		
-		def each
-			return to_enum unless block_given?
-			
-			@paths.each do |path, coverage|
-				yield coverage
-			end
+		def each(&block)
+			@paths.each_value(&block)
 		end
 	end
 	
 	class Include < Wrapper
-		def initialize(output, pattern)
+		def initialize(output, pattern, base = "")
 			super(output)
 			
 			@pattern = pattern
+			@base = base
 		end
 		
 		attr :pattern
 		
 		def glob
 			paths = Set.new
+			root = self.expand_path(@base)
+			pattern = File.expand_path(@pattern, root)
 			
-			Dir.glob(@pattern) do |path|
+			Dir.glob(pattern) do |path|
 				unless File.directory?(path)
 					paths << File.realpath(path)
 				end
@@ -100,21 +99,30 @@ module Covered
 		
 		def each(&block)
 			super do |coverage|
-				yield coverage if accept?(coverage.path)
+				if accept?(coverage.path)
+					yield coverage
+				else
+					puts "Skipping #{coverage.path} #{self.class}"
+				end
 			end
 		end
 	end
 	
 	class Skip < Filter
-		def initialize(output, pattern)
+		def initialize(output, pattern, base = "")
 			super(output)
 			
 			@pattern = pattern
+			@base = self.expand_path(base)
 		end
 		
 		attr :pattern
 		
 		def accept? path
+			if @base
+				path = relative_path(path)
+			end
+			
 			!(@pattern === path)
 		end
 	end
@@ -141,6 +149,18 @@ module Covered
 		end
 		
 		attr :path
+		
+		def expand_path(path)
+			File.expand_path(super, @path)
+		end
+		
+		def relative_path(path)
+			if path.start_with?(@path)
+				path[@path.size+1..-1]
+			else
+				super
+			end
+		end
 		
 		def accept?(path)
 			path.start_with?(@path)
