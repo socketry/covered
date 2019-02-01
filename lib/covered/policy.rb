@@ -23,8 +23,6 @@ require_relative "files"
 require_relative "source"
 require_relative "capture"
 
-require_relative 'coveralls'
-
 module Covered
 	def self.policy(&block)
 		policy = Policy.new
@@ -90,15 +88,42 @@ module Covered
 		
 		attr :reports
 		
+		class Autoload
+			def initialize(name)
+				@name = name
+			end
+			
+			def call(*args)
+				begin
+					klass = Covered.const_get(@name)
+				rescue NameError
+					require_relative @name.downcase
+				end
+				
+				begin
+					klass = Covered.const_get(@name)
+					
+					return klass.new.call(*args)
+				rescue NameError
+					warn "Could not find #{name} call Ignoring."
+				end
+			end
+			
+			def to_s
+				"\#<#{self.class} loading #{@name}>"
+			end
+		end
+		
 		def reports!(coverage = ENV['COVERAGE'])
 			if coverage
 				names = coverage.split(',')
 				
 				names.each do |name|
-					if klass = Covered.const_get(name)
+					begin
+						klass = Covered.const_get(name)
 						@reports << klass.new
-					else
-						warn "Could not find #{name} call Ignoring."
+					rescue NameError
+						@reports << Autoload.new(name)
 					end
 				end
 			else
