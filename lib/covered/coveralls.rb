@@ -50,6 +50,7 @@ module Covered
 				source_files = []
 				
 				wrapper.each do |coverage|
+					puts "Processing #{coverage}..."
 					source_files << {
 						name: coverage.path,
 						source_digest: Digest::MD5.hexdigest(File.read(coverage.path)),
