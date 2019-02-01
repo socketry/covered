@@ -25,9 +25,9 @@ RSpec.describe Covered::Wrapper do
 	subject {described_class.new(output)}
 	
 	it 'passes #mark through' do
-		expect(output).to receive(:mark).with("fleeb.rb", 5)
+		expect(output).to receive(:mark).with("fleeb.rb", 5, 1)
 		
-		subject.mark("fleeb.rb", 5)
+		subject.mark("fleeb.rb", 5, 1)
 	end
 	
 	it 'passes #enable through' do

@@ -29,7 +29,7 @@ module Covered
 			
 			@trace = TracePoint.new(:line, :call) do |event|
 				if path = event.path
-					@output.mark(path, event.lineno)
+					@output.mark(path, event.lineno, 1)
 				end
 			end
 		end

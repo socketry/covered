@@ -36,10 +36,10 @@ module Covered
 			@paths.empty?
 		end
 		
-		def mark(path, *args)
+		def mark(path, lineno, value)
 			coverage = (@paths[path] ||= Coverage.new(path))
 			
-			coverage.mark(*args)
+			coverage.mark(lineno, value)
 			
 			return coverage
 		end
@@ -93,7 +93,7 @@ module Covered
 			true
 		end
 		
-		def mark(path, *args)
+		def mark(path, lineno, value)
 			super if accept?(path)
 		end
 		
@@ -109,21 +109,16 @@ module Covered
 	end
 	
 	class Skip < Filter
-		def initialize(output, pattern, base = "")
+		def initialize(output, pattern)
 			super(output)
 			
 			@pattern = pattern
-			@base = self.expand_path(base)
 		end
 		
 		attr :pattern
 		
 		def accept? path
-			if @base
-				path = relative_path(path)
-			end
-			
-			!(@pattern === path)
+			!@pattern.match?(path)
 		end
 	end
 	
@@ -156,7 +151,7 @@ module Covered
 		
 		def relative_path(path)
 			if path.start_with?(@path)
-				path[@path.size+1..-1]
+				path.slice(@path.size+1, path.size)
 			else
 				super
 			end

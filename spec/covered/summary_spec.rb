@@ -29,7 +29,7 @@ RSpec.describe Covered::Summary do
 	let(:io) {StringIO.new}
 	
 	it "can generate source code listing" do
-		files.mark(__FILE__, 24)
+		files.mark(__FILE__, 24, 1)
 		files.mark(__FILE__, 25, 0)
 		
 		summary.call(files, io)

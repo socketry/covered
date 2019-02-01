@@ -25,7 +25,7 @@ $covered = Covered.policy do
 	root Dir.pwd
 	
 	# We will ignore any files in the test or spec directory:
-	skip /^(test|spec|vendor)/
+	skip /^.*\/(test|spec|vendor)\//
 	
 	# We will include all files under lib, even if they aren't loaded:
 	include "lib/**/*.rb"

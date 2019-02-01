@@ -21,14 +21,14 @@
 RSpec.describe Covered::Files do
 	context '#mark' do
 		it "can mark lines" do
-			subject.mark("program.rb", 2)
+			subject.mark("program.rb", 2, 1)
 			
 			expect(subject.paths["program.rb"][2]).to be == 1
 		end
 		
 		it "can mark the same line twice" do
 			2.times do
-				subject.mark("program.rb", 2)
+				subject.mark("program.rb", 2, 1)
 			end
 			
 			expect(subject.paths["program.rb"][2]).to be == 2
@@ -37,7 +37,7 @@ RSpec.describe Covered::Files do
 	
 	context '#each' do
 		it "enumerates all paths" do
-			coverage = subject.mark("program.rb", 2)
+			coverage = subject.mark("program.rb", 2, 1)
 			
 			enumerator = subject.each
 			expect(enumerator.next).to be coverage
@@ -63,7 +63,7 @@ RSpec.describe Covered::Include do
 	let(:path) {subject.glob.first}
 	
 	it "should defer to existing files" do
-		files.mark(path, 5)
+		files.mark(path, 5, 1)
 		
 		paths = subject.to_h
 		
@@ -83,13 +83,13 @@ RSpec.describe Covered::Skip do
 	subject {described_class.new(files, "file.rb")}
 	
 	it "should ignore files which match given pattern" do
-		subject.mark("file.rb", 1)
+		subject.mark("file.rb", 1, 1)
 		
 		expect(files).to be_empty
 	end
 	
 	it "should include files which don't match given pattern" do
-		subject.mark("foo.rb", 1)
+		subject.mark("foo.rb", 1, 1)
 		
 		expect(files).to_not be_empty
 		expect(subject.to_h).to include("foo.rb")
@@ -101,13 +101,13 @@ RSpec.describe Covered::Only do
 	subject {described_class.new(files, "file.rb")}
 	
 	it "should ignore files which don't match given pattern" do
-		subject.mark("foo.rb", 1)
+		subject.mark("foo.rb", 1, 1)
 		
 		expect(files).to be_empty
 	end
 	
 	it "should include files which match given pattern" do
-		subject.mark("file.rb", 1)
+		subject.mark("file.rb", 1, 1)
 		
 		expect(files).to_not be_empty
 	end
@@ -118,13 +118,13 @@ RSpec.describe Covered::Root do
 	subject {described_class.new(files, "lib/")}
 	
 	it "should ignore files which don't match root" do
-		subject.mark("foo.rb", 1)
+		subject.mark("foo.rb", 1, 1)
 		
 		expect(files).to be_empty
 	end
 	
 	it "should include files which match root" do
-		subject.mark("lib/foo.rb", 1)
+		subject.mark("lib/foo.rb", 1, 1)
 		
 		expect(files).to_not be_empty
 	end
