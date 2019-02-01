@@ -80,7 +80,7 @@ end
 
 RSpec.describe Covered::Skip do
 	let(:files) {Covered::Files.new}
-	subject {described_class.new(files, "file.rb")}
+	subject {described_class.new(files, /file.rb/)}
 	
 	it "should ignore files which match given pattern" do
 		subject.mark("file.rb", 1, 1)
