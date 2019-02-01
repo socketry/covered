@@ -59,6 +59,8 @@ When running `rspec`, you can specify the kind of coverage analysis you would li
 COVERAGE=Summary rspec
 ```
 
+If no `COVERAGE` is specified, coverage tracking will be disabled.
+
 ### Partial Summary
 
 ```
@@ -69,12 +71,23 @@ This report only shows snippets of source code with incomplete coverage.
 
 ### Brief Summary
 
-
 ```
 COVERAGE=BriefSummary rspec
 ```
 
-This report lists several files in order of least coverage.
+This report lists several files in order of least coverage.l
+
+### Coveralls/Travis Integration
+
+You can send coverage information to [Coveralls](https://coveralls.io).
+
+```
+COVERAGE=BriefSummary,Coveralls rspec
+```
+
+This will print out a brief report and then upload the coverage data. This integrates transparently with Travis.
+
+### 
 
 ## Contributing
 
