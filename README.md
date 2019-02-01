@@ -90,7 +90,10 @@ matrix:
 
 This will print out a brief report and then upload the coverage data. This integrates transparently with Travis.
 
-### 
+## See Also
+
+- [coveralls-ruby](https://github.com/lemurheavy/coveralls-ruby) – the official Coveralls implementation for Ruby.
+- [simplecov](https://github.com/colszowka/simplecov) – one of the original coverage implementations for Ruby, uses the built-in `coverage` library.
 
 ## Contributing
 
