@@ -49,6 +49,8 @@ module Covered
 		
 		def initialize(token: nil, service: nil, job_id: nil)
 			@token = token
+			@service = service
+			@job_id = job_id
 		end
 		
 		def detect_service
