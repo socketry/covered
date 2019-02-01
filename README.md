@@ -79,10 +79,13 @@ This report lists several files in order of least coverage.l
 
 ### Coveralls/Travis Integration
 
-You can send coverage information to [Coveralls](https://coveralls.io).
+You can send coverage information to [Coveralls](https://coveralls.io) by editing your `.travis.yml` file:
 
 ```
-COVERAGE=BriefSummary,Coveralls rspec
+matrix:
+  include:
+    - rvm: 2.6
+      env: COVERAGE=PartialSummary,Coveralls
 ```
 
 This will print out a brief report and then upload the coverage data. This integrates transparently with Travis.
