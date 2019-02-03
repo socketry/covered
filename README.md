@@ -2,6 +2,10 @@
 
 Covered uses modern Ruby features to generate comprehensive coverage, including support for templates which are compiled into Ruby.
 
+- Incremental coverage - if you run your full test suite, and the run a subset, it will still report the correct coverage - so you can incrementally work on improving coverage.
+- Integration with RSpec, Minitest, Travis & Coveralls - no need to configure anything - out of the box support for these platforms.
+- Supports coverage of views - templates compiled to Ruby code can be tracked for coverage reporting.
+
 ![Screenshot](media/example.png)
 
 ## Motivation
