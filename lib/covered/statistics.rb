@@ -48,6 +48,8 @@ module Covered
 		
 		def print(output)
 			output.puts "* #{count} files checked; #{executed_count}/#{executable_count} lines executed; #{percentage.to_f.round(2)}% covered."
+			
+			# Could output funny message here, especially for 100% coverage.
 		end
 	end
 end
