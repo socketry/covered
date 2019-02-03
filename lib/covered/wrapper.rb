@@ -52,10 +52,6 @@ module Covered
 		
 		attr :output
 		
-		def mark(path, lineno, value)
-			@output.mark(path, lineno, value)
-		end
-		
 		def enable
 			@output.enable
 		end
