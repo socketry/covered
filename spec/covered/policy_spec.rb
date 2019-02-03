@@ -72,6 +72,19 @@ RSpec.describe Covered::Policy do
 		expect(subject.output).to be_kind_of(Covered::Root)
 	end
 	
+	it 'can select default reports' do
+		subject.reports!(nil)
+		
+		expect(subject.reports.count).to be == 1
+		expect(subject.reports.first).to be_kind_of Covered::BriefSummary
+	end
+	
+	it 'can select specified reports' do
+		subject.reports!('BriefSummary,PartialSummary')
+		
+		expect(subject.reports.count).to be == 2
+	end
+	
 	it 'can #call' do
 		io = StringIO.new
 		
