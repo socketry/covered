@@ -98,20 +98,20 @@ module Covered
 				@name = name
 			end
 			
-			def call(*args)
+			def new
 				begin
 					klass = Covered.const_get(@name)
 				rescue NameError
 					require_relative @name.downcase
 				end
 				
-				begin
-					klass = Covered.const_get(@name)
-					
-					return klass.new.call(*args)
-				rescue NameError
-					warn "Could not find #{name} call Ignoring."
-				end
+				klass = Covered.const_get(@name)
+				
+				return klass.new
+			end
+			
+			def call(*args)
+				self.new.call(*args)
 			end
 			
 			def to_s
