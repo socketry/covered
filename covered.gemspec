@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
 	
 	spec.add_dependency "rainbow"
 	spec.add_dependency "parser"
+	spec.add_dependency "msgpack"
 	
 	spec.add_dependency "async-rest"
 	

@@ -22,6 +22,7 @@ require_relative "summary"
 require_relative "files"
 require_relative "source"
 require_relative "capture"
+require_relative "persist"
 
 module Covered
 	def self.policy(&block)
@@ -72,6 +73,10 @@ module Covered
 		
 		def cache!
 			@output = Cache.new(@output)
+		end
+		
+		def persist!
+			@output = Persist.new(@output)
 		end
 		
 		def capture
