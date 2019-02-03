@@ -20,7 +20,7 @@
 
 require 'covered/wrapper'
 
-RSpec.shared_examples_for Covered::Wrapper do
+RSpec.shared_context Covered::Wrapper do
 	let(:output) {Covered::Base.new}
 	subject {described_class.new(output)}
 	
