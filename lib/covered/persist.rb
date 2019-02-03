@@ -21,20 +21,30 @@
 require_relative 'wrapper'
 
 require 'msgpack'
+require 'time'
+require 'set'
 
 module Covered
 	class Persist < Wrapper
-		def initialize(output, path = ".covered")
+		def initialize(output, path = ".covered.msgpack")
 			super(output)
 			
 			@path = path
+			
+			@touched = Set.new
 		end
 		
 		def apply(record)
-			path = expand_path(record[:path])
+			# The file must still exist:
+			return unless path = expand_path(record[:path])
+			return unless File.exist? path
+			
+			# If the file has been modified since... we can't use the coverage.
+			return unless mtime = record[:mtime]
+			return if File.mtime(path).to_f > record[:mtime]
 			
 			record[:coverage].each_with_index do |count, index|
-				self.mark(path, index, count) if count
+				@output.mark(path, index, count) if count
 			end
 		end
 		
@@ -43,6 +53,7 @@ module Covered
 				# We want to use relative paths so that moving the repo won't break everything:
 				path: relative_path(coverage.path),
 				coverage: coverage.counts,
+				mtime: File.mtime(coverage.path).to_f,
 			}
 		end
 		
@@ -51,6 +62,8 @@ module Covered
 			
 			# Load existing coverage information and mark all files:
 			File.open(@path, "r") do |file|
+				file.flock(File::LOCK_SH)
+				
 				make_unpacker(file).each(&self.method(:apply))
 			end
 		end
@@ -58,6 +71,8 @@ module Covered
 		def save!(path = @path)
 			# Dump all coverage:
 			File.open(@path, "w") do |file|
+				file.flock(File::LOCK_EX)
+				
 				packer = make_packer(file)
 				
 				self.each do |coverage|
@@ -66,6 +81,12 @@ module Covered
 				
 				packer.flush
 			end
+		end
+		
+		def mark(file, line, count)
+			@touched << file
+		
+			super
 		end
 		
 		def enable
@@ -77,12 +98,27 @@ module Covered
 		def disable
 			super
 			
+			# @touched.each do |path|
+			# 	if @output.accept?(path)
+			# 		puts "Updated #{path} coverage."
+			# 	end
+			# end
+			
 			save!
 		end
+		
+		# def each
+		# 	super do |coverage|
+		# 		if @touched.include?(coverage.path)
+		# 			yield coverage
+		# 		end
+		# 	end
+		# end
 		
 		def make_packer(io)
 			packer = MessagePack::Packer.new(io)
 			packer.register_type(0x00, Symbol, :to_msgpack_ext)
+			packer.register_type(0x01, Time) {|object| object.to_s}
 			
 			return packer
 		end
@@ -90,6 +126,7 @@ module Covered
 		def make_unpacker(io)
 			unpacker = MessagePack::Unpacker.new(io)
 			unpacker.register_type(0x00, Symbol, :from_msgpack_ext)
+			unpacker.register_type(0x01, Time, :parse)
 			
 			return unpacker
 		end

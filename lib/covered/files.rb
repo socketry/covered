@@ -19,13 +19,14 @@
 # THE SOFTWARE.
 
 require_relative 'coverage'
+require_relative 'wrapper'
 
 require 'set'
 
 module Covered
-	class Files < Wrapper
-		def initialize(output = nil)
-			super(output)
+	class Files < Base
+		def initialize(*)
+			super
 			
 			@paths = {}
 		end
@@ -88,26 +89,6 @@ module Covered
 		end
 	end
 	
-	class Filter < Wrapper
-		def accept?(path)
-			true
-		end
-		
-		def mark(path, lineno, value)
-			super if accept?(path)
-		end
-		
-		def each(&block)
-			super do |coverage|
-				if accept?(coverage.path)
-					yield coverage
-				else
-					puts "Skipping #{coverage.path} #{self.class}"
-				end
-			end
-		end
-	end
-	
 	class Skip < Filter
 		def initialize(output, pattern)
 			super(output)
@@ -119,11 +100,11 @@ module Covered
 		
 		if Regexp.instance_methods.include? :match?
 			# This is better as it doesn't allocate a MatchData instance which is essentially useless.
-			def accept? path
+			def match? path
 				!@pattern.match?(path)
 			end
 		else
-			def accept? path
+			def match? path
 				!(@pattern =~ path)
 			end
 		end
@@ -138,7 +119,7 @@ module Covered
 		
 		attr :pattern
 		
-		def accept?(path)
+		def match?(path)
 			@pattern === path
 		end
 	end
@@ -164,7 +145,7 @@ module Covered
 			end
 		end
 		
-		def accept?(path)
+		def match?(path)
 			path.start_with?(@path)
 		end
 	end

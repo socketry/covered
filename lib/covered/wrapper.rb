@@ -19,50 +19,95 @@
 # THE SOFTWARE.
 
 module Covered
-	class Wrapper
-		include Enumerable
+	class Base
+		def enable
+		end
 		
-		def initialize(output = nil)
+		def disable
+		end
+		
+		def accept?(path)
+			true
+		end
+		
+		def mark(path, lineno, value)
+		end
+		
+		def each
+		end
+		
+		def relative_path(path)
+			path
+		end
+		
+		def expand_path(path)
+			path
+		end
+	end
+	
+	class Wrapper < Base
+		def initialize(output = Base.new)
 			@output = output
 		end
 		
 		attr :output
 		
 		def mark(path, lineno, value)
-			@output.mark(path, lineno, value) if @output
+			@output.mark(path, lineno, value)
 		end
 		
 		def enable
-			@output.enable if @output
+			@output.enable
 		end
 		
 		def disable
-			@output.disable if @output
+			@output.disable
+		end
+		
+		def accept?(path)
+			@output.accept?(path)
+		end
+		
+		def mark(path, lineno, value)
+			@output.mark(path, lineno, value)
 		end
 		
 		# @yield [Coverage] the path to the file, and the execution counts.
 		def each(&block)
-			@output.each(&block) if @output
+			@output.each(&block)
 		end
 		
 		def relative_path(path)
-			if @output
-				@output.relative_path(path)
-			else
-				path
-			end
+			@output.relative_path(path)
 		end
 		
 		def expand_path(path)
-			if @output
-				@output.expand_path(path)
-			else
-				path
-			end
+			@output.expand_path(path)
 		end
 		
 		def to_h
-			collect{|coverage| [coverage.path, coverage]}.to_h
+			@output.to_enum(:each).collect{|coverage| [coverage.path, coverage]}.to_h
+		end
+	end
+	
+	class Filter < Wrapper
+		def mark(path, lineno, value)
+			@output.mark(path, lineno, value) if accept?(path)
+		end
+		
+		# @yield [Coverage] the path to the file, and the execution counts.
+		def each(&block)
+			@output.each do |coverage|
+				yield coverage if accept?(coverage.path)
+			end
+		end
+		
+		def accept?(path)
+			match?(path) and super
+		end
+		
+		def match?(path)
+			true
 		end
 	end
 end
