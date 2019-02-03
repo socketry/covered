@@ -24,7 +24,7 @@ require 'msgpack'
 
 module Covered
 	class Persist < Wrapper
-		def initialize(output, path: ".covered")
+		def initialize(output, path = ".covered")
 			super(output)
 			
 			@path = path
@@ -46,9 +46,7 @@ module Covered
 			}
 		end
 		
-		def enable
-			super
-			
+		def load!(path = @path)
 			return unless File.exist?(@path)
 			
 			# Load existing coverage information and mark all files:
@@ -57,9 +55,7 @@ module Covered
 			end
 		end
 		
-		def disable
-			super
-			
+		def save!(path = @path)
 			# Dump all coverage:
 			File.open(@path, "w") do |file|
 				packer = make_packer(file)
@@ -70,6 +66,18 @@ module Covered
 				
 				packer.flush
 			end
+		end
+		
+		def enable
+			super
+			
+			load!
+		end
+		
+		def disable
+			super
+			
+			save!
 		end
 		
 		def make_packer(io)
