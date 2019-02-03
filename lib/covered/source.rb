@@ -28,23 +28,11 @@ require 'parser/current'
 module Covered
 	# The source map, loads the source file, parses the AST to generate which lines contain executable code.
 	class Source < Wrapper
-		EXECUTABLE = /(.?CALL|.VAR|.ASGN|DEFN)/.freeze
-		
-		# Deviate from the standard policy above, because all the files are already loaded, so we skip NODE_FCALL.
-		DOGFOOD = /(^V?CALL|.VAR|.ASGN|DEFN)/.freeze
-		
-		# Ruby trace points don't trigger for argument execution.
-		# Constants are loaded when the file loads, so they are less interesting.
-		IGNORE = /(ARGS|CDECL)/.freeze
-		
-		def initialize(output, executable: EXECUTABLE, ignore: IGNORE)
+		def initialize(output)
 			super(output)
 			
 			@paths = {}
 			@mutex = Mutex.new
-			
-			@executable = executable
-			@ignore = ignore
 			
 			@annotations = {}
 		end
