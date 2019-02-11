@@ -18,12 +18,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'eval'
 require_relative 'wrapper'
 
 require 'thread'
-
 require 'parser/current'
+
+require 'pry'
 
 module Covered
 	# The source map, loads the source file, parses the AST to generate which lines contain executable code.
@@ -35,29 +35,33 @@ module Covered
 			@mutex = Mutex.new
 			
 			@annotations = {}
+			
+			begin
+				@trace = TracePoint.new(:script_compiled) do |event|
+					if path = event.instruction_sequence&.path and source = event.eval_script
+						@mutex.synchronize do
+							@paths[path] = source
+						end
+					end
+				end
+			rescue ArgumentError
+				@trace = nil
+			end
 		end
 		
 		def enable
 			super
 			
-			Eval::enable(self)
+			@trace&.enable
 		end
 		
 		def disable
-			Eval::disable(self)
+			@trace&.disable
 			
 			super
 		end
 		
 		attr :paths
-		
-		def intercept_eval(string, binding = nil, filename = nil, lineno = 1)
-			return unless filename
-			
-			@mutex.synchronize do
-				@paths[filename] = string
-			end
-		end
 		
 		def executable?(node)
 			node.type == :send
