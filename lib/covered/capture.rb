@@ -27,7 +27,7 @@ module Covered
 		def initialize(output)
 			super(output)
 			
-			@trace = TracePoint.new(:line, :call) do |event|
+			@trace = TracePoint.new(:line, :call, :c_call) do |event|
 				if path = event.path
 					@output.mark(path, event.lineno, 1)
 				end
