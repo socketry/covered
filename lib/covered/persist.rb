@@ -26,7 +26,9 @@ require 'set'
 
 module Covered
 	class Persist < Wrapper
-		def initialize(output, path = ".covered.msgpack")
+		DEFAULT_PATH = ".covered.db"
+		
+		def initialize(output, path = DEFAULT_PATH)
 			super(output)
 			
 			@path = path
