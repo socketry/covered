@@ -22,13 +22,13 @@ $covered = Covered.policy do
 	cache!
 	
 	# Only files in the root would be tracked:
-	root Dir.pwd
+	root(Dir.pwd)
 	
 	# We will ignore any files in the test or spec directory:
-	skip /^.*\/(test|spec|vendor)\//
+	skip(/^.*\/(test|spec|vendor)\//)
 	
 	# We will include all files under lib, even if they aren't loaded:
-	include "lib/**/*.rb"
+	include("lib/**/*.rb")
 	
 	persist!
 	
