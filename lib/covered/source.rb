@@ -23,8 +23,6 @@ require_relative 'wrapper'
 require 'thread'
 require 'parser/current'
 
-require 'pry'
-
 module Covered
 	# The source map, loads the source file, parses the AST to generate which lines contain executable code.
 	class Source < Wrapper
