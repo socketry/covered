@@ -42,7 +42,8 @@ module Covered
 						end
 					end
 				end
-			rescue ArgumentError
+			rescue
+				warn "Script coverage disabled: #{$!}"
 				@trace = nil
 			end
 		end

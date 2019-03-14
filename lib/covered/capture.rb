@@ -27,21 +27,26 @@ module Covered
 		def initialize(output)
 			super(output)
 			
-			@trace = TracePoint.new(:line, :call, :c_call) do |event|
-				if path = event.path
-					@output.mark(path, event.lineno, 1)
+			begin
+				@trace = TracePoint.new(:line, :call, :c_call) do |event|
+					if path = event.path
+						@output.mark(path, event.lineno, 1)
+					end
 				end
+			rescue
+				warn "Line coverage disabled: #{$!}"
+				@trace = nil
 			end
 		end
 		
 		def enable
 			super
 			
-			@trace.enable
+			@trace&.enable
 		end
 		
 		def disable
-			@trace.disable
+			@trace&.disable
 			
 			super
 		end
