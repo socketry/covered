@@ -37,6 +37,7 @@ module Covered
 				terminal[:uncovered_prefix] ||= terminal.style(:red)
 				terminal[:covered_prefix] ||= terminal.style(:green)
 				terminal[:ignored_prefix] ||= terminal.style(nil, nil, :faint)
+				terminal[:header_prefix] ||= terminal.style(nil, nil, :faint)
 				
 				terminal[:uncovered_code] ||= terminal.style(:red)
 				terminal[:covered_code] ||= terminal.style(:green)
@@ -71,8 +72,9 @@ module Covered
 		end
 		
 		def print_line_header(terminal)
-			terminal.write "Line|".rjust(8)
-			terminal.puts "Hits|".rjust(8)
+			prefix = "Line|".rjust(8) + "Hits|".rjust(8)
+			
+			terminal.puts prefix, style: :header_prefix
 		end
 		
 		def print_line(terminal, line, line_offset, count)
