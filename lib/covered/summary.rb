@@ -21,12 +21,29 @@
 require_relative 'statistics'
 require_relative 'wrapper'
 
-require 'rainbow'
+require 'event/terminal'
 
 module Covered
 	class Summary
 		def initialize(threshold: 1.0)
 			@threshold = threshold
+		end
+		
+		def terminal(output)
+			Event::Terminal.for(output).tap do |terminal|
+				terminal[:path] ||= terminal.style(nil, nil, :bold, :underline)
+				terminal[:brief_path] ||= terminal.style(:yellow)
+				
+				terminal[:uncovered_prefix] ||= terminal.style(:red)
+				terminal[:covered_prefix] ||= terminal.style(:green)
+				terminal[:ignored_prefix] ||= terminal.style(nil, nil, :faint)
+				
+				terminal[:uncovered_code] ||= terminal.style(:red)
+				terminal[:covered_code] ||= terminal.style(:green)
+				terminal[:ignored_code] ||= terminal.style(nil, nil, :faint)
+				
+				terminal[:annotations] ||= terminal.style(:blue)
+			end
 		end
 		
 		def each(wrapper)
@@ -43,49 +60,63 @@ module Covered
 			return statistics
 		end
 		
-		def print_annotations(output, coverage, line, line_offset)
+		def print_annotations(terminal, coverage, line, line_offset)
 			if annotations = coverage.annotations[line_offset]
-				output.write("#{line_offset}|".rjust(8))
-				output.write("*|".rjust(8))
+				prefix = "#{line_offset}|".rjust(8) + "*|".rjust(8)
+				terminal.write prefix, style: :ignored_prefix
 				
-				output.write line.match(/^\s+/)
-				output.write '# '
-				
-				output.puts Rainbow(annotations.join(", ")).bright
+				terminal.write line.match(/^\s+/)
+				terminal.puts "\# #{annotations.join(", ")}", style: :annotations
+			end
+		end
+		
+		def print_line_header(terminal)
+			terminal.write "Line|".rjust(8)
+			terminal.puts "Hits|".rjust(8)
+		end
+		
+		def print_line(terminal, line, line_offset, count)
+			prefix = "#{line_offset}|".rjust(8) + "#{count}|".rjust(8)
+			
+			if count == nil
+				terminal.write prefix, style: :ignored_prefix
+				terminal.write line, style: :ignored_code
+			elsif count == 0
+				terminal.write prefix, style: :uncovered_prefix
+				terminal.write line, style: :uncovered_code
+			else
+				terminal.write prefix, style: :covered_prefix
+				terminal.write line, style: :covered_code
+			end
+			
+			# If there was no newline at end of file, we add one:
+			unless line.end_with? $/
+				terminal.puts
 			end
 		end
 		
 		# A coverage array gives, for each line, the number of line execution by the interpreter. A nil value means coverage is disabled for this line (lines like else and end).
 		def call(wrapper, output = $stdout)
+			terminal = self.terminal(output)
+			
 			statistics = self.each(wrapper) do |coverage|
 				line_offset = 1
 				
 				path = wrapper.relative_path(coverage.path)
-				output.puts "", Rainbow(path).bold.underline
+				terminal.puts ""
+				terminal.puts path, style: :path
 				
 				counts = coverage.counts
 				
 				coverage.read do |file|
+					print_line_header(terminal)
+					
 					file.each_line do |line|
 						count = counts[line_offset]
 						
-						print_annotations(output, coverage, line, line_offset)
+						print_annotations(terminal, coverage, line, line_offset)
 						
-						output.write("#{line_offset}|".rjust(8))
-						output.write("#{count}|".rjust(8))
-						
-						if count == nil
-							output.write Rainbow(line).faint
-						elsif count == 0
-							output.write Rainbow(line).red
-						else
-							output.write Rainbow(line).green
-						end
-						
-						# If there was no newline at end of file, we add one:
-						unless line.end_with? $/
-							output.puts
-						end
+						print_line(terminal, line, line_offset, count)
 						
 						line_offset += 1
 					end
@@ -100,24 +131,26 @@ module Covered
 	
 	class BriefSummary < Summary
 		def call(wrapper, output = $stdout, before: 4, after: 4)
+			terminal = self.terminal(output)
+			
 			ordered = []
 			
 			statistics = self.each(wrapper) do |coverage|
 				ordered << coverage unless coverage.complete?
 			end
 			
-			output.puts
+			terminal.puts
 			statistics.print(output)
 			
 			if ordered.any?
-				output.puts "", "Least Coverage:"
+				terminal.puts "", "Least Coverage:"
 				ordered.sort_by!(&:missing_count).reverse!
 				
 				ordered.first(5).each do |coverage|
 					path = wrapper.relative_path(coverage.path)
 					
-					output.write Rainbow(path).orange
-					output.puts ": #{coverage.missing_count} lines not executed!"
+					terminal.write path, style: :brief_path
+					terminal.puts ": #{coverage.missing_count} lines not executed!"
 				end
 			end
 		end
@@ -125,16 +158,21 @@ module Covered
 	
 	class PartialSummary < Summary
 		def call(wrapper, output = $stdout, before: 4, after: 4)
+			terminal = self.terminal(output)
+			
 			statistics = self.each(wrapper) do |coverage|
 				line_offset = 1
 				
 				path = wrapper.relative_path(coverage.path)
-				output.puts "", Rainbow(path).bold.underline
+				terminal.puts ""
+				terminal.puts path, style: :path
 				
 				counts = coverage.counts
 				last_line = nil
 				
 				unless coverage.zero?
+					print_line_header(terminal)
+					
 					coverage.read do |file|
 						file.each_line do |line|
 							range = Range.new([line_offset - before, 0].max, line_offset+after)
@@ -143,28 +181,11 @@ module Covered
 								count = counts[line_offset]
 								
 								if last_line and last_line != line_offset-1
-									output.puts ":".rjust(16)
+									terminal.puts ":".rjust(16)
 								end
 								
-								print_annotations(output, coverage, line, line_offset)
-								
-								prefix = "#{line_offset}|".rjust(8) + "#{count}|".rjust(8)
-								
-								if count == nil
-									output.write prefix
-									output.write Rainbow(line).faint
-								elsif count == 0
-									output.write Rainbow(prefix).background(:darkred)
-									output.write Rainbow(line).red
-								else
-									output.write Rainbow(prefix).background(:darkgreen)
-									output.write Rainbow(line).green
-								end
-								
-								# If there was no newline at end of file, we add one:
-								unless line.end_with? $/
-									output.puts
-								end
+								print_annotations(terminal, coverage, line, line_offset)
+								print_line(terminal, line, line_offset, count)
 								
 								last_line = line_offset
 							end
@@ -177,7 +198,7 @@ module Covered
 				coverage.print(output)
 			end
 			
-			output.puts
+			terminal.puts
 			statistics.print(output)
 		end
 	end
