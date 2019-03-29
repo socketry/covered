@@ -21,7 +21,7 @@
 require_relative 'statistics'
 require_relative 'wrapper'
 
-require 'event/terminal'
+require 'console/terminal'
 
 module Covered
 	class Summary
@@ -30,7 +30,7 @@ module Covered
 		end
 		
 		def terminal(output)
-			Event::Terminal.for(output).tap do |terminal|
+			Console::Terminal.for(output).tap do |terminal|
 				terminal[:path] ||= terminal.style(nil, nil, :bold, :underline)
 				terminal[:brief_path] ||= terminal.style(:yellow)
 				
