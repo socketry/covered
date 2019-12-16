@@ -4,6 +4,7 @@ require_relative "lib/covered/version"
 Gem::Specification.new do |spec|
 	spec.name          = "covered"
 	spec.version       = Covered::VERSION
+	spec.licenses      = ["MIT"]
 	spec.authors       = ["Samuel Williams"]
 	spec.email         = ["samuel.williams@oriontransfer.co.nz"]
 
