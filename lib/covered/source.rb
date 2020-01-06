@@ -36,7 +36,7 @@ module Covered
 			
 			begin
 				@trace = TracePoint.new(:script_compiled) do |event|
-					if path = event.instruction_sequence&.path and source = event.eval_script
+					if path = event.instruction_sequence.path and source = event.eval_script
 						@mutex.synchronize do
 							@paths[path] = source
 						end
