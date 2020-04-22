@@ -1,4 +1,7 @@
-# Covered [![Build Status](https://travis-ci.com/ioquatix/covered.svg)](https://travis-ci.com/ioquatix/covered) [![Coverage Status](https://coveralls.io/repos/github/ioquatix/covered/badge.svg)](https://coveralls.io/github/ioquatix/covered)
+# Covered
+
+[![Actions Status](https://github.com/ioquatix/covered/workflows/Development/badge.svg)](https://github.com/ioquatix/covered/actions?workflow=Development)
+[![Coverage Status](https://coveralls.io/repos/github/ioquatix/covered/badge.svg)](https://coveralls.io/github/ioquatix/covered)
 
 Covered uses modern Ruby features to generate comprehensive coverage, including support for templates which are compiled into Ruby.
 

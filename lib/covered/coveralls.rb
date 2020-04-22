@@ -60,6 +60,8 @@ module Covered
 				return {"service_name" => @service, "service_job_id" => @job_id}
 			elsif job_id = ENV['TRAVIS_JOB_ID']
 				return {"service_name" => "travis-ci", "service_job_id" => job_id}
+			elsif token = ENV['GITHUB_TOKEN']
+				return {"service_name" => "github", "repo_token" => token}
 			else
 				warn "#{self.class} can't detect service! Please specify COVERALLS_REPO_TOKEN."
 			end
