@@ -60,10 +60,10 @@ module Covered
 		end
 		
 		def load!(path = @path)
-			return unless File.exist?(@path)
+			return unless File.exist?(path)
 			
 			# Load existing coverage information and mark all files:
-			File.open(@path, "r") do |file|
+			File.open(path, "r") do |file|
 				file.flock(File::LOCK_SH)
 				
 				make_unpacker(file).each(&self.method(:apply))
@@ -72,7 +72,7 @@ module Covered
 		
 		def save!(path = @path)
 			# Dump all coverage:
-			File.open(@path, "w") do |file|
+			File.open(path, "wb") do |file|
 				file.flock(File::LOCK_EX)
 				
 				packer = make_packer(file)

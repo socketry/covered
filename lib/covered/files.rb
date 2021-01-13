@@ -134,7 +134,7 @@ module Covered
 		attr :path
 		
 		def expand_path(path)
-			File.expand_path(super, @path)
+			File.expand_path(super, path)
 		end
 		
 		def relative_path(path)
