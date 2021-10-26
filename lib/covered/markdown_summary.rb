@@ -74,39 +74,26 @@ module Covered
 			output.puts '# Coverage Report'
 			output.puts
 			
+			ordered = []
 			buffer = StringIO.new
 			
 			statistics = self.each(wrapper) do |coverage|
-				line_offset = 1
-				
-				path = wrapper.relative_path(coverage.path)
-				buffer.puts ""
-				buffer.puts "\#\# #{path}"
-				
-				counts = coverage.counts
-				
-				coverage.read do |file|
-					buffer.puts "~~~"
-					
-					print_line_header(buffer)
-					
-					file.each_line do |line|
-						count = counts[line_offset]
-						
-						print_annotations(buffer, coverage, line, line_offset)
-						
-						print_line(buffer, line, line_offset, count)
-						
-						line_offset += 1
-					end
-					
-					buffer.puts "~~~"
-				end
-				
-				coverage.print(buffer)
+				ordered << coverage unless coverage.complete?
 			end
 			
 			statistics.print(output)
+			
+			if ordered.any?
+				output.puts "", "\#\# Least Coverage:", ""
+				ordered.sort_by!(&:missing_count).reverse!
+				
+				ordered.first(5).each do |coverage|
+					path = wrapper.relative_path(coverage.path)
+					
+					output.puts "- `#{path}`: #{coverage.missing_count} lines not executed!"
+				end
+			end
+			
 			output.print(buffer.string)
 		end
 	end
