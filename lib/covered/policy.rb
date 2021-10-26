@@ -102,7 +102,7 @@ module Covered
 				begin
 					klass = Covered.const_get(@name)
 				rescue NameError
-					require_relative @name.downcase
+					require_relative(snake_case(@name))
 				end
 				
 				klass = Covered.const_get(@name)
@@ -116,6 +116,12 @@ module Covered
 			
 			def to_s
 				"\#<#{self.class} loading #{@name}>"
+			end
+			
+			private
+			
+			def snake_case(name)
+				name.gsub(/(.+)(?=[A-Z\z])/){$1 + '_'}.downcase
 			end
 		end
 		
