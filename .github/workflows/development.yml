@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 jobs:
   test:
+    name: ${{matrix.ruby}} on ${{matrix.os}}
     runs-on: ${{matrix.os}}-latest
     continue-on-error: ${{matrix.experimental}}
     
@@ -11,40 +12,34 @@ jobs:
       matrix:
         os:
           - ubuntu
-          # - macos
+          - macos
         
         ruby:
-          - 2.5
-          - 2.6
-          - 2.7
+          - "2.6"
+          - "2.7"
+          - "3.0"
         
         experimental: [false]
         env: [""]
         
         include:
-          # - experimental: true
-          #   os: ubuntu
-          #   ruby: truffleruby
-          # - experimental: true
-          #   os: ubuntu
-          #   ruby: jruby
+          - os: ubuntu
+            ruby: truffleruby
+            experimental: true
+          - os: ubuntu
+            ruby: jruby
+            experimental: true
           - os: ubuntu
             ruby: head
             experimental: true
-          - os: ubuntu
-            ruby: 2.6
-            experimental: false
-            env: COVERAGE=PartialSummary,Coveralls
     
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{matrix.ruby}}
-    
-    - name: Install dependencies
-      run: ${{matrix.env}} bundle install
+        bundler-cache: true
     
     - name: Run tests
       timeout-minutes: 5
-      run: GITHUB_TOKEN=${{secrets.GITHUB_TOKEN}} ${{matrix.env}} bundle exec rspec
+      run: ${{matrix.env}} bundle exec rspec

@@ -11,3 +11,5 @@
 .rspec_status
 
 .covered.db
+
+/gems.locked

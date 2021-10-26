@@ -3,6 +3,7 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in covered.gemspec
 gemspec
 
-group :development do
-	gem "pry"
+group :maintenance do
+	gem "bake-modernize"
+	gem "bake-gem"
 end
