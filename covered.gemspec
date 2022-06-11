@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 require_relative "lib/covered/version"
 
@@ -6,7 +7,7 @@ Gem::Specification.new do |spec|
 	spec.version = Covered::VERSION
 	
 	spec.summary = "A modern approach to code coverage."
-	spec.authors = ["Samuel Williams"]
+	spec.authors = ["Samuel Williams", "Cyril Roelandt", "Shannon Skipper", "chocolateboy"]
 	spec.license = "MIT"
 	
 	spec.cert_chain  = ['release.cert']
