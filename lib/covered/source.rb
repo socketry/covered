@@ -73,13 +73,17 @@ module Covered
 		def expand(node, coverage, level = 0)
 			if node.is_a? Parser::AST::Node
 				if ignore?(node)
-					coverage.annotate(node.location.line, "ignoring #{node.type}")
+					# coverage.annotate(node.location.line, "ignoring #{node.type}")
 				else
 					if executable?(node)
-						# coverage.annotate(node.first_lineno, "executable #{node.type}")
+						# coverage.annotate(node.location.line, "executable #{node.type}")
 						coverage.counts[node.location.line] ||= 0
-					else
-						# coverage.annotate(node.first_lineno, "not executable #{node.type}")
+					elsif node.location
+						# coverage.annotate(node.location.line, "not executable #{node.type}") rescue nil
+					end
+					
+					if node.type == :send
+						# coverage.annotate(node.location.line, "ignoring #{node.type} children")
 					end
 					
 					expand(node.children, coverage, level + 1)
