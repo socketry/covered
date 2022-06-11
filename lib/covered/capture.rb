@@ -28,9 +28,13 @@ module Covered
 			super(output)
 			
 			begin
-				@trace = TracePoint.new(:line, :call, :c_call) do |event|
-					if path = event.path
-						@output.mark(path, event.lineno, 1)
+				@trace = TracePoint.new(:line, :call, :c_call) do |trace|
+					if trace.event == :call
+						# Ruby doesn't always mark call-sites in sub-expressions, so we use this approach to compute a call site and mark it:
+						location = caller_locations(2, 1).first
+						@output.mark(location.path, location.lineno, 1)
+					elsif path = trace.path
+						@output.mark(path, trace.lineno, 1)
 					end
 				end
 			rescue
