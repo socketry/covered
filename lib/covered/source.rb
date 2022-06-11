@@ -35,10 +35,16 @@ module Covered
 			@annotations = {}
 			
 			begin
-				@trace = TracePoint.new(:script_compiled) do |event|
-					if path = event.instruction_sequence.path and source = event.eval_script
-						@mutex.synchronize do
-							@paths[path] = source
+				@trace = TracePoint.new(:script_compiled) do |trace|
+					instruction_sequence = trace.instruction_sequence
+
+					# We only track source files which begin at line 1, as these represent whole files instead of monkey patches.
+					if instruction_sequence.first_lineno <= 1
+						# Extract the source path and source itself and save it for later:
+						if path = instruction_sequence.path and source = trace.eval_script
+							@mutex.synchronize do
+								@paths[path] = source
+							end
 						end
 					end
 				end
