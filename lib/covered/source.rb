@@ -69,7 +69,7 @@ module Covered
 		attr :paths
 		
 		def executable?(node)
-			node.type == :send
+			node.type == :send || node.type == :yield
 		end
 		
 		def ignore?(node)
