@@ -39,6 +39,9 @@ RSpec.describe Covered::Source do
 		template.to_string
 		capture.disable
 		
+		expect(source.paths.size).to be == 1
+		expect(source.paths).to include(template_path)
+
 		io = StringIO.new
 		summary.call(source, io)
 		
