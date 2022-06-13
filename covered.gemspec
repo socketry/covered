@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
 		"funding_uri" => "https://github.com/sponsors/ioquatix/",
 	}
 	
-	spec.files = Dir.glob('{.github,examples,lib,media}/**/*', File::FNM_DOTMATCH, base: __dir__)
+	spec.files = Dir.glob('{bake,lib}/**/*', File::FNM_DOTMATCH, base: __dir__)
 	
 	spec.add_dependency "async-rest"
 	spec.add_dependency "console", "~> 1.0"
