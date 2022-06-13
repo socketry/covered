@@ -23,11 +23,12 @@ RSpec.describe Covered::Cache do
 	subject {described_class.new(files)}
 	
 	it "will mark lines after flushing" do
+		subject.enable
 		subject.mark("program.rb", 2, 1)
 		
 		expect(files.paths).to be_empty
 		
-		subject.flush
+		subject.disable
 		
 		expect(files.paths["program.rb"][2]).to be == 1
 	end

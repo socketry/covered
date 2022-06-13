@@ -8,7 +8,7 @@ end
 # Validate the coverage of multiple test runs.
 # @parameter paths [Array(String)] The coverage database paths.
 # @parameter minumum [Float] The minimum required coverage in order to pass.
-def validate(paths: nil, minumum: 1.0)
+def validate(paths: nil, minimum: 1.0)
 	paths&.each do |path|
 		Covered::Persist.new($covered.output, path).load!
 	end
@@ -21,5 +21,5 @@ def validate(paths: nil, minumum: 1.0)
 		statistics << coverage
 	end
 	
-	statistics.print($stdout)
+	statistics.validate!(minimum)
 end

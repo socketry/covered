@@ -23,6 +23,7 @@ require_relative 'wrapper'
 require 'msgpack'
 require 'time'
 require 'set'
+require 'console'
 
 module Covered
 	class Persist < Wrapper
@@ -65,7 +66,7 @@ module Covered
 			File.open(@path, "rb") do |file|
 				file.flock(File::LOCK_SH)
 				
-				Console.logger.info(self) {"Loading from #{@path}..."}
+				Console.logger.debug(self) {"Loading from #{@path}..."}
 				
 				make_unpacker(file).each(&self.method(:apply))
 			end
@@ -76,7 +77,7 @@ module Covered
 			File.open(@path, "wb") do |file|
 				file.flock(File::LOCK_EX)
 				
-				Console.logger.info(self) {"Saving to #{@path}..."}
+				Console.logger.debug(self) {"Saving to #{@path}..."}
 				
 				packer = make_packer(file)
 				

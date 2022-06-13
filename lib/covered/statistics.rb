@@ -22,6 +22,9 @@ require_relative 'wrapper'
 require_relative 'coverage'
 
 module Covered
+	class CoverageError < StandardError
+	end
+	
 	class Statistics < Wrapper
 		def initialize
 			@count = 0
@@ -50,6 +53,12 @@ module Covered
 			output.puts "* #{count} files checked; #{executed_count}/#{executable_count} lines executed; #{percentage.to_f.round(2)}% covered."
 			
 			# Could output funny message here, especially for 100% coverage.
+		end
+		
+		def validate!(minimum = 1.0)
+			if self.ratio < minimum
+				raise CoverageError, "Coverage of #{self.percentage.to_f.round(2)}% is less than required minimum of #{(minimum * 100.0).round(2)}%!"
+			end
 		end
 	end
 end
