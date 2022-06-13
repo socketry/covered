@@ -36,14 +36,24 @@ module Covered
 			@touched = Set.new
 		end
 		
-		def apply(record)
+		def apply(record, ignore_mtime: false)
 			# The file must still exist:
 			return unless path = expand_path(record[:path])
-			return unless File.exist? path
+			
+			unless File.exist?(path)
+				Console.logger.debug(self) {"Ignoring coverage, path #{path} does not exist!"}
+				return
+			end
 			
 			# If the file has been modified since... we can't use the coverage.
 			return unless mtime = record[:mtime]
-			return if File.mtime(path).to_f > record[:mtime]
+			
+			unless ignore_mtime
+				if File.mtime(path).to_f > record[:mtime]
+					Console.logger.debug(self) {"Ignoring coverage, path #{path} has been updated: #{File.mtime(path).to_f} > #{record[:mtime]}!"}
+					return
+				end
+			end
 			
 			record[:coverage].each_with_index do |count, index|
 				@output.mark(path, index, count) if count
@@ -59,20 +69,22 @@ module Covered
 			}
 		end
 		
-		def load!(path = @path)
+		def load!(**options)
 			return unless File.exist?(@path)
 			
 			# Load existing coverage information and mark all files:
 			File.open(@path, "rb") do |file|
 				file.flock(File::LOCK_SH)
 				
-				Console.logger.debug(self) {"Loading from #{@path}..."}
+				Console.logger.debug(self) {"Loading from #{@path} with #{options}..."}
 				
-				make_unpacker(file).each(&self.method(:apply))
+				make_unpacker(file).each do |record|
+					self.apply(record, **options)
+				end
 			end
 		end
 		
-		def save!(path = @path)
+		def save!
 			# Dump all coverage:
 			File.open(@path, "wb") do |file|
 				file.flock(File::LOCK_EX)
