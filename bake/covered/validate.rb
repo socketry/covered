@@ -22,5 +22,7 @@ def validate(paths: nil, minimum: 1.0)
 		statistics << coverage
 	end
 	
+	statistics.print($stderr)
+	
 	statistics.validate!(minimum)
 end
