@@ -59,35 +59,6 @@ module Covered
 		end
 	end
 	
-	class Cache < Wrapper
-		def initialize(output)
-			super(output)
-			@marks = []
-		end
-		
-		def mark(path, lineno, count = 1)
-			@marks << path << lineno << count
-		end
-		
-		def enable
-			super
-		end
-		
-		def flush
-			@marks.each_slice(3) do |path, lineno, count|
-				@output.mark(path, lineno, count)
-			end
-			
-			@marks.clear
-		end
-		
-		def disable
-			super
-			
-			flush
-		end
-	end
-	
 	# class Capture < Wrapper
 	# 	def enable
 	# 		super

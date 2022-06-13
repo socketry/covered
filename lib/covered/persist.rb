@@ -32,7 +32,6 @@ module Covered
 			super(output)
 			
 			@path = path
-			
 			@touched = Set.new
 		end
 		
@@ -66,6 +65,8 @@ module Covered
 			File.open(@path, "rb") do |file|
 				file.flock(File::LOCK_SH)
 				
+				Console.logger.info(self) {"Loading from #{@path}..."}
+				
 				make_unpacker(file).each(&self.method(:apply))
 			end
 		end
@@ -74,6 +75,8 @@ module Covered
 			# Dump all coverage:
 			File.open(@path, "wb") do |file|
 				file.flock(File::LOCK_EX)
+				
+				Console.logger.info(self) {"Saving to #{@path}..."}
 				
 				packer = make_packer(file)
 				
@@ -87,7 +90,7 @@ module Covered
 		
 		def mark(file, line, count)
 			@touched << file
-		
+			
 			super
 		end
 		
@@ -95,6 +98,12 @@ module Covered
 			super
 			
 			load!
+		end
+		
+		def flush
+			load!
+			
+			super
 		end
 		
 		def disable

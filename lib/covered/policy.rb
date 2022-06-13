@@ -22,6 +22,7 @@ require_relative "summary"
 require_relative "files"
 require_relative "source"
 require_relative "capture"
+require_relative "cache"
 require_relative "persist"
 
 module Covered
@@ -41,6 +42,8 @@ module Covered
 			
 			@reports = []
 		end
+		
+		attr :output
 		
 		def freeze
 			return self if frozen?
@@ -89,6 +92,10 @@ module Covered
 		
 		def disable
 			capture.disable
+		end
+		
+		def flush
+			@output.flush
 		end
 		
 		attr :reports

@@ -26,6 +26,9 @@ module Covered
 		def disable
 		end
 		
+		def flush
+		end
+		
 		def accept?(path)
 			true
 		end
@@ -58,6 +61,10 @@ module Covered
 		
 		def disable
 			@output.disable
+		end
+		
+		def flush
+			@output.flush
 		end
 		
 		def accept?(path)

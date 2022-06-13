@@ -1,4 +1,4 @@
-# Copyright, 2019, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,27 +18,48 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative '../policy'
+require_relative 'wrapper'
 
-if File.exist?("config/coverage.rb")
-	load("config/coverage.rb")
-else
-	$covered = Covered.policy do
-		cache!
+require 'coverage'
+
+module Covered
+	class Cache < Wrapper
+		def initialize(output)
+			super(output)
+			
+			@marks = nil
+		end
 		
-		# Only files in the root would be tracked:
-		root(Dir.pwd)
+		def mark(path, lineno, count = 1)
+			if @marks
+				@marks << path << lineno << count
+			else
+				super
+			end
+		end
 		
-		# We will ignore any files in the test or spec directory:
-		skip(/^.*\/(test|spec|vendor)\//)
+		def enable
+			@marks = []
+			
+			super
+		end
 		
-		# We will include all files under lib, even if they aren't loaded:
-		include("lib/**/*.rb")
+		def flush
+			if @marks
+				@marks.each_slice(3) do |path, lineno, count|
+					@output.mark(path, lineno, count)
+				end
+				
+				@marks = nil
+			end
+			
+			super
+		end
 		
-		persist!
-		
-		source
-		
-		reports!
+		def disable
+			super
+			
+			flush
+		end
 	end
 end
