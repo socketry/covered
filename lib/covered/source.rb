@@ -68,8 +68,17 @@ module Covered
 		
 		attr :paths
 		
+		EXECUTABLE = {
+			send: true,
+			yield: true,
+			return: true,
+			lvar: true,
+			ivar: true,
+			def: true
+		}
+		
 		def executable?(node)
-			node.type == :send || node.type == :yield
+			EXECUTABLE[node.type]
 		end
 		
 		def ignore?(node)
