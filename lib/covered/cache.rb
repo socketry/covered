@@ -32,7 +32,7 @@ module Covered
 		
 		def mark(path, lineno, count = 1)
 			if @marks
-				@marks << path << lineno << count
+				@marks.push(path, lineno, count)
 			else
 				super
 			end
