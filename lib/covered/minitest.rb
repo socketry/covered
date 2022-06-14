@@ -19,9 +19,10 @@
 # THE SOFTWARE.
 
 require_relative 'policy'
-require_relative 'policy/default'
 
 require 'minitest'
+
+$covered = Covered::Config.load
 
 module Covered
 	module Minitest
@@ -33,7 +34,7 @@ module Covered
 	end
 end
 
-if ENV['COVERAGE']
+if $covered
 	class << Minitest
 		prepend Covered::Minitest
 	end

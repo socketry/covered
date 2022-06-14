@@ -23,14 +23,6 @@ require 'covered/policy'
 RSpec.describe Covered::Policy do
 	let(:pattern) {"**/*.rb"}
 	
-	it 'can generate policy' do
-		policy = Covered.policy do
-		end
-		
-		expect(policy).to be_frozen
-		expect(policy).to be_kind_of described_class
-	end
-	
 	it 'can enable capture via policy' do
 		expect do
 			subject.enable

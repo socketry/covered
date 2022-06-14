@@ -26,16 +26,6 @@ require_relative "cache"
 require_relative "persist"
 
 module Covered
-	def self.policy(&block)
-		policy = Policy.new
-		
-		policy.instance_eval(&block)
-		
-		policy.freeze
-		
-		return policy
-	end
-	
 	class Policy < Wrapper
 		def initialize
 			super(Files.new)
@@ -132,7 +122,7 @@ module Covered
 			end
 		end
 		
-		def reports!(coverage = ENV['COVERAGE'])
+		def reports!(coverage)
 			if coverage
 				names = coverage.split(',')
 				

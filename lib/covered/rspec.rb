@@ -18,10 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'policy'
-require_relative 'policy/default'
+require_relative 'config'
 
 require 'rspec/core/formatters'
+
+$covered = Covered::Config.load
 
 module Covered
 	module RSpec
@@ -56,7 +57,7 @@ module Covered
 	end
 end
 
-if ENV['COVERAGE']
+if $covered
 	RSpec::Core::Configuration.prepend(Covered::RSpec::Policy)
 
 	RSpec.configure do |config|
