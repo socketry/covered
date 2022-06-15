@@ -72,9 +72,10 @@ module Covered
 			send: true,
 			yield: true,
 			return: true,
-			lvar: true,
-			ivar: true,
-			def: true
+			def: true,
+			if: true,
+			lvasgn: true, ivasgn: true, cvasgn: true, gvasgn: true,
+			match_pattern: true
 		}
 		
 		def executable?(node)
