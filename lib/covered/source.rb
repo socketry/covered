@@ -71,10 +71,14 @@ module Covered
 		EXECUTABLE = {
 			send: true,
 			yield: true,
-			return: true,
+			# Line trace point is not triggered for return statements.
+			# return: true,
 			def: true,
 			if: true,
-			lvasgn: true, ivasgn: true, cvasgn: true, gvasgn: true,
+			lvasgn: true,
+			ivasgn: true,
+			cvasgn: true,
+			gvasgn: true,
 			match_pattern: true
 		}
 		
@@ -82,8 +86,14 @@ module Covered
 			EXECUTABLE[node.type]
 		end
 		
+		IGNORE = {
+			arg: true,
+			# Ruby doesn't appear to execute rescue lines.
+			rescue: true
+		}
+		
 		def ignore?(node)
-			node.nil? or node.type == :arg
+			node.nil? || IGNORE[node.type]
 		end
 		
 		def expand(node, coverage, level = 0)
