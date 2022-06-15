@@ -34,9 +34,11 @@ module Covered
 			end
 		end
 		
-		def self.load(root: Dir.pwd, coverage: ENV['COVERAGE'])
-			return nil unless coverage
-			
+		def self.coverage
+			ENV['COVERAGE']
+		end
+		
+		def self.load(root: Dir.pwd, coverage: self.coverage)
 			derived = Class.new(self)
 			
 			if path = self.path(root)
@@ -54,8 +56,18 @@ module Covered
 			@policy = nil
 		end
 		
+		def record?
+			!!@coverage
+		end
+		
+		attr :coverage
+		
 		def policy
 			@policy ||= Policy.new.tap{|policy| make_policy(policy)}.freeze
+		end
+		
+		def output
+			policy.output
 		end
 		
 		def enable
@@ -72,6 +84,10 @@ module Covered
 		
 		def call(output)
 			policy.call(output)
+		end
+		
+		def each(&block)
+			policy.each(&block)
 		end
 		
 		# Override this method to implement your own policy.

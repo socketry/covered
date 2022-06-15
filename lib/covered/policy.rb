@@ -123,7 +123,7 @@ module Covered
 		end
 		
 		def reports!(coverage)
-			if coverage
+			if coverage.is_a?(String)
 				names = coverage.split(',')
 				
 				names.each do |name|
@@ -134,7 +134,7 @@ module Covered
 						@reports << Autoload.new(name)
 					end
 				end
-			else
+			elsif coverage
 				@reports << Covered::BriefSummary.new
 			end
 		end

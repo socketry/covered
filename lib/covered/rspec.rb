@@ -57,7 +57,7 @@ module Covered
 	end
 end
 
-if $covered
+if $covered.record?
 	RSpec::Core::Configuration.prepend(Covered::RSpec::Policy)
 
 	RSpec.configure do |config|

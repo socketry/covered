@@ -65,7 +65,7 @@ RSpec.describe Covered::Policy do
 	end
 	
 	it 'can select default reports' do
-		subject.reports!(nil)
+		subject.reports!(true)
 		
 		expect(subject.reports.count).to be == 1
 		expect(subject.reports.first).to be_kind_of Covered::BriefSummary

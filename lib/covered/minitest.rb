@@ -34,7 +34,7 @@ module Covered
 	end
 end
 
-if $covered
+if $covered.record?
 	class << Minitest
 		prepend Covered::Minitest
 	end
