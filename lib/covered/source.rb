@@ -101,16 +101,19 @@ module Covered
 				if ignore?(node)
 					# coverage.annotate(node.location.line, "ignoring #{node.type}")
 				else
-					if executable?(node)
+					if node.type == :send
+						# We want to mark the line which has the method on it:
+						coverage.counts[node.location.selector.line] ||= 0
+					elsif executable?(node)
 						# coverage.annotate(node.location.line, "executable #{node.type}")
 						coverage.counts[node.location.line] ||= 0
-					elsif node.location
-						# coverage.annotate(node.location.line, "not executable #{node.type}") rescue nil
+					# elsif location = node.location
+					# 	coverage.annotate(location.line, "not executable #{node.type}") rescue nil
 					end
 					
-					if node.type == :send
-						# coverage.annotate(node.location.line, "ignoring #{node.type} children")
-					end
+					# if node.type == :send
+					# 	coverage.annotate(node.location.line, "ignoring #{node.type} children")
+					# end
 					
 					expand(node.children, coverage, level + 1)
 				end
