@@ -1,5 +1,4 @@
-
-# Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2022, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,10 +18,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative "test_helper"
+require 'covered'
 
-class DummyTest < Minitest::Test
-	def test_hello_world
-		assert_equal "Hello World", "Hello World"
+describe "Covered::Minitest" do
+	let(:test_path) {File.expand_path(".minitest/dummy_test.rb", __dir__)}
+
+	it "can run minitest test suite with coverage" do
+		input, output = IO.pipe
+		
+		system({"COVERAGE" => "PartialSummary"}, test_path, out: output, err: output)
+		output.close
+
+		buffer = input.read
+		expect(buffer).to be =~ /\* (.*?) files checked; (.*?) lines executed; (.*?)% covered/
 	end
 end

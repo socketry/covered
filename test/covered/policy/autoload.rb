@@ -1,4 +1,4 @@
-# Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2022, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,21 +20,21 @@
 
 require 'covered/policy'
 
-RSpec.describe Covered::Policy::Autoload do
-	context "Coveralls class" do
-		subject {described_class.new('Coveralls')}
+describe Covered::Policy::Autoload do
+	with "PartialSummary class" do
+		let(:autoload) {subject.new('PartialSummary')}
 		
 		it "should autoload and instantiate class" do
-			expect(subject.new).to be_instance_of Covered::Coveralls
+			expect(autoload.new).to be_a Covered::PartialSummary
 		end
 	end
 	
-	context "unknown class" do
-		subject {described_class.new('Unknown')}
+	with "unknown class" do
+		let(:autoload) {subject.new('Unknown')}
 		
-		it "fails to autload unknown class" do
+		it "fails to autoload unknown class" do
 			expect do
-				subject.new
+				autoload.new
 			end.to raise_exception(LoadError)
 		end
 	end
