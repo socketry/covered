@@ -79,7 +79,7 @@ module Covered
 			ivasgn: true,
 			cvasgn: true,
 			gvasgn: true,
-			match_pattern: true
+			match_pattern: true,
 		}
 		
 		def executable?(node)
@@ -88,34 +88,42 @@ module Covered
 		
 		IGNORE = {
 			arg: true,
-			# Ruby doesn't appear to execute rescue lines.
-			rescue: true
 		}
 		
 		def ignore?(node)
 			node.nil? || IGNORE[node.type]
 		end
 		
+		IGNORE_CHILDREN = {
+			hash: true,
+			array: true,
+		}
+		
+		def ignore_children?(node)
+			IGNORE_CHILDREN[node.type]
+		end
+		
 		def expand(node, coverage, level = 0)
 			if node.is_a? Parser::AST::Node
 				if ignore?(node)
 					# coverage.annotate(node.location.line, "ignoring #{node.type}")
-				else
-					if node.type == :send
-						# We want to mark the line which has the method on it:
-						coverage.counts[node.location.selector.line] ||= 0
-					elsif executable?(node)
-						# coverage.annotate(node.location.line, "executable #{node.type}")
-						coverage.counts[node.location.line] ||= 0
-					# elsif location = node.location
-					# 	coverage.annotate(location.line, "not executable #{node.type}") rescue nil
+				elsif node.type == :begin
+					if last_child = node.children&.last
+						coverage.counts[last_child.location.line] ||= 0
 					end
 					
-					# if node.type == :send
-					# 	coverage.annotate(node.location.line, "ignoring #{node.type} children")
-					# end
-					
 					expand(node.children, coverage, level + 1)
+				elsif node.type == :send
+					coverage.counts[node.location.selector.line] ||= 0
+				elsif executable?(node)
+					# coverage.annotate(node.location.line, "executable #{node.type}")
+					coverage.counts[node.location.line] ||= 0
+				else
+					if ignore_children?(node)
+						# coverage.annotate(node.location.line, "ignoring #{node.type} children")
+					else
+						expand(node.children, coverage, level + 1)
+					end
 				end
 			elsif node.is_a? Array
 				node.each do |child|

@@ -31,7 +31,7 @@ module Covered
 			@paths = {}
 		end
 		
-		attr :paths
+		attr_accessor :paths
 		
 		def empty?
 			@paths.empty?
