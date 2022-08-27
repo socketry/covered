@@ -18,23 +18,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'config'
-
 module Covered
 	module Sus
 		def initialize(...)
 			super
 			
-			@covered = Covered::Config.load(root: self.root)
-			if @covered.record?
-				@covered.enable
+			# Defer loading the coverage configuration unless we are actually running with coverage enabled to avoid performance cost/overhead.
+			if ENV['COVERAGE']
+				require_relative 'config'
+				
+				@covered = Covered::Config.load(root: self.root)
+				if @covered.record?
+					@covered.enable
+				end
+			else
+				@covered = nil
 			end
 		end
 		
 		def after_tests(assertions)
 			super(assertions)
 			
-			if @covered.record?
+			if @covered&.record?
 				@covered.disable
 				@covered.call(self.output.io)
 			end
