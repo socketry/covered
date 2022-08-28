@@ -117,8 +117,12 @@ module Covered
 			
 			private
 			
-			def snake_case(name)
-				name.gsub(/(.+)(?=[A-Z\z])/){$1 + '_'}.downcase
+			def snake_case(string)
+				return string.gsub(/::/, '/').
+					gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
+					gsub(/([a-z\d])([A-Z])/,'\1_\2').
+					tr("-", "_").
+					downcase
 			end
 		end
 		
