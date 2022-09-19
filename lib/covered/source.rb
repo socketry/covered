@@ -165,7 +165,7 @@ module Covered
 			elsif File.exist?(path)
 				Parser::CurrentRuby.parse_file(path)
 			else
-				warn "Couldn't parse #{path}, file doesn't exist?"
+				# warn "Couldn't parse #{path}, file doesn't exist?"
 			end
 		rescue
 			warn "Couldn't parse #{path}: #{$!}"
