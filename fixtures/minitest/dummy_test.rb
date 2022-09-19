@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 # Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,22 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'covered/summary'
-require 'covered/files'
+require_relative '../../lib/covered/minitest'
+require 'minitest/autorun'
 
-RSpec.describe Covered::Summary do
-	let(:files) {Covered::Files.new}
-	let(:summary) {Covered::Summary.new}
-	
-	let(:first_line) {File.readlines(__FILE__).first}
-	let(:io) {StringIO.new}
-	
-	it "can generate source code listing" do
-		files.mark(__FILE__, 24, 1)
-		files.mark(__FILE__, 25, 0)
-		
-		summary.call(files, io)
-		
-		expect(io.string).to include("RSpec.describe Covered::Summary do")
+class DummyTest < Minitest::Test
+	def test_hello_world
+		assert_equal "Hello World", "Hello World"
 	end
 end

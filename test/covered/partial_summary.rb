@@ -21,9 +21,9 @@
 require 'covered/summary'
 require 'covered/files'
 
-RSpec.describe Covered::PartialSummary do
+describe Covered::PartialSummary do
 	let(:files) {Covered::Files.new}
-	let(:summary) {described_class.new}
+	let(:summary) {subject.new}
 	
 	let(:first_line) {File.readlines(__FILE__).first}
 	let(:io) {StringIO.new}
@@ -34,8 +34,8 @@ RSpec.describe Covered::PartialSummary do
 		
 		summary.call(files, io)
 		
-		expect(io.string).to_not include(first_line)
-		expect(io.string).to include("What are some of the best recursion jokes?")
+		expect(io.string).not.to be =~ /#{first_line}/
+		expect(io.string).to be =~ /What are some of the best recursion jokes/
 	end
 	
 	it "should break segments with elipsis" do
@@ -46,6 +46,6 @@ RSpec.describe Covered::PartialSummary do
 		
 		summary.call(files, io)
 		
-		expect(io.string).to include("               :\n")
+		expect(io.string).to be =~ /               :\n/
 	end
 end

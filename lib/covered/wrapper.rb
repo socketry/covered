@@ -36,6 +36,9 @@ module Covered
 		def mark(path, lineno, value)
 		end
 		
+		def add(path, source = nil)
+		end
+		
 		def each
 		end
 		
@@ -73,6 +76,10 @@ module Covered
 		
 		def mark(path, lineno, value)
 			@output.mark(path, lineno, value)
+		end
+		
+		def add(path, source = nil)
+			@output.add(path, source = nil)
 		end
 		
 		# @yield [Coverage] the path to the file, and the execution counts.

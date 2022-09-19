@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 # Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,11 +18,39 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative '../../../lib/covered/minitest'
-require 'minitest/autorun'
+require 'covered/files'
+require 'covered/source'
+require 'covered/summary'
+require 'covered/capture'
 
-class DummyTest < Minitest::Test
-	def test_hello_world
-		assert_equal "Hello World", "Hello World"
+require 'trenni/template'
+
+describe Covered::Source do
+	let(:template_path) {File.expand_path("template.trenni", __dir__)}
+	let(:template) {Trenni::Template.load_file(template_path)}
+	
+	let(:files) {Covered::Files.new}
+	let(:only) {Covered::Only.new(template_path, files)}
+	let(:source) {Covered::Source.new(files)}
+	let(:capture) {Covered::Capture.new(source)}
+	
+	let(:summary) {Covered::Summary.new}
+	
+	it "correctly generates coverage for template" do
+		capture.enable
+		template.to_string
+		capture.disable
+		
+		expect(source.paths.size).to be == 1
+		expect(source.paths).to be(:include?, template_path)
+
+		io = StringIO.new
+		summary.call(source, io)
+		
+		expect(io.string).to be(:include?, "2/3 lines executed; 66.67% covered")
+	end
+	
+	it "can't parse non-existant path" do
+		expect(source.parse("do_not_exist")).to be == nil
 	end
 end

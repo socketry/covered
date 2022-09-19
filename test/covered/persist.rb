@@ -1,4 +1,4 @@
-# Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2019, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,17 +18,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require "bundler/setup"
-require "covered/rspec"
+require 'covered/coverage'
+require 'covered/persist'
+require 'wrapper_examples'
 
-RSpec.configure do |config|
-	# Enable flags like --only-failures and --next-failure
-	config.example_status_persistence_file_path = ".rspec_status"
-
-	# Disable RSpec exposing methods globally on `Module` and `main`
-	config.disable_monkey_patching!
-
-	config.expect_with :rspec do |c|
-		c.syntax = :expect
+describe Covered::Persist do
+	it_behaves_like WrapperExamples
+	
+	let(:coverage) {Covered::Coverage.new(__FILE__)}
+	let(:output) {Covered::Base.new}
+	let(:persist) {subject.new(output)}
+	let(:record) {persist.serialize(coverage)}
+	
+	it "can serialize coverage" do
+		expect(record[:path]).to be == __FILE__
 	end
 end

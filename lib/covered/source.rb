@@ -26,6 +26,8 @@ require 'parser/current'
 module Covered
 	# The source map, loads the source file, parses the AST to generate which lines contain executable code.
 	class Source < Wrapper
+		Script = Struct.new(:path, :source, :line_offset)
+		
 		def initialize(output)
 			super(output)
 			
@@ -43,7 +45,7 @@ module Covered
 						# Extract the source path and source itself and save it for later:
 						if path = instruction_sequence.path and source = trace.eval_script
 							@mutex.synchronize do
-								@paths[path] = source
+								@paths[path] = Script.new(path, source, instruction_sequence.first_lineno)
 							end
 						end
 					end
@@ -103,27 +105,41 @@ module Covered
 			IGNORE_CHILDREN[node.type]
 		end
 		
+		IGNORE_METHOD = {
+			freeze: true
+		}
+		
+		def ignore_method?(name)
+			IGNORE_METHOD[name]
+		end
+		
 		def expand(node, coverage, level = 0)
 			if node.is_a? Parser::AST::Node
 				if ignore?(node)
 					# coverage.annotate(node.location.line, "ignoring #{node.type}")
 				elsif node.type == :begin
-					if last_child = node.children&.last
-						coverage.counts[last_child.location.line] ||= 0
-					end
+					# if last_child = node.children&.last
+					# 	coverage.counts[last_child.location.line] ||= 0
+					# end
 					
 					expand(node.children, coverage, level + 1)
 				elsif node.type == :send
-					coverage.counts[node.location.selector.line] ||= 0
+					if ignore_method?(node.children[1])
+						# coverage.annotate(node.location.line, "ignoring #{node.type}")
+						return
+					else
+						# coverage.annotate(node.location.line, "accepting selector #{node.type}")
+						coverage.counts[node.location.selector.line] ||= 0
+					end
 				elsif executable?(node)
 					# coverage.annotate(node.location.line, "executable #{node.type}")
 					coverage.counts[node.location.line] ||= 0
+				end
+
+				if ignore_children?(node)
+					# coverage.annotate(node.location.line, "ignoring #{node.type} children")
 				else
-					if ignore_children?(node)
-						# coverage.annotate(node.location.line, "ignoring #{node.type} children")
-					else
-						expand(node.children, coverage, level + 1)
-					end
+					expand(node.children, coverage, level + 1)
 				end
 			elsif node.is_a? Array
 				node.each do |child|
@@ -134,9 +150,18 @@ module Covered
 			end
 		end
 		
+		def add(path, source = nil)
+			if coverage = super
+				top = Parser::CurrentRuby.parse(source)
+				self.expand(top, coverage)
+			end
+			
+			return coverage
+		end
+		
 		def parse(path)
-			if source = @paths[path]
-				Parser::CurrentRuby.parse(source)
+			if script = @paths[path]
+				Parser::CurrentRuby.parse(script.source, script.path, script.line_offset)
 			elsif File.exist?(path)
 				Parser::CurrentRuby.parse_file(path)
 			else

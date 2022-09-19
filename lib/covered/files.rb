@@ -45,6 +45,10 @@ module Covered
 			return coverage
 		end
 		
+		def add(path, source = nil)
+			@paths[path] ||= Coverage.new(path)
+		end
+		
 		def each(&block)
 			@paths.each_value(&block)
 		end

@@ -1,4 +1,6 @@
-# Copyright, 2019, by Samuel G. D. Williams. <http://www.codeotaku.com>
+#!/usr/bin/env ruby
+
+# Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,17 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'covered/persist'
+require_relative '../../lib/covered/rspec'
 
-require_relative 'wrapper_examples'
-
-RSpec.describe Covered::Persist do
-	include_context Covered::Wrapper
-	
-	let(:coverage) {Covered::Coverage.new(__FILE__)}
-	let(:record) {subject.serialize(coverage)}
-	
-	it "can serialize coverage" do
-		expect(record[:path]).to be == __FILE__
+RSpec.describe "Hello World Test" do
+	it "can hello world" do
+		expect("Hello World").to eq "Hello World"
 	end
 end

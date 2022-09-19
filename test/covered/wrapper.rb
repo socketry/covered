@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 # Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,10 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative '../../../lib/covered/rspec'
+require 'wrapper_examples'
 
-RSpec.describe "Hello World Test" do
-	it "can hello world" do
-		expect("Hello World").to eq "Hello World"
-	end
+describe Covered::Wrapper do
+	it_behaves_like WrapperExamples
 end

@@ -18,8 +18,34 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'wrapper_examples'
+require 'covered/wrapper'
 
-RSpec.describe Covered::Wrapper do
-	it_behaves_like Covered::Wrapper
+WrapperExamples = Sus::Shared("a wrapper") do
+	let(:output) {Covered::Base.new}
+	let(:wrapper) {subject.new(output)}
+	
+	it 'passes #mark through' do
+		expect(output).to receive(:mark).with_arguments("fleeb.rb", 5, 1)
+		
+		wrapper.mark("fleeb.rb", 5, 1)
+	end
+	
+	it 'passes #enable through' do
+		expect(output).to receive(:enable)
+		
+		wrapper.enable
+	end
+	
+	it 'passes #disable through' do
+		expect(output).to receive(:disable)
+		
+		wrapper.disable
+	end
+	
+	it 'passes #each through' do
+		expect(output).to receive(:each)
+		
+		wrapper.each do
+		end
+	end
 end

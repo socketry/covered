@@ -1,16 +1,17 @@
 trace_point = TracePoint.new(:call, :return, :line, :c_call, :c_return, :b_call, :b_return) do |trace|
-	puts [trace.path, trace.lineno].join(":")
+	puts [trace.event, trace.path, trace.lineno, trace.method_id].join(":")
 end
+
+class String
+	def freezer
+		self.freeze
+	end
+end
+
+output = String.new
 
 trace_point.enable
 
-values = {foo: 10}
-
-def shell_escape(x)
-	x
-end
-
-values.map{|key, value| [
-	key.to_s.upcase,
-	shell_escape(value) # TracePoint is never triggered for this line.
-]}
+begin
+	output << "
+".freezer; end

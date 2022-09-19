@@ -19,9 +19,10 @@
 # THE SOFTWARE.
 
 require 'covered'
+require 'rspec_tests'
 
 describe "Covered::RSpec" do
-	let(:test_path) {File.expand_path(".rspec/dummy_spec.rb", __dir__)}
+	include RSpecTests
 
 	it "can run rspec test suite with coverage" do
 		input, output = IO.pipe

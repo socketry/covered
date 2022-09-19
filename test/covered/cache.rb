@@ -18,54 +18,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'covered/statistics'
+require 'covered/cache'
+require 'covered/files'
 
-RSpec.describe Covered::Statistics do
-	context 'initial state' do
-		it "is zero" do
-			expect(subject.count).to be 0
-			expect(subject.executable_count).to be 0
-			expect(subject.executed_count).to be 0
-		end
-		
-		it "is complete" do
-			expect(subject).to be_complete
-		end
-	end
+describe Covered::Cache do
+	let(:files) {Covered::Files.new}
+	let(:cache) {subject.new(files)}
 	
-	context 'after adding full coverage' do
-		let(:coverage) {Covered::Coverage.new("foo.rb", [nil, 1])}
+	it "will mark lines after flushing" do
+		cache.enable
+		cache.mark("program.rb", 2, 1)
 		
-		before(:each) do
-			subject << coverage
-		end
+		expect(files.paths).to be(:empty?)
 		
-		it "has one entry" do
-			expect(subject.count).to be 1
-			expect(subject.executable_count).to be 1
-			expect(subject.executed_count).to be 1
-		end
+		cache.disable
 		
-		it "is complete" do
-			expect(subject).to be_complete
-		end
-	end
-	
-	context 'after adding partial coverage' do
-		let(:coverage) {Covered::Coverage.new("foo.rb", [nil, 1, 0])}
-		
-		before(:each) do
-			subject << coverage
-		end
-		
-		it "has one entry" do
-			expect(subject.count).to be 1
-			expect(subject.executable_count).to be 2
-			expect(subject.executed_count).to be 1
-		end
-		
-		it "is not complete" do
-			expect(subject).to_not be_complete
-		end
+		expect(files.paths["program.rb"][2]).to be == 1
 	end
 end

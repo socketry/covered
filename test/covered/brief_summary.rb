@@ -18,34 +18,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'covered/wrapper'
+require 'covered/summary'
+require 'covered/files'
 
-RSpec.shared_context Covered::Wrapper do
-	let(:output) {Covered::Base.new}
-	subject {described_class.new(output)}
+describe Covered::BriefSummary do
+	let(:files) {Covered::Files.new}
+	let(:summary) {subject.new}
 	
-	it 'passes #mark through' do
-		expect(output).to receive(:mark).with("fleeb.rb", 5, 1)
-		
-		subject.mark("fleeb.rb", 5, 1)
-	end
+	let(:first_line) {File.readlines(__FILE__).first}
+	let(:io) {StringIO.new}
 	
-	it 'passes #enable through' do
-		expect(output).to receive(:enable)
+	it "can generate partial summary" do
+		files.mark(__FILE__, 37, 1)
+		files.mark(__FILE__, 38, 0)
 		
-		subject.enable
-	end
-	
-	it 'passes #disable through' do
-		expect(output).to receive(:disable)
+		summary.call(files, io)
 		
-		subject.disable
-	end
-	
-	it 'passes #each through' do
-		expect(output).to receive(:each)
-		
-		subject.each do
-		end
+		expect(io.string).not.to be =~ /#{first_line}/
+		expect(io.string).to be =~ /#{__FILE__}/
 	end
 end

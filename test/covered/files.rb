@@ -18,114 +18,120 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-RSpec.describe Covered::Files do
-	context '#mark' do
+require 'covered/files'
+
+describe Covered::Files do
+	let(:files) {subject.new}
+	
+	with '#mark' do
 		it "can mark lines" do
-			subject.mark("program.rb", 2, 1)
+			files.mark("program.rb", 2, 1)
 			
-			expect(subject.paths["program.rb"][2]).to be == 1
+			expect(files.paths["program.rb"][2]).to be == 1
 		end
 		
 		it "can mark the same line twice" do
 			2.times do
-				subject.mark("program.rb", 2, 1)
+				files.mark("program.rb", 2, 1)
 			end
 			
-			expect(subject.paths["program.rb"][2]).to be == 2
+			expect(files.paths["program.rb"][2]).to be == 2
 		end
 	end
 	
-	context '#each' do
+	with '#each' do
 		it "enumerates all paths" do
-			coverage = subject.mark("program.rb", 2, 1)
+			coverage = files.mark("program.rb", 2, 1)
 			
-			enumerator = subject.each
-			expect(enumerator.next).to be coverage
+			enumerator = files.each
+			expect(enumerator.next).to be == coverage
 		end
 	end
 end
 
-RSpec.describe Covered::Filter do
+describe Covered::Filter do
+	let(:filter) {subject.new}
+	
 	it "accepts everything" do
-		expect(subject.accept?("foo")).to be_truthy
+		expect(filter.accept?("foo")).to be == true
 	end
 end
 
-RSpec.describe Covered::Include do
+describe Covered::Include do
 	let(:files) {Covered::Files.new}
 	let(:pattern) {File.join(__dir__, "**", "*.rb")}
-	subject {described_class.new(files, pattern)}
+	let(:include) {subject.new(files, pattern)}
 	
 	it "should match some files" do
-		expect(subject.glob).to_not be_empty
+		expect(include.glob).not.to be(:empty?)
 	end
 	
-	let(:path) {subject.glob.first}
+	let(:path) {include.glob.first}
 	
 	it "should defer to existing files" do
-		files.mark(path, 5, 1)
+		include.mark(path, 5, 1)
 		
-		paths = subject.to_h
+		paths = include.to_h
 		
-		expect(paths).to include(path)
+		expect(paths).to have_keys(path)
 		expect(paths[path].counts).to be == [nil, nil, nil, nil, nil, 1]
 	end
 	
 	it "should enumerate paths" do
-		enumerator = subject.to_enum(:each)
+		enumerator = include.to_enum(:each)
 		
-		expect(enumerator.next).to be_kind_of Covered::Coverage
+		expect(enumerator.next).to be_a(Covered::Coverage)
 	end
 end
 
-RSpec.describe Covered::Skip do
+describe Covered::Skip do
 	let(:files) {Covered::Files.new}
-	subject {described_class.new(files, /file.rb/)}
+	let(:skip) {subject.new(files, /file.rb/)}
 	
 	it "should ignore files which match given pattern" do
-		subject.mark("file.rb", 1, 1)
+		skip.mark("file.rb", 1, 1)
 		
-		expect(files).to be_empty
+		expect(files).to be(:empty?)
 	end
 	
 	it "should include files which don't match given pattern" do
-		subject.mark("foo.rb", 1, 1)
+		skip.mark("foo.rb", 1, 1)
 		
-		expect(files).to_not be_empty
-		expect(subject.to_h).to include("foo.rb")
+		expect(files).not.to be(:empty?)
+		expect(skip.to_h).to have_keys("foo.rb")
 	end
 end
 
-RSpec.describe Covered::Only do
+describe Covered::Only do
 	let(:files) {Covered::Files.new}
-	subject {described_class.new(files, "file.rb")}
+	let(:only) {subject.new(files, "file.rb")}
 	
 	it "should ignore files which don't match given pattern" do
-		subject.mark("foo.rb", 1, 1)
+		only.mark("foo.rb", 1, 1)
 		
-		expect(files).to be_empty
+		expect(files).to be(:empty?)
 	end
 	
 	it "should include files which match given pattern" do
-		subject.mark("file.rb", 1, 1)
+		only.mark("file.rb", 1, 1)
 		
-		expect(files).to_not be_empty
+		expect(files).not.to be(:empty?)
 	end
 end
 
-RSpec.describe Covered::Root do
+describe Covered::Root do
 	let(:files) {Covered::Files.new}
-	subject {described_class.new(files, "lib/")}
+	let(:root) {subject.new(files, "lib/")}
 	
 	it "should ignore files which don't match root" do
-		subject.mark("foo.rb", 1, 1)
+		root.mark("foo.rb", 1, 1)
 		
-		expect(files).to be_empty
+		expect(files).to be(:empty?)
 	end
 	
 	it "should include files which match root" do
-		subject.mark("lib/foo.rb", 1, 1)
+		root.mark("lib/foo.rb", 1, 1)
 		
-		expect(files).to_not be_empty
+		expect(files).not.to be(:empty?)
 	end
 end

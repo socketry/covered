@@ -21,20 +21,19 @@
 require 'covered/summary'
 require 'covered/files'
 
-RSpec.describe Covered::BriefSummary do
+describe Covered::Summary do
 	let(:files) {Covered::Files.new}
-	let(:summary) {described_class.new}
+	let(:summary) {Covered::Summary.new}
 	
 	let(:first_line) {File.readlines(__FILE__).first}
 	let(:io) {StringIO.new}
 	
-	it "can generate partial summary" do
-		files.mark(__FILE__, 37, 1)
-		files.mark(__FILE__, 38, 0)
+	it "can generate source code listing" do
+		files.mark(__FILE__, 24, 1)
+		files.mark(__FILE__, 25, 0)
 		
 		summary.call(files, io)
 		
-		expect(io.string).to_not include(first_line)
-		expect(io.string).to include(__FILE__)
+		expect(io.string).to be(:include?, "RSpec.describe Covered::Summary do")
 	end
 end

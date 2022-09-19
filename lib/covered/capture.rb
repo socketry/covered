@@ -57,6 +57,14 @@ module Covered
 			
 			super
 		end
+		
+		def execute(path, source, binding: TOPLEVEL_BINDING)
+			enable
+			
+			eval(source, binding, path)
+		ensure
+			disable
+		end
 	end
 	
 	# class Capture < Wrapper

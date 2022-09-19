@@ -20,69 +20,70 @@
 
 require 'covered/policy'
 
-RSpec.describe Covered::Policy do
+describe Covered::Policy do
 	let(:pattern) {"**/*.rb"}
+	let(:policy) {subject.new}
 	
 	it 'can enable capture via policy' do
 		expect do
-			subject.enable
-			subject.disable
-		end.to_not raise_error
+			policy.enable
+			policy.disable
+		end.not.to raise_exception
 	end
 	
 	it 'can specify #source mapping' do
-		subject.source
+		policy.source
 		
-		expect(subject.source).to be_kind_of(Covered::Source)
+		expect(policy.source).to be_a(Covered::Source)
 	end
 	
 	it 'can #include a pattern' do
-		subject.include(pattern)
+		policy.include(pattern)
 		
-		expect(subject.output.pattern).to be == pattern
-		expect(subject.output).to be_kind_of(Covered::Include)
+		expect(policy.output.pattern).to be == pattern
+		expect(policy.output).to be_a(Covered::Include)
 	end
 	
 	it 'can #skip a pattern' do
-		subject.skip(pattern)
+		policy.skip(pattern)
 		
-		expect(subject.output.pattern).to be == pattern
-		expect(subject.output).to be_kind_of(Covered::Skip)
+		expect(policy.output.pattern).to be == pattern
+		expect(policy.output).to be_a(Covered::Skip)
 	end
 	
 	it 'can #only a pattern' do
-		subject.only(pattern)
+		policy.only(pattern)
 		
-		expect(subject.output.pattern).to be == pattern
-		expect(subject.output).to be_kind_of(Covered::Only)
+		expect(policy.output.pattern).to be == pattern
+		expect(policy.output).to be_a(Covered::Only)
 	end
 	
 	it 'can specify #root' do
-		subject.root(__dir__)
+		policy.root(__dir__)
 		
-		expect(subject.output.path).to be == __dir__
-		expect(subject.output).to be_kind_of(Covered::Root)
+		expect(policy.output.path).to be == __dir__
+		expect(policy.output).to be_a(Covered::Root)
 	end
 	
 	it 'can select default reports' do
-		subject.reports!(true)
+		policy.reports!(true)
 		
-		expect(subject.reports.count).to be == 1
-		expect(subject.reports.first).to be_kind_of Covered::BriefSummary
+		expect(policy.reports.count).to be == 1
+		expect(policy.reports.first).to be_a Covered::BriefSummary
 	end
 	
 	it 'can select specified reports' do
-		subject.reports!('BriefSummary,PartialSummary')
+		policy.reports!('BriefSummary,PartialSummary')
 		
-		expect(subject.reports.count).to be == 2
+		expect(policy.reports.count).to be == 2
 	end
 	
 	it 'can #call' do
 		io = StringIO.new
 		
-		subject.reports << Covered::BriefSummary.new
-		subject.call(io)
+		policy.reports << Covered::BriefSummary.new
+		policy.call(io)
 		
-		expect(io.string).to include("* 0 files checked; 0/0 lines executed; 100.0% covered.")
+		expect(io.string).to be(:include?, "* 0 files checked; 0/0 lines executed; 100.0% covered.")
 	end
 end

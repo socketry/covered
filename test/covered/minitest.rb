@@ -19,10 +19,11 @@
 # THE SOFTWARE.
 
 require 'covered'
+require 'minitest_tests'
 
 describe "Covered::Minitest" do
-	let(:test_path) {File.expand_path(".minitest/dummy_test.rb", __dir__)}
-
+	include MinitestTests
+	
 	it "can run minitest test suite with coverage" do
 		input, output = IO.pipe
 		

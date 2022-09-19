@@ -18,37 +18,58 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'covered/source'
-require 'covered/summary'
+require 'covered/statistics'
 
-require 'trenni/template'
-
-RSpec.describe Covered::Source do
-	let(:template_path) {File.expand_path("template.trenni", __dir__)}
-	let(:template) {Trenni::Template.load_file(template_path)}
+describe Covered::Statistics do
+	let(:statistics) {subject.new}
 	
-	let(:files) {Covered::Files.new}
-	let(:only) {Covered::Only.new(template_path, files)}
-	let(:source) {Covered::Source.new(files)}
-	let(:capture) {Covered::Capture.new(source)}
-	
-	let(:summary) {Covered::Summary.new}
-	
-	it "correctly generates coverage for template" do
-		capture.enable
-		template.to_string
-		capture.disable
+	with 'initial state' do
+		it "is zero" do
+			expect(statistics.count).to be == 0
+			expect(statistics.executable_count).to be == 0
+			expect(statistics.executed_count).to be == 0
+		end
 		
-		expect(source.paths.size).to be == 1
-		expect(source.paths).to include(template_path)
-
-		io = StringIO.new
-		summary.call(source, io)
-		
-		expect(io.string).to include("2/3 lines executed; 66.67% covered")
+		it "is complete" do
+			expect(statistics).to be(:complete?)
+		end
 	end
 	
-	it "can't parse non-existant path" do
-		expect(source.parse("do_not_exist")).to be_nil
+	with 'after adding full coverage' do
+		let(:coverage) {Covered::Coverage.new("foo.rb", [nil, 1])}
+		
+		def before
+			statistics << coverage
+			super
+		end
+		
+		it "has one entry" do
+			expect(statistics.count).to be == 1
+			expect(statistics.executable_count).to be == 1
+			expect(statistics.executed_count).to be == 1
+		end
+		
+		it "is complete" do
+			expect(statistics).to be(:complete?)
+		end
+	end
+	
+	with 'after adding partial coverage' do
+		let(:coverage) {Covered::Coverage.new("foo.rb", [nil, 1, 0])}
+		
+		def before
+			statistics << coverage
+			super
+		end
+		
+		it "has one entry" do
+			expect(statistics.count).to be == 1
+			expect(statistics.executable_count).to be == 2
+			expect(statistics.executed_count).to be == 1
+		end
+		
+		it "is not complete" do
+			expect(statistics).not.to be(:complete?)
+		end
 	end
 end
