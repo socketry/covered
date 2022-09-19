@@ -21,5 +21,3 @@ group :test do
 	gem "minitest"
 	gem "rspec"
 end
-
-gem "sus", path: "../sus"
