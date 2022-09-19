@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
 		"funding_uri" => "https://github.com/sponsors/ioquatix/",
 	}
 	
-	spec.files = Dir.glob('{bake,lib}/**/*', File::FNM_DOTMATCH, base: __dir__)
+	spec.files = Dir.glob(['{bake,lib}/**/*', '*.md'], File::FNM_DOTMATCH, base: __dir__)
 	
 	spec.add_dependency "async-rest"
 	spec.add_dependency "console", "~> 1.0"
@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
 	spec.add_dependency "parser"
 	
 	spec.add_development_dependency "bundler"
-	spec.add_development_dependency "sus", "~> 0.12"
 	spec.add_development_dependency "rspec", "~> 3.6"
+	spec.add_development_dependency "sus", "~> 0.12"
 	spec.add_development_dependency "trenni", "~> 3.6"
 end
