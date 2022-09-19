@@ -11,7 +11,7 @@ end
 
 # Validate the coverage of multiple test runs.
 # @parameter paths [Array(String)] The coverage database paths.
-# @parameter minumum [Float] The minimum required coverage in order to pass.
+# @parameter minimum [Float] The minimum required coverage in order to pass.
 def validate(paths: nil, minimum: 1.0)
 	config = Covered::Config.load
 	
