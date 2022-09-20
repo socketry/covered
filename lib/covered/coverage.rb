@@ -21,8 +21,38 @@ module Covered
 	end
 	
 	class Coverage
-		def initialize(path, counts = [])
-			@path = path
+		Source = Struct.new(:path, :code, :line_offset) do
+			def to_s
+				"\#<#{self.class} path=#{path}>"
+			end
+			
+			def read(&block)
+				if block_given?
+					File.open(self.path, "r", &block)
+				else
+					File.read(self.path)
+				end
+			end
+			
+			def code!
+				self.code || self.read
+			end
+			
+			def code?
+				!!self.code
+			end
+		end
+		
+		def self.source(path, code = nil, line_offset = 1)
+			Source.new(path, code, line_offset)
+		end
+		
+		def self.for(path, code = nil, line_offset = 1)
+			self.new(Source.new(path, code, line_offset))
+		end
+		
+		def initialize(source, counts = [])
+			@source = source
 			@counts = counts
 			@total = 0
 			
@@ -32,18 +62,19 @@ module Covered
 			@executed_lines = nil
 		end
 		
-		attr :path
+		def path
+			@source.path
+		end
+		
+		attr_accessor :source
+		
 		attr :counts
 		attr :total
 		
 		attr :annotations
 		
 		def read(&block)
-			if block_given?
-				File.open(@path, "r", &block)
-			else
-				File.read(@path)
-			end
+			@source.read(&block)
 		end
 		
 		def freeze

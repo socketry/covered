@@ -26,8 +26,7 @@ describe Covered::Source do
 		template.to_string
 		capture.disable
 		
-		expect(source.paths.size).to be == 1
-		expect(source.paths).to be(:include?, template_path)
+		expect(files.paths).to be(:include?, template_path)
 
 		io = StringIO.new
 		summary.call(source, io)
@@ -36,6 +35,6 @@ describe Covered::Source do
 	end
 	
 	it "can't parse non-existant path" do
-		expect(source.parse("do_not_exist")).to be == nil
+		expect(source.parse(Covered::Coverage.source("do_not_exist.rb"))).to be == nil
 	end
 end

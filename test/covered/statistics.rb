@@ -7,6 +7,7 @@ require 'covered/statistics'
 
 describe Covered::Statistics do
 	let(:statistics) {subject.new}
+	let(:source) {Covered::Source.new("foo.rb")}
 	
 	with 'initial state' do
 		it "is zero" do
@@ -21,7 +22,7 @@ describe Covered::Statistics do
 	end
 	
 	with 'after adding full coverage' do
-		let(:coverage) {Covered::Coverage.new("foo.rb", [nil, 1])}
+		let(:coverage) {Covered::Coverage.new(source, [nil, 1])}
 		
 		def before
 			statistics << coverage
@@ -40,7 +41,7 @@ describe Covered::Statistics do
 	end
 	
 	with 'after adding partial coverage' do
-		let(:coverage) {Covered::Coverage.new("foo.rb", [nil, 1, 0])}
+		let(:coverage) {Covered::Coverage.new(source, [nil, 1, 0])}
 		
 		def before
 			statistics << coverage

@@ -11,15 +11,8 @@ require 'parser/current'
 module Covered
 	# The source map, loads the source file, parses the AST to generate which lines contain executable code.
 	class Source < Wrapper
-		Script = Struct.new(:path, :source, :line_offset)
-		
 		def initialize(output)
 			super(output)
-			
-			@paths = {}
-			@mutex = Mutex.new
-			
-			@annotations = {}
 			
 			begin
 				@trace = TracePoint.new(:script_compiled) do |trace|
@@ -28,10 +21,8 @@ module Covered
 					# We only track source files which begin at line 1, as these represent whole files instead of monkey patches.
 					if instruction_sequence.first_lineno <= 1
 						# Extract the source path and source itself and save it for later:
-						if path = instruction_sequence.path and source = trace.eval_script
-							@mutex.synchronize do
-								@paths[path] = Script.new(path, source, instruction_sequence.first_lineno)
-							end
+						if path = instruction_sequence.path and script = trace.eval_script
+							self.add(Coverage::Source.new(path, script, instruction_sequence.first_lineno))
 						end
 					end
 				end
@@ -135,30 +126,31 @@ module Covered
 			end
 		end
 		
-		def add(path, source = nil)
+		def add(source)
 			if coverage = super
-				top = Parser::CurrentRuby.parse(source)
-				self.expand(top, coverage)
+				if top = self.parse(source)
+					self.expand(top, coverage)
+				end
 			end
 			
 			return coverage
 		end
 		
-		def parse(path)
-			if script = @paths[path]
-				Parser::CurrentRuby.parse(script.source, script.path, script.line_offset)
-			elsif File.exist?(path)
+		def parse(source)
+			if source.code?
+				Parser::CurrentRuby.parse(source.code, source.path, source.line_offset)
+			elsif path = source.path and File.exist?(path)
 				Parser::CurrentRuby.parse_file(path)
 			else
 				# warn "Couldn't parse #{path}, file doesn't exist?"
 			end
 		rescue
-			warn "Couldn't parse #{path}: #{$!}"
+			warn "Couldn't parse #{source}: #{$!}"
 		end
 		
 		def each(&block)
 			@output.each do |coverage|
-				if top = parse(coverage.path)
+				if top = parse(coverage.source)
 					self.expand(top, coverage)
 				end
 				

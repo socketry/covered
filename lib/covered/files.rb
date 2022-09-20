@@ -23,15 +23,15 @@ module Covered
 		end
 		
 		def mark(path, lineno, value)
-			coverage = (@paths[path] ||= Coverage.new(path))
+			coverage = (@paths[path] ||= Coverage.for(path))
 			
 			coverage.mark(lineno, value)
 			
 			return coverage
 		end
 		
-		def add(path, source = nil)
-			@paths[path] ||= Coverage.new(path)
+		def add(source)
+			@paths[source.path] ||= Coverage.new(source)
 		end
 		
 		def each(&block)
@@ -73,7 +73,7 @@ module Covered
 			end
 			
 			paths.each do |path|
-				yield Coverage.new(path)
+				yield Coverage.for(path)
 			end
 		end
 	end

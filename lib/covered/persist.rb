@@ -40,7 +40,11 @@ module Covered
 				end
 			end
 			
-			record[:coverage].each_with_index do |count, index|
+			if source = record[:source]
+				@output.add(source)
+			end
+			
+			record[:counts].each_with_index do |count, index|
 				@output.mark(path, index, count) if count
 			end
 		end
@@ -49,8 +53,9 @@ module Covered
 			{
 				# We want to use relative paths so that moving the repo won't break everything:
 				path: relative_path(coverage.path),
-				coverage: coverage.counts,
 				mtime: File.mtime(coverage.path).to_f,
+				counts: coverage.counts,
+				source: coverage.source,
 			}
 		end
 		
@@ -128,6 +133,9 @@ module Covered
 			packer = MessagePack::Packer.new(io)
 			packer.register_type(0x00, Symbol, :to_msgpack_ext)
 			packer.register_type(0x01, Time) {|object| object.to_s}
+			packer.register_type(0x0F, Coverage::Source) do |object|
+				object.to_a.to_msgpack
+			end
 			
 			return packer
 		end
@@ -136,6 +144,9 @@ module Covered
 			unpacker = MessagePack::Unpacker.new(io)
 			unpacker.register_type(0x00, Symbol, :from_msgpack_ext)
 			unpacker.register_type(0x01, Time, :parse)
+			unpacker.register_type(0x0F) do |data|
+				Coverage::Source.new(*MessagePack.unpack(data))
+			end
 			
 			return unpacker
 		end

@@ -43,10 +43,10 @@ module Covered
 			super
 		end
 		
-		def execute(path, source, binding: TOPLEVEL_BINDING)
+		def execute(source, binding: TOPLEVEL_BINDING)
 			enable
 			
-			eval(source, binding, path)
+			eval(source.code!, binding, source.path)
 		ensure
 			disable
 		end

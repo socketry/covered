@@ -10,7 +10,7 @@ require 'wrapper_examples'
 describe Covered::Persist do
 	it_behaves_like WrapperExamples
 	
-	let(:coverage) {Covered::Coverage.new(__FILE__)}
+	let(:coverage) {Covered::Coverage.for(__FILE__)}
 	let(:output) {Covered::Base.new}
 	let(:persist) {subject.new(output)}
 	let(:record) {persist.serialize(coverage)}
