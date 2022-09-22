@@ -12,7 +12,7 @@ describe "Covered::RSpec" do
 	it "can run rspec test suite with coverage" do
 		input, output = IO.pipe
 		
-		system({"COVERAGE" => "PartialSummary"}, "rspec", test_path, out: output, err: output)
+		system({"COVERAGE" => "PartialSummary"}, "rspec", "--require", spec_helper_path, test_path, out: output, err: output)
 		output.close
 
 		buffer = input.read

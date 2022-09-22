@@ -8,69 +8,77 @@ require_relative 'wrapper'
 require 'coverage'
 
 module Covered
-	class Capture < Wrapper
-		def initialize(output)
-			super(output)
-			
-			begin
-				@trace = TracePoint.new(:line, :call, :c_call) do |trace|
-					if trace.event == :call
-						# Ruby doesn't always mark call-sites in sub-expressions, so we use this approach to compute a call site and mark it:
-						if location = caller_locations(2, 1).first and path = location.path
-							@output.mark(path, location.lineno, 1)
+	if RUBY_VERSION < "3.2.0"
+		class Capture < Wrapper
+			def initialize(output)
+				super(output)
+				
+				begin
+					@trace = TracePoint.new(:line, :call, :c_call) do |trace|
+						if trace.event == :call
+							# Ruby doesn't always mark call-sites in sub-expressions, so we use this approach to compute a call site and mark it:
+							if location = caller_locations(2, 1).first and path = location.path
+								@output.mark(path, location.lineno, 1)
+							end
+						end
+						
+						if path = trace.path
+							@output.mark(path, trace.lineno, 1)
 						end
 					end
-					
-					if path = trace.path
-						@output.mark(path, trace.lineno, 1)
-					end
+				rescue
+					warn "Line coverage disabled: #{$!}"
+					@trace = nil
 				end
-			rescue
-				warn "Line coverage disabled: #{$!}"
-				@trace = nil
+			end
+			
+			def enable
+				super
+				
+				@trace&.enable
+			end
+			
+			def disable
+				@trace&.disable
+				
+				super
+			end
+			
+			def execute(source, binding: TOPLEVEL_BINDING)
+				enable
+				
+				eval(source.code!, binding, source.path)
+			ensure
+				disable
 			end
 		end
-		
-		def enable
-			super
+	else
+		class Capture < Wrapper
+			def enable
+				super
+				
+				::Coverage.start
+			end
 			
-			@trace&.enable
-		end
+			def disable
+				result = ::Coverage.result
+
+				result.each do |path, lines|
+					lines.each_with_index do |count, lineno|
+						@output.mark(path, lineno+1, count) if count
+					end
+				end
 		
-		def disable
-			@trace&.disable
-			
-			super
-		end
-		
-		def execute(source, binding: TOPLEVEL_BINDING)
-			enable
-			
-			eval(source.code!, binding, source.path)
-		ensure
-			disable
+				super
+			end
+
+			def execute(source, binding: TOPLEVEL_BINDING)
+				enable
+				
+				eval(source.code!, binding, source.path)
+			ensure
+				disable
+			end
 		end
 	end
-	
-	# class Capture < Wrapper
-	# 	def enable
-	# 		super
-	# 
-	# 		::Coverage.start
-	# 	end
-	# 
-	# 	def disable
-	# 		result = ::Coverage.result
-	# 
-	# 		puts result.inspect
-	# 
-	# 		result.each do |path, lines|
-	# 			lines.each_with_index do |lineno, count|
-	# 				@output.mark(path, lineno, count)
-	# 			end
-	# 		end
-	# 
-	# 		super
-	# 	end
-	# end
 end
