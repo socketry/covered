@@ -8,7 +8,13 @@ require_relative 'wrapper'
 require 'coverage'
 
 module Covered
-	if RUBY_VERSION < "3.2.0"
+	def self.coverage_with_eval?
+		::Coverage.start
+		eval("1 + 1", TOPLEVEL_BINDING, "test.rb", 1)
+		return ::Coverage.result.include?("test.rb")
+	end
+	
+	unless self.coverage_with_eval?
 		class Capture < Wrapper
 			def initialize(output)
 				super(output)
