@@ -4,7 +4,6 @@
 # Copyright, 2018-2022, by Samuel Williams.
 
 require_relative 'config'
-
 require 'rspec/core/formatters'
 
 $covered = Covered::Config.load
@@ -13,6 +12,7 @@ module Covered
 	module RSpec
 		module Policy
 			def load_spec_files
+				$stderr.puts "load_spec_files"
 				$covered.enable
 				
 				super
