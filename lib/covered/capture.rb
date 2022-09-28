@@ -63,13 +63,15 @@ module Covered
 			def enable
 				super
 				
-				::Coverage.start
+				::Coverage.start(lines: true, eval: true)
 			end
 			
 			def disable
-				result = ::Coverage.result
+				results = ::Coverage.result
 
-				result.each do |path, lines|
+				results.each do |path, result|
+					lines = result[:lines]
+
 					lines.each_with_index do |count, lineno|
 						@output.mark(path, lineno+1, count) if count
 					end
