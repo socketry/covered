@@ -9,9 +9,9 @@ require 'coverage'
 
 module Covered
 	def self.coverage_with_eval?
-		::Coverage.start
-		eval("1 + 1", TOPLEVEL_BINDING, "test.rb", 1)
-		return ::Coverage.result.include?("test.rb")
+		if ::Coverage.respond_to?(:supported?)
+			::Coverage.supported?(:eval)
+		end
 	end
 	
 	unless self.coverage_with_eval?
