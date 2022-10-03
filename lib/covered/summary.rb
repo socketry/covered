@@ -6,8 +6,6 @@
 require_relative 'statistics'
 require_relative 'wrapper'
 
-require 'console/terminal'
-
 module Covered
 	class Summary
 		def initialize(threshold: 1.0)
@@ -15,6 +13,8 @@ module Covered
 		end
 		
 		def terminal(output)
+			require 'console/terminal'
+			
 			Console::Terminal.for(output).tap do |terminal|
 				terminal[:path] ||= terminal.style(nil, nil, :bold, :underline)
 				terminal[:brief_path] ||= terminal.style(:yellow)

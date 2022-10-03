@@ -8,7 +8,6 @@ require_relative 'wrapper'
 require 'msgpack'
 require 'time'
 require 'set'
-require 'console'
 
 module Covered
 	class Persist < Wrapper
@@ -26,7 +25,7 @@ module Covered
 			return unless path = expand_path(record[:path])
 			
 			unless File.exist?(path)
-				Console.logger.debug(self) {"Ignoring coverage, path #{path} does not exist!"}
+				# Ignore this coverage, the file no longer exists.
 				return
 			end
 			
@@ -35,7 +34,7 @@ module Covered
 			
 			unless ignore_mtime
 				if File.mtime(path).to_f > record[:mtime]
-					Console.logger.debug(self) {"Ignoring coverage, path #{path} has been updated: #{File.mtime(path).to_f} > #{record[:mtime]}!"}
+					# Ignore this coverage, the file has been modified since it was recorded.
 					return
 				end
 			end
@@ -66,8 +65,6 @@ module Covered
 			File.open(@path, "rb") do |file|
 				file.flock(File::LOCK_SH)
 				
-				Console.logger.debug(self) {"Loading from #{@path} with #{options}..."}
-				
 				make_unpacker(file).each do |record|
 					self.apply(record, **options)
 				end
@@ -78,8 +75,6 @@ module Covered
 			# Dump all coverage:
 			File.open(@path, "wb") do |file|
 				file.flock(File::LOCK_EX)
-				
-				Console.logger.debug(self) {"Saving to #{@path}..."}
 				
 				packer = make_packer(file)
 				
