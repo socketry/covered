@@ -189,4 +189,10 @@ module Covered
 			statistics.print(output)
 		end
 	end
+	
+	class Quiet
+		def call(wrapper, output = $stdout)
+			# Silent.
+		end
+	end
 end

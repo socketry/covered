@@ -29,5 +29,9 @@ module Covered
 				@covered.call(self.output.io)
 			end
 		end
+		
+		def covered
+			@covered
+		end
 	end
 end
