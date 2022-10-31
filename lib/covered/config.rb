@@ -81,7 +81,7 @@ module Covered
 			policy.root(@root)
 			
 			# We will ignore any files in the test or spec directory:
-			policy.skip(/^.*\/(test|spec|vendor|config)\//)
+			policy.skip(/^.*\/(test|fixtures|spec|vendor|config)\//)
 			
 			# We will include all files under lib, even if they aren't loaded:
 			policy.include("lib/**/*.rb")
