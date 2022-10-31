@@ -34,6 +34,7 @@ module Covered
 				end
 			end
 			
+			# The actual code which is being covered. If a template generates the source, this is the generated code, while the path refers to the template itself.
 			def code!
 				self.code || self.read
 			end

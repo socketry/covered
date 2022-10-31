@@ -98,7 +98,7 @@ module Covered
 					# 	coverage.counts[last_child.location.line] ||= 0
 					# end
 					
-					expand(node.children, coverage, level + 1)
+					return expand(node.children, coverage, level + 1)
 				elsif node.type == :send
 					if ignore_method?(node.children[1])
 						# coverage.annotate(node.location.line, "ignoring #{node.type}")
@@ -107,6 +107,8 @@ module Covered
 						# coverage.annotate(node.location.line, "accepting selector #{node.type}")
 						coverage.counts[node.location.selector.line] ||= 0
 					end
+				elsif node.type == :resbody
+					return expand(node.children[2], coverage, level + 1)
 				elsif executable?(node)
 					# coverage.annotate(node.location.line, "executable #{node.type}")
 					coverage.counts[node.location.line] ||= 0
