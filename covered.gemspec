@@ -28,6 +28,6 @@ Gem::Specification.new do |spec|
 	
 	spec.add_development_dependency "bundler"
 	spec.add_development_dependency "rspec", "~> 3.6"
-	spec.add_development_dependency "sus", "~> 0.12"
+	spec.add_development_dependency "sus", "~> 0.14"
 	spec.add_development_dependency "trenni", "~> 3.6"
 end
