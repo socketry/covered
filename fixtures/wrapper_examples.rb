@@ -10,7 +10,7 @@ WrapperExamples = Sus::Shared("a wrapper") do
 	let(:wrapper) {subject.new(output)}
 	
 	it 'passes #mark through' do
-		expect(output).to receive(:mark).with_arguments("fleeb.rb", 5, 1)
+		expect(output).to receive(:mark).with("fleeb.rb", 5, 1)
 		
 		wrapper.mark("fleeb.rb", 5, 1)
 	end
