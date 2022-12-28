@@ -69,6 +69,8 @@ module Covered
 					self.apply(record, **options)
 				end
 			end
+		rescue => error
+			raise LoadError, "Failed to load coverage from #{@path}, maybe old format or corrupt!"
 		end
 		
 		def save!
