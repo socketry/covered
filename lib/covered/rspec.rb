@@ -12,7 +12,6 @@ module Covered
 	module RSpec
 		module Policy
 			def load_spec_files
-				$stderr.puts "load_spec_files"
 				$covered.enable
 				
 				super
