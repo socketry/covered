@@ -5,8 +5,8 @@
 
 require 'erb'
 require 'covered/files'
-require 'covered/source'
 require 'covered/capture'
+require 'covered/summary'
 
 let(:code) {<<~ERB}
 <ul>
@@ -21,14 +21,17 @@ ERB
 
 it "can parse multi-line methods" do
 	files = Covered::Files.new
-	source = Covered::Source.new(files)
 	
 	template = ERB.new(code)
+	template.location = [__FILE__, 12]
 	
-	capture = Covered::Capture.new(source)
+	capture = Covered::Capture.new(files)
 	capture.enable
 	template.result_with_hash(items: [1, 2, 3])
 	capture.disable
 	
-	expect(files.paths["(erb)"].counts).not.to be(:include?, 0)
+	expect(files.paths[__FILE__].counts).not.to be(:include?, 0)
+	
+	# Show the actual coverage:
+	# Covered::Summary.new(threshold: nil).call(files, $stderr)
 end

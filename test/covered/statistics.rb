@@ -7,7 +7,7 @@ require 'covered/statistics'
 
 describe Covered::Statistics do
 	let(:statistics) {subject.new}
-	let(:source) {Covered::Source.new("foo.rb")}
+	let(:source) {Covered::Coverage::Source.new("foo.rb")}
 	
 	with 'initial state' do
 		it "is zero" do

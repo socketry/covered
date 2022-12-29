@@ -18,6 +18,10 @@ module Covered
 		
 		attr_accessor :paths
 		
+		def [](path)
+			@paths[path]
+		end
+		
 		def empty?
 			@paths.empty?
 		end
