@@ -16,12 +16,6 @@ describe Covered::Policy do
 		end.not.to raise_exception
 	end
 	
-	it 'can specify #source mapping' do
-		policy.source
-		
-		expect(policy.source).to be_a(Covered::Source)
-	end
-	
 	it 'can #include a pattern' do
 		policy.include(pattern)
 		

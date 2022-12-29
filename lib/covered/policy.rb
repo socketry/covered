@@ -5,7 +5,6 @@
 
 require_relative "summary"
 require_relative "files"
-require_relative "source"
 require_relative "capture"
 require_relative "cache"
 require_relative "persist"
@@ -27,10 +26,6 @@ module Covered
 			@reports.freeze
 			
 			super
-		end
-		
-		def source(*args)
-			@output = Source.new(@output, *args)
 		end
 		
 		def include(*args)

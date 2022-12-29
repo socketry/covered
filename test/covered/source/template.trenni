@@ -1,4 +1,4 @@
-<?r if true ?>
+<?r if rand > 0.5 ?>
 Hello World
 <?r else ?>
 Goodbye World

@@ -88,8 +88,6 @@ module Covered
 			
 			policy.persist!
 			
-			policy.source
-			
 			policy.reports!(@coverage)
 		end
 	end
