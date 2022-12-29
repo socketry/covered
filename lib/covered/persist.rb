@@ -95,16 +95,10 @@ module Covered
 			super
 		end
 		
-		def enable
-			super
-			
-			load!
-		end
-		
 		def flush
-			load!
-			
 			super
+			
+			load!
 		end
 		
 		def disable

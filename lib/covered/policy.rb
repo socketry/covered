@@ -119,6 +119,8 @@ module Covered
 		end
 		
 		def call(...)
+			self.flush
+			
 			@reports.each do |report|
 				report.call(self, ...)
 			end

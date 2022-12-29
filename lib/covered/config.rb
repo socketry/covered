@@ -9,8 +9,12 @@ module Covered
 	class Config
 		PATH = "config/covered.rb"
 		
+		def self.root
+			ENV['COVERED_ROOT'] || Dir.pwd
+		end
+		
 		def self.path(root)
-			path = ::File.join(root, PATH)
+			path = ::File.expand_path(PATH, root)
 			
 			if ::File.exist?(path)
 				return path
@@ -21,7 +25,7 @@ module Covered
 			ENV['COVERAGE']
 		end
 		
-		def self.load(root: Dir.pwd, coverage: self.coverage)
+		def self.load(root: self.root, coverage: self.coverage)
 			derived = Class.new(self)
 			
 			if path = self.path(root)
@@ -30,13 +34,19 @@ module Covered
 				derived.prepend(config)
 			end
 			
-			return derived.new(root, coverage)
+			return derived.new(root, coverage).tap do |config|
+				config.prepare
+			end
 		end
 		
 		def initialize(root, coverage)
 			@root = root
 			@coverage = coverage
 			@policy = nil
+		end
+		
+		def prepare
+			autostart!
 		end
 		
 		def record?
@@ -87,6 +97,18 @@ module Covered
 			policy.persist!
 			
 			policy.reports!(@coverage)
+		end
+		
+		REQUIRE_COVERED_AUTOSTART = '-rcovered/autostart'
+		
+		def autostart!
+			unless ENV['RUBYOPT'].include?(REQUIRE_COVERED_AUTOSTART)
+				ENV['RUBYOPT'] = [REQUIRE_COVERED_AUTOSTART, ENV['RUBYOPT']].compact.join(' ')
+			end
+			
+			unless ENV['COVERED_ROOT']
+				ENV['COVERED_ROOT'] = @root
+			end
 		end
 	end
 end
