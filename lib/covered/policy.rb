@@ -27,20 +27,20 @@ module Covered
 			super
 		end
 		
-		def include(*args)
-			@output = Include.new(@output, *args)
+		def include(...)
+			@output = Include.new(@output, ...)
 		end
 		
-		def skip(*args)
-			@output = Skip.new(@output, *args)
+		def skip(...)
+			@output = Skip.new(@output, ...)
 		end
 		
-		def only(*args)
-			@output = Only.new(@output, *args)
+		def only(...)
+			@output = Only.new(@output, ...)
 		end
 		
-		def root(*args)
-			@output = Root.new(@output, *args)
+		def root(...)
+			@output = Root.new(@output, ...)
 		end
 		
 		def persist!
@@ -82,8 +82,8 @@ module Covered
 				return klass.new
 			end
 			
-			def call(*args)
-				self.new.call(*args)
+			def call(...)
+				self.new.call(...)
 			end
 			
 			def to_s
@@ -118,9 +118,9 @@ module Covered
 			end
 		end
 		
-		def call(*args)
+		def call(...)
 			@reports.each do |report|
-				report.call(self, *args)
+				report.call(self, ...)
 			end
 		end
 	end
