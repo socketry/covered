@@ -6,7 +6,6 @@
 require_relative "summary"
 require_relative "files"
 require_relative "capture"
-require_relative "cache"
 require_relative "persist"
 
 module Covered
@@ -42,10 +41,6 @@ module Covered
 		
 		def root(*args)
 			@output = Root.new(@output, *args)
-		end
-		
-		def cache!
-			@output = Cache.new(@output)
 		end
 		
 		def persist!

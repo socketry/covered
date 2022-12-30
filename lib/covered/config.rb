@@ -75,8 +75,6 @@ module Covered
 		
 		# Override this method to implement your own policy.
 		def make_policy(policy)
-			policy.cache!
-			
 			# Only files in the root would be tracked:
 			policy.root(@root)
 			
