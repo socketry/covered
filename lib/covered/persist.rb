@@ -51,6 +51,7 @@ module Covered
 		def serialize(coverage)
 			{
 				# We want to use relative paths so that moving the repo won't break everything:
+				pid: Process.pid,
 				path: relative_path(coverage.path),
 				mtime: File.mtime(coverage.path).to_f,
 				counts: coverage.counts,
