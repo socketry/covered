@@ -16,7 +16,7 @@ module Covered
 		def initialize(output, path = DEFAULT_PATH)
 			super(output)
 			
-			@path = path
+			@path = self.expand_path(path)
 			@touched = Set.new
 		end
 		
