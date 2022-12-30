@@ -43,8 +43,8 @@ module Covered
 			@output = Root.new(@output, ...)
 		end
 		
-		def persist!
-			@output = Persist.new(@output)
+		def persist!(...)
+			@output = Persist.new(@output, ...)
 		end
 		
 		def capture
