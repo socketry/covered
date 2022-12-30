@@ -28,7 +28,7 @@ module Covered
 	
 			super
 		end
-
+		
 		def execute(source, binding: TOPLEVEL_BINDING)
 			enable
 			
