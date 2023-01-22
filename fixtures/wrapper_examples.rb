@@ -15,16 +15,16 @@ WrapperExamples = Sus::Shared("a wrapper") do
 		wrapper.mark("fleeb.rb", 5, 1)
 	end
 	
-	it 'passes #enable through' do
-		expect(output).to receive(:enable)
+	it 'passes #start through' do
+		expect(output).to receive(:start)
 		
-		wrapper.enable
+		wrapper.start
 	end
 	
-	it 'passes #disable through' do
-		expect(output).to receive(:disable)
+	it 'passes #finish through' do
+		expect(output).to receive(:finish)
 		
-		wrapper.disable
+		wrapper.finish
 	end
 	
 	it 'passes #each through' do

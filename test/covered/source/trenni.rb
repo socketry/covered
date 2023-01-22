@@ -19,9 +19,9 @@ let(:capture) {Covered::Capture.new(files)}
 let(:summary) {Covered::Summary.new}
 
 it "correctly generates coverage for template" do
-	capture.enable
+	capture.start
 	template.to_string
-	capture.disable
+	capture.finish
 	
 	expect(files.paths).to be(:include?, template_path)
 

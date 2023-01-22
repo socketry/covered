@@ -5,13 +5,16 @@
 
 module Covered
 	class Base
-		def enable
+		# Start tracking coverage.
+		def start
 		end
 		
-		def disable
+		# Discard any coverage data and restart tracking.
+		def clear
 		end
 		
-		def flush
+		# Stop tracking coverage.
+		def finish
 		end
 		
 		def accept?(path)
@@ -24,6 +27,9 @@ module Covered
 		def add(source)
 		end
 		
+		# Enumerate the coverage data.
+		# @yields {|coverage| ...}
+		# 	@parameter coverage [Coverage] The coverage data, including the source file and execution counts.
 		def each
 		end
 		
@@ -43,16 +49,16 @@ module Covered
 		
 		attr :output
 		
-		def enable
-			@output.enable
+		def start
+			@output.start
 		end
 		
-		def disable
-			@output.disable
+		def clear
+			@output.clear
 		end
 		
-		def flush
-			@output.flush
+		def finish
+			@output.finish
 		end
 		
 		def accept?(path)

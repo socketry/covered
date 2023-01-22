@@ -6,10 +6,10 @@
 ENV['COVERAGE'] ||= 'PartialSummary'
 require 'covered/policy/default'
 
-$covered.enable
+$covered.start
 
 require_relative 'test'
 
-$covered.disable
+$covered.finish
 
 $covered.call($stdout)

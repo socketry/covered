@@ -26,9 +26,9 @@ it "can parse multi-line methods" do
 	template.location = [__FILE__, 12]
 	
 	capture = Covered::Capture.new(files)
-	capture.enable
+	capture.start
 	template.result_with_hash(items: [1, 2, 3])
-	capture.disable
+	capture.finish
 	
 	expect(files.paths[__FILE__].counts).not.to be(:include?, 0)
 	

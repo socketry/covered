@@ -7,7 +7,6 @@ require_relative 'wrapper'
 
 require 'msgpack'
 require 'time'
-require 'set'
 
 module Covered
 	class Persist < Wrapper
@@ -17,7 +16,6 @@ module Covered
 			super(output)
 			
 			@path = self.expand_path(path)
-			@touched = Set.new
 		end
 		
 		def apply(record, ignore_mtime: false)
@@ -52,10 +50,8 @@ module Covered
 			{
 				# We want to use relative paths so that moving the repo won't break everything:
 				pid: Process.pid,
-				path: relative_path(coverage.path),
-				mtime: File.mtime(coverage.path).to_f,
-				counts: coverage.counts,
-				source: coverage.source,
+				# relative_path: relative_path(coverage.path),
+				coverage: coverage,
 			}
 		end
 		
@@ -81,7 +77,7 @@ module Covered
 				
 				packer = make_packer(file)
 				
-				self.each do |coverage|
+				@output.each do |coverage|
 					packer.write(serialize(coverage))
 				end
 				
@@ -89,58 +85,75 @@ module Covered
 			end
 		end
 		
-		def mark(file, line, count)
-			@touched << file
-			
+		def finish
 			super
-		end
-		
-		def flush
-			super
-			
-			load!
-		end
-		
-		def disable
-			super
-			
-			# @touched.each do |path|
-			# 	if @output.accept?(path)
-			# 		puts "Updated #{path} coverage."
-			# 	end
-			# end
 			
 			save!
 		end
 		
-		# def each
-		# 	super do |coverage|
-		# 		if @touched.include?(coverage.path)
-		# 			yield coverage
-		# 		end
-		# 	end
-		# end
+		def deserialize(record)
+			if record.key?(:coverage)
+				coverage = record[:coverage]
+				# coverage.path = expand_path(record[:relative_path])
+				
+				return coverage
+			end
+		end
+		
+		def load!
+			return unless File.exist?(@path)
+			
+			# Load existing coverage information and mark all files:
+			File.open(@path, "rb") do |file|
+				file.flock(File::LOCK_SH)
+				
+				make_unpacker(file).each do |record|
+					if coverage = deserialize(record)
+						yield coverage
+					end
+				end
+			end
+		rescue => error
+			raise LoadError, "Failed to load coverage from #{@path}, maybe old format or corrupt!"
+		end
+		
+		def each(&block)
+			return to_enum unless block_given?
+			
+			load!(&block)
+		end
+		
+		def make_factory
+			factory = MessagePack::Factory.new
+			
+			factory.register_type(0x00, Symbol)
+			
+			factory.register_type(0x01, Time,
+				packer: MessagePack::Time::Packer,
+				unpacker: MessagePack::Time::Unpacker
+			)
+			
+			factory.register_type(0x20, Source,
+				recursive: true,
+				packer: :serialize,
+				unpacker: :deserialize,
+			)
+			
+			factory.register_type(0x21, Coverage,
+				recursive: true,
+				packer: :serialize,
+				unpacker: :deserialize,
+			)
+			
+			return factory
+		end
 		
 		def make_packer(io)
-			packer = MessagePack::Packer.new(io)
-			packer.register_type(0x00, Symbol, :to_msgpack_ext)
-			packer.register_type(0x01, Time) {|object| object.to_s}
-			packer.register_type(0x0F, Coverage::Source) do |object|
-				object.to_a.to_msgpack
-			end
-			
-			return packer
+			return make_factory.packer(io)
 		end
 		
 		def make_unpacker(io)
-			unpacker = MessagePack::Unpacker.new(io)
-			unpacker.register_type(0x00, Symbol, :from_msgpack_ext)
-			unpacker.register_type(0x01, Time, :parse)
-			unpacker.register_type(0x0F) do |data|
-				Coverage::Source.new(*MessagePack.unpack(data))
-			end
-			
-			return unpacker
+			return make_factory.unpacker(io)
 		end
 	end
 end

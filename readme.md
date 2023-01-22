@@ -59,7 +59,7 @@ When running `rspec`, you can specify the kind of coverage analysis you would li
 
     COVERAGE=Summary rspec
 
-If no `COVERAGE` is specified, coverage tracking will be disabled.
+If no `COVERAGE` is specified, coverage tracking will be finishd.
 
 ### Partial Summary
 

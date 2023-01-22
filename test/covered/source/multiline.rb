@@ -16,7 +16,7 @@ RUBY
 it "can parse multi-line methods" do
 	files = Covered::Files.new
 	
-	source = Covered::Coverage::Source.new(__FILE__, code, 10)
+	source = Covered::Source.new(__FILE__, code, 10)
 	
 	capture = Covered::Capture.new(files)
 	capture.execute(source)

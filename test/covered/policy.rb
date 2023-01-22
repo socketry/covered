@@ -9,10 +9,10 @@ describe Covered::Policy do
 	let(:pattern) {"**/*.rb"}
 	let(:policy) {subject.new}
 	
-	it 'can enable capture via policy' do
+	it 'can start capture via policy' do
 		expect do
-			policy.enable
-			policy.disable
+			policy.start
+			policy.finish
 		end.not.to raise_exception
 	end
 	

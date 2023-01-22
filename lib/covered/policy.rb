@@ -7,6 +7,7 @@ require_relative "summary"
 require_relative "files"
 require_relative "capture"
 require_relative "persist"
+require_relative "forks"
 
 module Covered
 	class Policy < Wrapper
@@ -14,6 +15,7 @@ module Covered
 			super(Files.new)
 			
 			@reports = []
+			@capture = nil
 		end
 		
 		attr :output
@@ -48,19 +50,17 @@ module Covered
 		end
 		
 		def capture
-			@capture ||= Capture.new(@output)
+			@capture ||= Forks.new(
+				Capture.new(@output)
+			)
 		end
 		
-		def enable
-			capture.enable
+		def start
+			capture.start
 		end
 		
-		def disable
-			capture.disable
-		end
-		
-		def flush
-			@output.flush
+		def finish
+			capture.finish
 		end
 		
 		attr :reports
@@ -119,8 +119,6 @@ module Covered
 		end
 		
 		def call(...)
-			self.flush
-			
 			@reports.each do |report|
 				report.call(self, ...)
 			end

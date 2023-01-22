@@ -6,21 +6,27 @@
 require_relative 'config'
 
 module Coverage
-	# Start recording coverage information.
-	# Usage: RUBYOPT=-rcovered/start ruby -e '...'
-	def self.autostart!
-		config = Covered::Config.load
-		config.enable
-		
-		pid = Process.pid
-		
-		at_exit do
-			# Don't break forked children:
-			if Process.pid == pid
-				config.disable
+	module Autostart
+		# Start recording coverage information.
+		# Usage: RUBYOPT=-rcovered/autostart ruby my_script.rb
+		def self.autostart!
+			config = Covered::Config.load
+			config.start
+			
+			pid = Process.pid
+			
+			at_exit do
+				# Don't break forked children:
+				if Process.pid == pid
+					config.finish
+					
+					if config.report?
+						config.call($stderr)
+					end
+				end
 			end
 		end
 	end
 end
 
-Coverage.autostart!
+Coverage::Autostart.autostart!

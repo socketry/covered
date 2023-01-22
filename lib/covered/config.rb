@@ -49,9 +49,11 @@ module Covered
 			autostart!
 		end
 		
-		def record?
+		def report?
 			!!@coverage
 		end
+		
+		alias :record? :report?
 		
 		attr :coverage
 		
@@ -63,16 +65,12 @@ module Covered
 			policy.output
 		end
 		
-		def enable
-			policy.enable
+		def start
+			policy.start
 		end
 		
-		def disable
-			policy.disable
-		end
-		
-		def flush
-			policy.flush
+		def finish
+			policy.finish
 		end
 		
 		def call(output)
@@ -109,6 +107,9 @@ module Covered
 			unless ENV['COVERED_ROOT']
 				ENV['COVERED_ROOT'] = @root
 			end
+			
+			# Don't report coverage in child processes:
+			ENV.delete('COVERAGE')
 		end
 	end
 end
