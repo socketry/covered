@@ -19,30 +19,13 @@ module Covered
 		end
 		
 		def apply(record, ignore_mtime: false)
-			# The file must still exist:
-			return unless path = expand_path(record[:path])
-			
-			unless File.exist?(path)
-				# Ignore this coverage, the file no longer exists.
-				return
-			end
-			
-			# If the file has been modified since... we can't use the coverage.
-			return unless mtime = record[:mtime]
-			
-			unless ignore_mtime
-				if File.mtime(path).to_f > record[:mtime]
-					# Ignore this coverage, the file has been modified since it was recorded.
-					return
+			if coverage = record[:coverage]
+				if path = record[:path]
+					path = self.expand_path(path)
+					coverage.path = path
 				end
-			end
-			
-			if source = record[:source]
-				@output.add(source)
-			end
-			
-			record[:counts].each_with_index do |count, index|
-				@output.mark(path, index, count) if count
+				
+				add(coverage)
 			end
 		end
 		
@@ -50,6 +33,7 @@ module Covered
 			{
 				# We want to use relative paths so that moving the repo won't break everything:
 				pid: Process.pid,
+				path: relative_path(coverage.path),
 				# relative_path: relative_path(coverage.path),
 				coverage: coverage,
 			}
@@ -63,6 +47,7 @@ module Covered
 				file.flock(File::LOCK_SH)
 				
 				make_unpacker(file).each do |record|
+					# pp load: record
 					self.apply(record, **options)
 				end
 			end
@@ -72,12 +57,13 @@ module Covered
 		
 		def save!
 			# Dump all coverage:
-			File.open(@path, "wb") do |file|
+			File.open(@path, "ab") do |file|
 				file.flock(File::LOCK_EX)
 				
 				packer = make_packer(file)
 				
 				@output.each do |coverage|
+					# pp save: coverage
 					packer.write(serialize(coverage))
 				end
 				
@@ -91,36 +77,13 @@ module Covered
 			save!
 		end
 		
-		def deserialize(record)
-			if record.key?(:coverage)
-				coverage = record[:coverage]
-				# coverage.path = expand_path(record[:relative_path])
-				
-				return coverage
-			end
-		end
-		
-		def load!
-			return unless File.exist?(@path)
-			
-			# Load existing coverage information and mark all files:
-			File.open(@path, "rb") do |file|
-				file.flock(File::LOCK_SH)
-				
-				make_unpacker(file).each do |record|
-					if coverage = deserialize(record)
-						yield coverage
-					end
-				end
-			end
-		rescue => error
-			raise LoadError, "Failed to load coverage from #{@path}, maybe old format or corrupt!"
-		end
-		
 		def each(&block)
 			return to_enum unless block_given?
 			
-			load!(&block)
+			@output.clear
+			self.load!
+			
+			super
 		end
 		
 		def make_factory

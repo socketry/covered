@@ -34,12 +34,21 @@ module Covered
 			return coverage
 		end
 		
-		def add(source)
-			@paths[source.path] ||= Coverage.new(source)
+		def add(coverage)
+			path = coverage.path
+			if @paths.key?(path)
+				@paths[path].merge!(coverage)
+			else
+				@paths[path] = coverage
+			end
 		end
 		
 		def each(&block)
 			@paths.each_value(&block)
+		end
+		
+		def clear
+			@paths.clear
 		end
 	end
 	

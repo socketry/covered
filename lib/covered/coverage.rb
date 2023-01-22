@@ -32,7 +32,7 @@ module Covered
 			@modified_time = modified_time
 		end
 		
-		attr :path
+		attr_accessor :path
 		attr :code
 		attr :line_offset
 		attr :modified_time
@@ -76,6 +76,40 @@ module Covered
 	end
 	
 	class Coverage
+		class Summary
+			include Ratio
+			
+			def initialize(counts)
+				@counts = counts
+			end
+			
+			attr :counts
+			
+			def executable_lines
+				@counts.compact
+			end
+			
+			def executable_count
+				executable_lines.count
+			end
+			
+			def executed_lines
+				executable_lines.reject(&:zero?)
+			end
+			
+			def executed_count
+				executed_lines.count
+			end
+			
+			def missing_count
+				executable_count - executed_count
+			end
+			
+			def print(output)
+				output.puts "** #{executed_count}/#{executable_count} lines executed; #{percentage.to_f.round(2)}% covered."
+			end
+		end
+		
 		def self.for(path, **options)
 			self.new(Source.new(path, **options))
 		end
@@ -86,13 +120,51 @@ module Covered
 			@total = total
 			@annotations = annotations
 			
-			# Cached values:
-			@executable_lines = nil
-			@executed_lines = nil
+			# Cached summary:
+			@summary = nil
+		end
+		
+		def merge!(coverage)
+			@counts = @counts.zip(coverage.counts).map do |a, b|
+				if a || b
+					(a || 0) + (b || 0)
+				end
+			end
+			
+			@total += coverage.total
+			
+			coverage.annotations.each do |lineno, annotation|
+				annotate(lineno, annotation)
+			end
+			
+			return self
 		end
 		
 		def path
 			@source.path
+		end
+		
+		def path= value
+			@source.path = value
+		end
+		
+		def fresh?
+			if @source.modified_time.nil?
+				# We don't know when the file was last modified, so we assume it is fresh:
+				return true
+			end
+			
+			unless File.exist?(@source.path)
+				# The file no longer exists, so we assume it is stale:
+				return false
+			end
+			
+			if @source.modified_time >= File.mtime(@source.path)
+				# The file has not been modified since we last processed it, so we assume it is fresh:
+				return true
+			end
+			
+			return false
 		end
 		
 		attr_accessor :source
@@ -111,9 +183,7 @@ module Covered
 			
 			@counts.freeze
 			@annotations.freeze
-			
-			executable_lines
-			executed_lines
+			@summary ||= self.summary
 			
 			super
 		end
@@ -145,34 +215,16 @@ module Covered
 			end
 		end
 		
-		def executable_lines
-			@executable_lines ||= @counts.compact
+		def summary
+			@summary || Summary.new(@counts)
 		end
-		
-		def executable_count
-			executable_lines.count
-		end
-		
-		def executed_lines
-			@executed_lines ||= executable_lines.reject(&:zero?)
-		end
-		
-		def executed_count
-			executed_lines.count
-		end
-		
-		def missing_count
-			executable_count - executed_count
-		end
-		
-		include Ratio
 		
 		def print(output)
-			output.puts "** #{executed_count}/#{executable_count} lines executed; #{percentage.to_f.round(2)}% covered."
+			self.summary.print(output)
 		end
 		
 		def to_s
-			"\#<#{self.class} path=#{@path} #{percentage.to_f.round(2)}% covered>"
+			"\#<#{self.class} path=#{self.path} #{self.summary.percentage.to_f.round(2)}% covered>"
 		end
 		
 		def serialize(packer)
