@@ -28,6 +28,7 @@ module Covered
 		
 		def << coverage
 			@count += 1
+			
 			@executable_count += coverage.executable_count
 			@executed_count += coverage.executed_count
 		end

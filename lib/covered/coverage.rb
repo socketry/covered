@@ -76,68 +76,22 @@ module Covered
 	end
 	
 	class Coverage
-		class Summary
-			include Ratio
-			
-			def initialize(counts)
-				@counts = counts
-			end
-			
-			attr :counts
-			
-			def executable_lines
-				@counts.compact
-			end
-			
-			def executable_count
-				executable_lines.count
-			end
-			
-			def executed_lines
-				executable_lines.reject(&:zero?)
-			end
-			
-			def executed_count
-				executed_lines.count
-			end
-			
-			def missing_count
-				executable_count - executed_count
-			end
-			
-			def print(output)
-				output.puts "** #{executed_count}/#{executable_count} lines executed; #{percentage.to_f.round(2)}% covered."
-			end
-		end
+		include Ratio
 		
 		def self.for(path, **options)
 			self.new(Source.new(path, **options))
 		end
 		
-		def initialize(source, counts = [], total = 0, annotations = {})
+		def initialize(source, counts = [], annotations = {}, total = nil)
 			@source = source
 			@counts = counts
-			@total = total
 			@annotations = annotations
 			
-			# Cached summary:
-			@summary = nil
-		end
-		
-		def merge!(coverage)
-			@counts = @counts.zip(coverage.counts).map do |a, b|
-				if a || b
-					(a || 0) + (b || 0)
-				end
-			end
+			@total = total || counts.sum{|count| count || 0}
 			
-			@total += coverage.total
-			
-			coverage.annotations.each do |lineno, annotation|
-				annotate(lineno, annotation)
-			end
-			
-			return self
+			# Memoized metrics:
+			@executable_lines = nil
+			@executed_lines = nil
 		end
 		
 		def path
@@ -183,7 +137,6 @@ module Covered
 			
 			@counts.freeze
 			@annotations.freeze
-			@summary ||= self.summary
 			
 			super
 		end
@@ -200,27 +153,28 @@ module Covered
 			@counts[lineno]
 		end
 		
-		def annotate(lineno, annotation)
-			@annotations[lineno] ||= []
-			@annotations[lineno] << annotation
+		def executable_lines
+			@executable_lines ||= @counts.compact
 		end
 		
-		def mark(lineno, value = 1)
-			@total += value
-			
-			if @counts[lineno]
-				@counts[lineno] += value
-			else
-				@counts[lineno] = value
-			end
+		def executable_count
+			executable_lines.count
 		end
 		
-		def summary
-			@summary || Summary.new(@counts)
+		def executed_lines
+			@executed_lines ||= executable_lines.reject(&:zero?)
+		end
+		
+		def executed_count
+			executed_lines.count
+		end
+		
+		def missing_count
+			executable_count - executed_count
 		end
 		
 		def print(output)
-			self.summary.print(output)
+			output.puts "** #{executed_count}/#{executable_count} lines executed; #{percentage.to_f.round(2)}% covered."
 		end
 		
 		def to_s
@@ -230,17 +184,17 @@ module Covered
 		def serialize(packer)
 			packer.write(@source)
 			packer.write(@counts)
-			packer.write(@total)
 			packer.write(@annotations)
+			packer.write(@total)
 		end
 		
 		def self.deserialize(unpacker)
 			source = unpacker.read
 			counts = unpacker.read
-			total = unpacker.read
 			annotations = unpacker.read
+			total = unpacker.read
 			
-			self.new(source, counts, total, annotations)
+			self.new(source, counts, annotations, total)
 		end
 	end
 end
