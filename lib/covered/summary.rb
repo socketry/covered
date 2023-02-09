@@ -116,6 +116,12 @@ module Covered
 		end
 	end
 	
+	class FullSummary < Summary
+		def initialize
+			super(threshold: nil)
+		end
+	end
+	
 	class BriefSummary < Summary
 		def call(wrapper, output = $stdout, before: 4, after: 4)
 			terminal = self.terminal(output)
