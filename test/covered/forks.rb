@@ -48,21 +48,23 @@ describe Covered::Forks do
 		]
 	end
 	
-	it "tracks persistent coverage across processes" do
-		code = <<~RUBY
-			3.times do
-				Object.new
-			end
-		RUBY
-		
-		coverage = measure_coverage(code) do |path|
-			pid = spawn("ruby", path)
+	if RUBY_VERSION >= "3.2.1"
+		it "tracks persistent coverage across processes" do
+			code = <<~RUBY
+				3.times do
+					Object.new
+				end
+			RUBY
 			
-			Process.wait(pid)
+			coverage = measure_coverage(code) do |path|
+				pid = spawn("ruby", path)
+				
+				Process.wait(pid)
+			end
+			
+			expect(coverage.counts).to be == [
+				nil, 1, 3
+			]
 		end
-		
-		expect(coverage.counts).to be == [
-			nil, 1, 3
-		]
 	end
 end
