@@ -1,1 +1,0 @@
-gem "covered", path: "../../.."
