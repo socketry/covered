@@ -15,7 +15,7 @@ end
 
 output = String.new
 
-trace_point.enable
+trace_point.start
 
 begin
 	output << "

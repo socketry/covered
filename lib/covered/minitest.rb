@@ -13,7 +13,7 @@ $covered = Covered::Config.load
 module Covered
 	module Minitest
 		def run(*)
-			$covered.enable
+			$covered.start
 			
 			super
 		end
@@ -26,7 +26,7 @@ if $covered.record?
 	end
 	
 	Minitest.after_run do
-		$covered.disable
+		$covered.finish
 		$covered.call($stderr)
 	end
 end

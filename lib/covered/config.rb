@@ -9,8 +9,12 @@ module Covered
 	class Config
 		PATH = "config/covered.rb"
 		
+		def self.root
+			ENV['COVERED_ROOT'] || Dir.pwd
+		end
+		
 		def self.path(root)
-			path = ::File.join(root, PATH)
+			path = ::File.expand_path(PATH, root)
 			
 			if ::File.exist?(path)
 				return path
@@ -21,7 +25,7 @@ module Covered
 			ENV['COVERAGE']
 		end
 		
-		def self.load(root: Dir.pwd, coverage: self.coverage)
+		def self.load(root: self.root, coverage: self.coverage)
 			derived = Class.new(self)
 			
 			if path = self.path(root)
@@ -39,9 +43,11 @@ module Covered
 			@policy = nil
 		end
 		
-		def record?
+		def report?
 			!!@coverage
 		end
+		
+		alias :record? :report?
 		
 		attr :coverage
 		
@@ -53,16 +59,12 @@ module Covered
 			policy.output
 		end
 		
-		def enable
-			policy.enable
+		def start
+			policy.start
 		end
 		
-		def disable
-			policy.disable
-		end
-		
-		def flush
-			policy.flush
+		def finish
+			policy.finish
 		end
 		
 		def call(output)
@@ -87,6 +89,21 @@ module Covered
 			policy.persist!
 			
 			policy.reports!(@coverage)
+		end
+		
+		REQUIRE_COVERED_AUTOSTART = '-rcovered/autostart'
+		
+		def autostart!
+			unless ENV['RUBYOPT'].include?(REQUIRE_COVERED_AUTOSTART)
+				ENV['RUBYOPT'] = [REQUIRE_COVERED_AUTOSTART, ENV['RUBYOPT']].compact.join(' ')
+			end
+			
+			unless ENV['COVERED_ROOT']
+				ENV['COVERED_ROOT'] = @root
+			end
+			
+			# Don't report coverage in child processes:
+			ENV.delete('COVERAGE')
 		end
 	end
 end

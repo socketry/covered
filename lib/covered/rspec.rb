@@ -12,7 +12,7 @@ module Covered
 	module RSpec
 		module Policy
 			def load_spec_files
-				$covered.enable
+				$covered.start
 				
 				super
 			end
@@ -33,7 +33,7 @@ if $covered.record?
 
 	RSpec.configure do |config|
 		config.after(:suite) do
-			$covered.disable
+			$covered.finish
 			$covered.call(config.output_stream)
 		end
 	end

@@ -11,7 +11,7 @@ template_path = File.expand_path("template.erb", __dir__)
 ENV['COVERAGE'] ||= 'PartialSummary'
 require 'covered/policy/default'
 
-$covered.enable
+$covered.start
 
 template = ERB.new(File.read(template_path)).tap do |template|
 	template.filename = template_path
@@ -20,6 +20,6 @@ end
 @items = ["Cats", "Dogs", "Chickens"]
 puts template.result(binding)
 
-$covered.disable
+$covered.finish
 
 $covered.call($stdout)

@@ -23,15 +23,6 @@ describe Covered::Files do
 			expect(files.paths["program.rb"][2]).to be == 2
 		end
 	end
-	
-	with '#each' do
-		it "enumerates all paths" do
-			coverage = files.mark("program.rb", 2, 1)
-			
-			enumerator = files.each
-			expect(enumerator.next).to be == coverage
-		end
-	end
 end
 
 describe Covered::Filter do

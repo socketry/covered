@@ -8,13 +8,13 @@ module Covered
 		def initialize(...)
 			super
 			
-			# Defer loading the coverage configuration unless we are actually running with coverage enabled to avoid performance cost/overhead.
+			# Defer loading the coverage configuration unless we are actually running with coverage startd to avoid performance cost/overhead.
 			if ENV['COVERAGE']
 				require_relative 'config'
 				
 				@covered = Covered::Config.load(root: self.root)
 				if @covered.record?
-					@covered.enable
+					@covered.start
 				end
 			else
 				@covered = nil
@@ -25,7 +25,7 @@ module Covered
 			super(assertions)
 			
 			if @covered&.record?
-				@covered.disable
+				@covered.finish
 				@covered.call(self.output.io)
 			end
 		end

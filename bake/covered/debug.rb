@@ -23,11 +23,11 @@ def parse(paths: [], execute: false)
 	
 	if execute
 		capture = Covered::Capture.new(output)
-		capture.enable
+		capture.start
 		paths.each do |path|
 			load path
 		end
-		capture.disable
+		capture.finish
 		
 		files.paths = files.paths.slice(*paths)
 	end

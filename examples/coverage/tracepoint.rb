@@ -7,6 +7,6 @@ trace_point = TracePoint.new(:call, :return, :line, :c_call, :c_return, :b_call,
 	puts [trace.path, trace.lineno].join(":")
 end
 
-trace_point.enable
+trace_point.start
 
 require_relative 'test'

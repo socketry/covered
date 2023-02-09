@@ -5,13 +5,16 @@
 
 module Covered
 	class Base
-		def enable
+		# Start tracking coverage.
+		def start
 		end
 		
-		def disable
+		# Discard any coverage data and restart tracking.
+		def clear
 		end
 		
-		def flush
+		# Stop tracking coverage.
+		def finish
 		end
 		
 		def accept?(path)
@@ -21,9 +24,12 @@ module Covered
 		def mark(path, lineno, value)
 		end
 		
-		def add(source)
+		def add(coverage)
 		end
 		
+		# Enumerate the coverage data.
+		# @yields {|coverage| ...}
+		# 	@parameter coverage [Coverage] The coverage data, including the source file and execution counts.
 		def each
 		end
 		
@@ -43,16 +49,16 @@ module Covered
 		
 		attr :output
 		
-		def enable
-			@output.enable
+		def start
+			@output.start
 		end
 		
-		def disable
-			@output.disable
+		def clear
+			@output.clear
 		end
 		
-		def flush
-			@output.flush
+		def finish
+			@output.finish
 		end
 		
 		def accept?(path)
@@ -63,8 +69,8 @@ module Covered
 			@output.mark(path, lineno, value)
 		end
 		
-		def add(source)
-			@output.add(source)
+		def add(coverage)
+			@output.add(coverage)
 		end
 		
 		# @yield [Coverage] the path to the file, and the execution counts.
@@ -81,7 +87,7 @@ module Covered
 		end
 		
 		def to_h
-			@output.to_enum(:each).collect{|coverage| [coverage.path, coverage]}.to_h
+			to_enum(:each).collect{|coverage| [coverage.path, coverage]}.to_h
 		end
 	end
 	

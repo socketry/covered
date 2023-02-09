@@ -7,7 +7,6 @@ require_relative 'wrapper'
 
 require 'msgpack'
 require 'time'
-require 'set'
 
 module Covered
 	class Persist < Wrapper
@@ -17,34 +16,16 @@ module Covered
 			super(output)
 			
 			@path = self.expand_path(path)
-			@touched = Set.new
 		end
 		
 		def apply(record, ignore_mtime: false)
-			# The file must still exist:
-			return unless path = expand_path(record[:path])
-			
-			unless File.exist?(path)
-				# Ignore this coverage, the file no longer exists.
-				return
-			end
-			
-			# If the file has been modified since... we can't use the coverage.
-			return unless mtime = record[:mtime]
-			
-			unless ignore_mtime
-				if File.mtime(path).to_f > record[:mtime]
-					# Ignore this coverage, the file has been modified since it was recorded.
-					return
+			if coverage = record[:coverage]
+				if path = record[:path]
+					path = self.expand_path(path)
+					coverage.path = path
 				end
-			end
-			
-			if source = record[:source]
-				@output.add(source)
-			end
-			
-			record[:counts].each_with_index do |count, index|
-				@output.mark(path, index, count) if count
+				
+				add(coverage)
 			end
 		end
 		
@@ -53,9 +34,8 @@ module Covered
 				# We want to use relative paths so that moving the repo won't break everything:
 				pid: Process.pid,
 				path: relative_path(coverage.path),
-				mtime: File.mtime(coverage.path).to_f,
-				counts: coverage.counts,
-				source: coverage.source,
+				# relative_path: relative_path(coverage.path),
+				coverage: coverage,
 			}
 		end
 		
@@ -67,6 +47,7 @@ module Covered
 				file.flock(File::LOCK_SH)
 				
 				make_unpacker(file).each do |record|
+					# pp load: record
 					self.apply(record, **options)
 				end
 			end
@@ -76,12 +57,13 @@ module Covered
 		
 		def save!
 			# Dump all coverage:
-			File.open(@path, "wb") do |file|
+			File.open(@path, "ab") do |file|
 				file.flock(File::LOCK_EX)
 				
 				packer = make_packer(file)
 				
-				self.each do |coverage|
+				@output.each do |coverage|
+					# pp save: coverage
 					packer.write(serialize(coverage))
 				end
 				
@@ -89,64 +71,52 @@ module Covered
 			end
 		end
 		
-		def mark(file, line, count)
-			@touched << file
+		def finish
+			super
+			
+			self.save!
+		end
+		
+		def each(&block)
+			return to_enum unless block_given?
+			
+			@output.clear
+			self.load!
 			
 			super
 		end
 		
-		def enable
-			super
+		def make_factory
+			factory = MessagePack::Factory.new
 			
-			load!
+			factory.register_type(0x00, Symbol)
+			
+			factory.register_type(0x01, Time,
+				packer: MessagePack::Time::Packer,
+				unpacker: MessagePack::Time::Unpacker
+			)
+			
+			factory.register_type(0x20, Source,
+				recursive: true,
+				packer: :serialize,
+				unpacker: :deserialize,
+			)
+			
+			factory.register_type(0x21, Coverage,
+				recursive: true,
+				packer: :serialize,
+				unpacker: :deserialize,
+			)
+			
+			return factory
 		end
-		
-		def flush
-			load!
-			
-			super
-		end
-		
-		def disable
-			super
-			
-			# @touched.each do |path|
-			# 	if @output.accept?(path)
-			# 		puts "Updated #{path} coverage."
-			# 	end
-			# end
-			
-			save!
-		end
-		
-		# def each
-		# 	super do |coverage|
-		# 		if @touched.include?(coverage.path)
-		# 			yield coverage
-		# 		end
-		# 	end
-		# end
 		
 		def make_packer(io)
-			packer = MessagePack::Packer.new(io)
-			packer.register_type(0x00, Symbol, :to_msgpack_ext)
-			packer.register_type(0x01, Time) {|object| object.to_s}
-			packer.register_type(0x0F, Coverage::Source) do |object|
-				object.to_a.to_msgpack
-			end
-			
-			return packer
+			return make_factory.packer(io)
 		end
 		
 		def make_unpacker(io)
-			unpacker = MessagePack::Unpacker.new(io)
-			unpacker.register_type(0x00, Symbol, :from_msgpack_ext)
-			unpacker.register_type(0x01, Time, :parse)
-			unpacker.register_type(0x0F) do |data|
-				Coverage::Source.new(*MessagePack.unpack(data))
-			end
-			
-			return unpacker
+			return make_factory.unpacker(io)
 		end
 	end
 end

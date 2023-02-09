@@ -82,7 +82,7 @@ module Covered
 			end
 		end
 		
-		# A coverage array gives, for each line, the number of line execution by the interpreter. A nil value means coverage is disabled for this line (lines like else and end).
+		# A coverage array gives, for each line, the number of line execution by the interpreter. A nil value means coverage is finishd for this line (lines like else and end).
 		def call(wrapper, output = $stdout)
 			terminal = self.terminal(output)
 			
@@ -113,6 +113,12 @@ module Covered
 			end
 			
 			statistics.print(output)
+		end
+	end
+	
+	class FullSummary < Summary
+		def initialize
+			super(threshold: nil)
 		end
 	end
 	

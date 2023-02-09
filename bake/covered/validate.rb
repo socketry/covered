@@ -20,8 +20,6 @@ def validate(paths: nil, minimum: 1.0)
 		Covered::Persist.new(config.output, path).load!(ignore_mtime: true)
 	end
 	
-	config.flush
-	
 	statistics = Covered::Statistics.new
 	
 	config.each do |coverage|

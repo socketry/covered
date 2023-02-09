@@ -10,6 +10,55 @@ require 'set'
 
 module Covered
 	class Files < Base
+		class State
+			def self.for(path, **options)
+				self.new(Source.new(path, **options))
+			end
+			
+			def initialize(source)
+				@source = source
+				@counts = []
+				@annotations = {}
+			end
+			
+			def [](lineno)
+				@counts[lineno]
+			end
+			
+			attr :counts
+			attr :annotations
+			
+			def annotate(lineno, annotation)
+				@annotations[lineno] ||= []
+				@annotations[lineno] << annotation
+			end
+			
+			def mark(lineno, value = 1)
+				if @counts[lineno]
+					@counts[lineno] += value
+				else
+					@counts[lineno] = value
+				end
+			end
+			
+			def merge!(coverage)
+				coverage.counts.each_with_index do |count, index|
+					if count
+						@counts[index] ||= 0
+						@counts[index] += count
+					end
+				end
+				
+				@annotations.merge!(coverage.annotations) do |lineno, a, b|
+					Array(a) + Array(b)
+				end
+			end
+			
+			def coverage
+				Coverage.new(@source, @counts, @annotations)
+			end
+		end
+		
 		def initialize(*)
 			super
 			
@@ -19,7 +68,7 @@ module Covered
 		attr_accessor :paths
 		
 		def [](path)
-			@paths[path]
+			@paths[path] ||= State.for(path)
 		end
 		
 		def empty?
@@ -27,19 +76,27 @@ module Covered
 		end
 		
 		def mark(path, lineno, value)
-			coverage = (@paths[path] ||= Coverage.for(path))
-			
-			coverage.mark(lineno, value)
-			
-			return coverage
+			self[path].mark(lineno, value)
 		end
 		
-		def add(source)
-			@paths[source.path] ||= Coverage.new(source)
+		def annotate(path, lineno, value)
+			self[path].annotate(lineno, value)
 		end
 		
-		def each(&block)
-			@paths.each_value(&block)
+		def add(coverage)
+			self[coverage.path].merge!(coverage)
+		end
+		
+		def each
+			return to_enum unless block_given?
+			
+			@paths.each_value do |state|
+				yield state.coverage
+			end
+		end
+		
+		def clear
+			@paths.clear
 		end
 	end
 	
