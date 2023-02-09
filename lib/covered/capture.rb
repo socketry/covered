@@ -26,6 +26,7 @@ module Covered
 			
 			results.each do |path, result|
 				lines = result[:lines]
+				path = self.expand_path(path)
 				
 				lines.each_with_index do |count, lineno|
 					@output.mark(path, lineno+1, count) if count
