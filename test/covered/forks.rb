@@ -14,7 +14,12 @@ describe Covered::Forks do
 			
 			config.start
 			begin
-				eval(code, TOPLEVEL_BINDING.dup, test_path, 1)
+				if block_given?
+					File.write(test_path, code)
+					yield test_path
+				else
+					eval(code, TOPLEVEL_BINDING.dup, test_path, 1)
+				end
 			ensure
 				config.finish
 			end
@@ -40,6 +45,24 @@ describe Covered::Forks do
 		
 		expect(coverage.counts).to be == [
 			nil, 1, 3, nil, nil, 1, 1, 3, nil, nil, nil, 1
+		]
+	end
+	
+	it "tracks persistent coverage across processes" do
+		code = <<~RUBY
+			3.times do
+				Object.new
+			end
+		RUBY
+		
+		coverage = measure_coverage(code) do |path|
+			pid = spawn("ruby", path)
+			
+			Process.wait(pid)
+		end
+		
+		expect(coverage.counts).to be == [
+			nil, 1, 3
 		]
 	end
 end

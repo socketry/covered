@@ -41,6 +41,8 @@ module Covered
 			@root = root
 			@coverage = coverage
 			@policy = nil
+			
+			@environment = nil
 		end
 		
 		def report?
@@ -60,11 +62,21 @@ module Covered
 		end
 		
 		def start
+			# Save and setup the environment:
+			@environment = ENV.to_h
+			autostart!
+			
+			# Start coverage tracking:
 			policy.start
 		end
 		
 		def finish
+			# Finish coverage tracking:
 			policy.finish
+			
+			# Restore the environment:
+			ENV.replace(@environment)
+			@environment = nil
 		end
 		
 		def call(output)
@@ -91,12 +103,18 @@ module Covered
 			policy.reports!(@coverage)
 		end
 		
+		protected
+		
 		REQUIRE_COVERED_AUTOSTART = '-rcovered/autostart'
 		
 		def autostart!
-			unless ENV['RUBYOPT'].include?(REQUIRE_COVERED_AUTOSTART)
-				ENV['RUBYOPT'] = [REQUIRE_COVERED_AUTOSTART, ENV['RUBYOPT']].compact.join(' ')
+			if rubyopt = ENV['RUBYOPT'] and !rubyopt.empty?
+				rubyopt = [rubyopt.strip, REQUIRE_COVERED_AUTOSTART].join(' ')
+			else
+				rubyopt = REQUIRE_COVERED_AUTOSTART
 			end
+			
+			ENV['RUBYOPT'] = rubyopt
 			
 			unless ENV['COVERED_ROOT']
 				ENV['COVERED_ROOT'] = @root
