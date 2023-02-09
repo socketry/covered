@@ -74,7 +74,7 @@ module Covered
 		def finish
 			super
 			
-			save!
+			self.save!
 		end
 		
 		def each(&block)

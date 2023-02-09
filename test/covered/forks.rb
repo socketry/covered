@@ -38,6 +38,8 @@ describe Covered::Forks do
 			Process.wait(pid)
 		RUBY
 		
-		pp coverage
+		expect(coverage.counts).to be == [
+			nil, 1, 3, nil, nil, 1, 1, 3, nil, nil, nil, 1
+		]
 	end
 end

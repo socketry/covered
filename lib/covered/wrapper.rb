@@ -24,7 +24,7 @@ module Covered
 		def mark(path, lineno, value)
 		end
 		
-		def add(source)
+		def add(coverage)
 		end
 		
 		# Enumerate the coverage data.
@@ -69,8 +69,8 @@ module Covered
 			@output.mark(path, lineno, value)
 		end
 		
-		def add(source)
-			@output.add(source)
+		def add(coverage)
+			@output.add(coverage)
 		end
 		
 		# @yield [Coverage] the path to the file, and the execution counts.
@@ -87,7 +87,7 @@ module Covered
 		end
 		
 		def to_h
-			@output.to_enum(:each).collect{|coverage| [coverage.path, coverage]}.to_h
+			to_enum(:each).collect{|coverage| [coverage.path, coverage]}.to_h
 		end
 	end
 	
