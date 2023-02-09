@@ -88,7 +88,7 @@ module Covered
 		end
 		
 		def ignore_paths
-			['test', 'fixtures', 'spec', 'vendor', 'config']
+			['test/', 'fixtures/', 'spec/', 'vendor/', 'config/']
 		end
 		
 		# Override this method to implement your own policy.
@@ -97,7 +97,7 @@ module Covered
 			policy.root(@root)
 			
 			patterns = ignore_paths.map do |path|
-				File.expand_path(path, @root)
+				File.join(@root, path)
 			end
 			
 			# We will ignore any files in the test or spec directory:
