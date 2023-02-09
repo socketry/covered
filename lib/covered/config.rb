@@ -87,13 +87,21 @@ module Covered
 			policy.each(&block)
 		end
 		
+		def ignore_paths
+			['test', 'fixtures', 'spec', 'vendor', 'config']
+		end
+		
 		# Override this method to implement your own policy.
 		def make_policy(policy)
 			# Only files in the root would be tracked:
 			policy.root(@root)
 			
+			patterns = ignore_paths.map do |path|
+				File.expand_path(path, @root)
+			end
+			
 			# We will ignore any files in the test or spec directory:
-			policy.skip(/^.*\/(test|fixtures|spec|vendor|config)\//)
+			policy.skip(Regexp.union(patterns))
 			
 			# We will include all files under lib, even if they aren't loaded:
 			policy.include("lib/**/*.rb")
