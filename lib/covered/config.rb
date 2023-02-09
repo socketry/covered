@@ -34,19 +34,13 @@ module Covered
 				derived.prepend(config)
 			end
 			
-			return derived.new(root, coverage).tap do |config|
-				config.prepare
-			end
+			return derived.new(root, coverage)
 		end
 		
 		def initialize(root, coverage)
 			@root = root
 			@coverage = coverage
 			@policy = nil
-		end
-		
-		def prepare
-			autostart!
 		end
 		
 		def report?

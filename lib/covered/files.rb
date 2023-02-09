@@ -84,7 +84,7 @@ module Covered
 		end
 		
 		def add(coverage)
-			@paths[path].merge!(coverage)
+			self[coverage.path].merge!(coverage)
 		end
 		
 		def each
