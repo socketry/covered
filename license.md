@@ -1,10 +1,12 @@
 # MIT License
 
-Copyright, 2018-2022, by Samuel Williams.  
+Copyright, 2018-2023, by Samuel Williams.  
 Copyright, 2018, by Shannon Skipper.  
 Copyright, 2018, by chocolateboy.  
 Copyright, 2019, by Cyril Roelandt.  
 Copyright, 2022, by Adam Daniels.  
+Copyright, 2022, by Felix Yan.  
+Copyright, 2023, by Stephen Ierodiaconou.  
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

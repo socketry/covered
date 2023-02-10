@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
 	spec.version = Covered::VERSION
 	
 	spec.summary = "A modern approach to code coverage."
-	spec.authors = ["Samuel Williams", "Adam Daniels", "Cyril Roelandt", "Shannon Skipper", "chocolateboy"]
+	spec.authors = ["Samuel Williams", "Adam Daniels", "Cyril Roelandt", "Felix Yan", "Shannon Skipper", "Stephen Ierodiaconou", "chocolateboy"]
 	spec.license = "MIT"
 	
 	spec.cert_chain  = ['release.cert']

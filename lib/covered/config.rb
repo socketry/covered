@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2022, by Samuel Williams.
+# Copyright, 2022-2023, by Samuel Williams.
 
 require_relative 'policy'
 
@@ -91,6 +91,7 @@ module Covered
 			['test/', 'fixtures/', 'spec/', 'vendor/', 'config/']
 		end
 		
+
 		# Override this method to implement your own policy.
 		def make_policy(policy)
 			# Only files in the root would be tracked:
