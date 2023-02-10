@@ -91,7 +91,6 @@ module Covered
 			['test/', 'fixtures/', 'spec/', 'vendor/', 'config/']
 		end
 		
-
 		# Override this method to implement your own policy.
 		def make_policy(policy)
 			# Only files in the root would be tracked:
