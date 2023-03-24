@@ -21,15 +21,28 @@ module Covered
 			::Coverage.result(stop: false, clear: true)
 		end
 		
+		EVAL_PATHS = {
+			"(eval)" => true,
+			"(irb)" => true,
+			"eval" => true
+		}
+		
 		def finish
 			results = ::Coverage.result
 			
 			results.each do |path, result|
-				lines = result[:lines]
+				next if EVAL_PATHS.include?(path)
+				
 				path = self.expand_path(path)
 				
-				lines.each_with_index do |count, lineno|
-					@output.mark(path, lineno+1, count) if count
+				# Skip files which don't exist. This can happen if `eval` is used with an invalid/incorrect path.
+				if File.exist?(path)
+					result[:lines].each_with_index do |count, lineno|
+						@output.mark(path, lineno+1, count) if count
+					end
+				else
+					# warn "Skipping coverage for #{path.inspect} because it doesn't exist!"
+					# Ignore.
 				end
 			end
 			

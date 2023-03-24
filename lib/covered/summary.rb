@@ -29,6 +29,7 @@ module Covered
 				terminal[:ignored_code] ||= terminal.style(nil, nil, :faint)
 				
 				terminal[:annotations] ||= terminal.style(:blue)
+				terminal[:error] ||= terminal.style(:red)
 			end
 		end
 		
@@ -82,36 +83,49 @@ module Covered
 			end
 		end
 		
+		def print_coverage(terminal, coverage)
+			line_offset = 1
+			counts = coverage.counts
+			
+			coverage.read do |file|
+				print_line_header(terminal)
+				
+				file.each_line do |line|
+					count = counts[line_offset]
+					
+					print_annotations(terminal, coverage, line, line_offset)
+					
+					print_line(terminal, line, line_offset, count)
+					
+					line_offset += 1
+				end
+			end
+		end
+		
+		def print_error(terminal, error)
+			terminal.puts "Error: #{error.message}", style: :error
+			terminal.puts error.backtrace
+		end
+		
 		# A coverage array gives, for each line, the number of line execution by the interpreter. A nil value means coverage is finishd for this line (lines like else and end).
-		def call(wrapper, output = $stdout)
+		def call(wrapper, output = $stdout, **options)
 			terminal = self.terminal(output)
 			
 			statistics = self.each(wrapper) do |coverage|
-				line_offset = 1
-				
 				path = wrapper.relative_path(coverage.path)
 				terminal.puts ""
 				terminal.puts path, style: :path
 				
-				counts = coverage.counts
-				
-				coverage.read do |file|
-					print_line_header(terminal)
-					
-					file.each_line do |line|
-						count = counts[line_offset]
-						
-						print_annotations(terminal, coverage, line, line_offset)
-						
-						print_line(terminal, line, line_offset, count)
-						
-						line_offset += 1
-					end
+				begin
+					print_coverage(terminal, coverage, **options)
+				rescue => error
+					print_error(terminal, error)
 				end
 				
 				coverage.print(output)
 			end
 			
+			terminal.puts
 			statistics.print(output)
 		end
 	end
@@ -150,49 +164,35 @@ module Covered
 	end
 	
 	class PartialSummary < Summary
-		def call(wrapper, output = $stdout, before: 4, after: 4)
-			terminal = self.terminal(output)
+		def print_coverage(terminal, coverage, before: 4, after: 4)
+			return if coverage.zero?
 			
-			statistics = self.each(wrapper) do |coverage|
-				line_offset = 1
+			line_offset = 1
+			counts = coverage.counts
+			last_line = nil
+			
+			coverage.read do |file|
+				print_line_header(terminal)
 				
-				path = wrapper.relative_path(coverage.path)
-				terminal.puts ""
-				terminal.puts path, style: :path
-				
-				counts = coverage.counts
-				last_line = nil
-				
-				unless coverage.zero?
-					print_line_header(terminal)
+				file.each_line do |line|
+					range = Range.new([line_offset - before, 0].max, line_offset+after)
 					
-					coverage.read do |file|
-						file.each_line do |line|
-							range = Range.new([line_offset - before, 0].max, line_offset+after)
-							
-							if counts[range]&.include?(0)
-								count = counts[line_offset]
-								
-								if last_line and last_line != line_offset-1
-									terminal.puts ":".rjust(16)
-								end
-								
-								print_annotations(terminal, coverage, line, line_offset)
-								print_line(terminal, line, line_offset, count)
-								
-								last_line = line_offset
-							end
-							
-							line_offset += 1
+					if counts[range]&.include?(0)
+						count = counts[line_offset]
+						
+						if last_line and last_line != line_offset-1
+							terminal.puts ":".rjust(16)
 						end
+						
+						print_annotations(terminal, coverage, line, line_offset)
+						print_line(terminal, line, line_offset, count)
+						
+						last_line = line_offset
 					end
+					
+					line_offset += 1
 				end
-				
-				coverage.print(output)
 			end
-			
-			terminal.puts
-			statistics.print(output)
 		end
 	end
 	
