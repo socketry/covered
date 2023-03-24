@@ -4,5 +4,5 @@
 # Copyright, 2018-2022, by Samuel Williams.
 
 module Covered
-	VERSION = "0.20.1"
+	VERSION = "0.20.2"
 end
