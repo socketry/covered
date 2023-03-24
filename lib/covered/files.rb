@@ -34,10 +34,13 @@ module Covered
 			end
 			
 			def mark(lineno, value = 1)
-				if @counts[lineno]
-					@counts[lineno] += value
-				else
-					@counts[lineno] = value
+				Array(value).each_with_index do |value, index|
+					offset = lineno + index
+					if @counts[offset]
+						@counts[offset] += value
+					else
+						@counts[offset] = value
+					end
 				end
 			end
 			

@@ -37,9 +37,7 @@ module Covered
 				
 				# Skip files which don't exist. This can happen if `eval` is used with an invalid/incorrect path.
 				if File.exist?(path)
-					result[:lines].each_with_index do |count, lineno|
-						@output.mark(path, lineno+1, count) if count
-					end
+					@output.mark(path, 1, result[:lines])
 				else
 					# warn "Skipping coverage for #{path.inspect} because it doesn't exist!"
 					# Ignore.
