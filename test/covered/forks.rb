@@ -14,8 +14,9 @@ describe Covered::Forks do
 			
 			config.start
 			begin
+				File.write(test_path, code)
+				
 				if block_given?
-					File.write(test_path, code)
 					yield test_path
 				else
 					eval(code, TOPLEVEL_BINDING.dup, test_path, 1)
