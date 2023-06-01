@@ -24,3 +24,9 @@ template.result(binding)
 
 covered.finish
 covered.call($stdout)
+
+covered.each do |coverage|
+	puts "Coverage counts (values): #{coverage.counts.inspect}"
+	puts "Coverage counts (size): #{coverage.counts.size}"
+	puts "File lines (size): #{coverage.read.lines.size}"
+end

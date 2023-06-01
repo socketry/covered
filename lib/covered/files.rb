@@ -34,6 +34,8 @@ module Covered
 			end
 			
 			def mark(lineno, value = 1)
+				# As currently implemented, @counts is base-zero rather than base-one.
+				# Line numbers generally start at line 1, so the first line, line 1, is at index 1. This means that index[0] is usually nil.
 				Array(value).each_with_index do |value, index|
 					offset = lineno + index
 					if @counts[offset]
