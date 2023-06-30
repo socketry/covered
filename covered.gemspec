@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
 	spec.version = Covered::VERSION
 	
 	spec.summary = "A modern approach to code coverage."
-	spec.authors = ["Samuel Williams", "Adam Daniels", "Cyril Roelandt", "Felix Yan", "Shannon Skipper", "Stephen Ierodiaconou", "chocolateboy"]
+	spec.authors = ["Samuel Williams", "Adam Daniels", "Cyril Roelandt", "Felix Yan", "Shannon Skipper", "Stephen Ierodiaconou"]
 	spec.license = "MIT"
 	
 	spec.cert_chain  = ['release.cert']
@@ -25,9 +25,4 @@ Gem::Specification.new do |spec|
 	
 	spec.add_dependency "console", "~> 1.0"
 	spec.add_dependency "msgpack", "~> 1.0"
-	
-	spec.add_development_dependency "bundler"
-	spec.add_development_dependency "rspec", "~> 3.6"
-	spec.add_development_dependency "sus", "~> 0.14"
-	spec.add_development_dependency "trenni", "~> 3.6"
 end

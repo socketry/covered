@@ -10,13 +10,16 @@ gemspec
 group :maintenance do
 	gem "bake-modernize"
 	gem "bake-gem"
-
-	gem "bake-github-pages"
+	
 	gem "utopia-project"
 end
 
 group :test do
+	gem "sus"
+	gem "trenni"
+	
 	gem "bake-test"
+	gem "bake-test-external"
 	
 	gem "minitest"
 	gem "rspec"

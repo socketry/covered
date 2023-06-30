@@ -2,7 +2,6 @@
 
 Copyright, 2018-2023, by Samuel Williams.  
 Copyright, 2018, by Shannon Skipper.  
-Copyright, 2018, by chocolateboy.  
 Copyright, 2019, by Cyril Roelandt.  
 Copyright, 2022, by Adam Daniels.  
 Copyright, 2022, by Felix Yan.  
