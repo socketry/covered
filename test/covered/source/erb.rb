@@ -20,6 +20,8 @@ let(:code) {<<~ERB}
 ERB
 
 it "can parse multi-line methods" do
+	skip "Unsupported Ruby Version" unless RUBY_VERSION >= "3.2"
+	
 	files = Covered::Files.new
 	
 	template = ERB.new(code)

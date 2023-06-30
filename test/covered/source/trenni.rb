@@ -19,6 +19,8 @@ let(:capture) {Covered::Capture.new(files)}
 let(:summary) {Covered::Summary.new}
 
 it "correctly generates coverage for template" do
+	skip "Unsupported Ruby Version" unless RUBY_VERSION >= "3.2"
+	
 	capture.start
 	template.to_string
 	capture.finish

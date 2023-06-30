@@ -61,6 +61,10 @@ When running `rspec`, you can specify the kind of coverage analysis you would li
 
 If no `COVERAGE` is specified, coverage tracking will be finishd.
 
+### Template Coverage
+
+Covered supports coverage of templates which are compiled into Ruby code. This is only supported on Ruby 3.2+ due to enhancements in the coverage interface.
+
 ### Partial Summary
 
     COVERAGE=PartialSummary rspec
@@ -72,17 +76,6 @@ This report only shows snippets of source code with incomplete coverage.
     COVERAGE=BriefSummary rspec
 
 This report lists several files in order of least coverage.l
-
-### Coveralls/Travis Integration
-
-You can send coverage information to [Coveralls](https://coveralls.io) by editing your `.travis.yml` file:
-
-    matrix:
-      include:
-        - rvm: 2.6
-          env: COVERAGE=PartialSummary,Coveralls
-
-This will print out a brief report and then upload the coverage data. This integrates transparently with Travis.
 
 ## See Also
 
