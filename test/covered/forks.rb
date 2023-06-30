@@ -30,6 +30,8 @@ describe Covered::Forks do
 	end
 	
 	it "tracks persistent coverage across forks" do
+		skip "Unsupported Ruby Version" unless RUBY_VERSION >= "3.2.1"
+		
 		coverage = measure_coverage(<<~RUBY)
 			3.times do
 				Object.new
@@ -49,23 +51,23 @@ describe Covered::Forks do
 		]
 	end
 	
-	if RUBY_VERSION >= "3.2.1"
-		it "tracks persistent coverage across processes" do
-			code = <<~RUBY
-				3.times do
-					Object.new
-				end
-			RUBY
-			
-			coverage = measure_coverage(code) do |path|
-				pid = spawn("ruby", path)
-				
-				Process.wait(pid)
+	it "tracks persistent coverage across processes" do
+		skip "Unsupported Ruby Version" unless RUBY_VERSION >= "3.2.1"
+		
+		code = <<~RUBY
+			3.times do
+				Object.new
 			end
+		RUBY
+		
+		coverage = measure_coverage(code) do |path|
+			pid = spawn("ruby", path)
 			
-			expect(coverage.counts).to be == [
-				nil, 1, 3
-			]
+			Process.wait(pid)
 		end
+		
+		expect(coverage.counts).to be == [
+			nil, 1, 3
+		]
 	end
 end
