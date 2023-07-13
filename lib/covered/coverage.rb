@@ -6,7 +6,7 @@
 module Covered
 	module Ratio
 		def ratio
-			return 1 if executable_count.zero?
+			return 0 if executable_count.zero?
 			
 			Rational(executed_count, executable_count)
 		end

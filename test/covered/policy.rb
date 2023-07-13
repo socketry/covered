@@ -63,6 +63,6 @@ describe Covered::Policy do
 		policy.reports << Covered::BriefSummary.new
 		policy.call(io)
 		
-		expect(io.string).to be(:include?, "* 0 files checked; 0/0 lines executed; 100.0% covered.")
+		expect(io.string).to be(:include?, "* 0 files checked; 0/0 lines executed; 0.0% covered.")
 	end
 end
