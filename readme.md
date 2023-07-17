@@ -79,8 +79,8 @@ This report lists several files in order of least coverage.l
 
 ## See Also
 
-  - [coveralls-ruby](https://github.com/lemurheavy/coveralls-ruby) – the official Coveralls implementation for Ruby.
   - [simplecov](https://github.com/colszowka/simplecov) – one of the original coverage implementations for Ruby, uses the built-in `coverage` library.
+  - [sus](https://github.com/ioquatix/sus) - a test framework which uses `covered` to generate coverage reports.
 
 ## Contributing
 
