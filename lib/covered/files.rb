@@ -12,7 +12,7 @@ module Covered
 	class Files < Base
 		class State
 			def self.for(path, **options)
-				self.new(Source.new(path, **options))
+				self.new(Source.for(path, **options))
 			end
 			
 			def initialize(source)

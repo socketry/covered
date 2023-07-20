@@ -26,8 +26,13 @@ module Covered
 					coverage.path = path
 				end
 				
-				add(coverage)
+				if ignore_mtime || coverage.fresh?
+					add(coverage)
+					return true
+				end
 			end
+			
+			return false
 		end
 		
 		def serialize(coverage)

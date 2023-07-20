@@ -3,6 +3,8 @@
 # Released under the MIT License.
 # Copyright, 2018-2023, by Samuel Williams.
 
+require_relative 'source'
+
 module Covered
 	module Ratio
 		def ratio
@@ -20,66 +22,11 @@ module Covered
 		end
 	end
 	
-	class Source
-		def self.for(path, code, line_offset)
-			self.new(path, code: code, line_offset: line_offset)
-		end
-		
-		def initialize(path, code: nil, line_offset: 1, modified_time: nil)
-			@path = path
-			@code = code
-			@line_offset = line_offset
-			@modified_time = modified_time
-		end
-		
-		attr_accessor :path
-		attr :code
-		attr :line_offset
-		attr :modified_time
-		
-		def to_s
-			"\#<#{self.class} path=#{path}>"
-		end
-		
-		def read(&block)
-			if block_given?
-				File.open(self.path, "r", &block)
-			else
-				File.read(self.path)
-			end
-		end
-		
-		# The actual code which is being covered. If a template generates the source, this is the generated code, while the path refers to the template itself.
-		def code!
-			self.code || self.read
-		end
-		
-		def code?
-			!!self.code
-		end
-		
-		def serialize(packer)
-			packer.write(self.path)
-			packer.write(self.code)
-			packer.write(self.line_offset)
-			packer.write(self.modified_time)
-		end
-		
-		def self.deserialize(unpacker)
-			path = unpacker.read
-			code = unpacker.read
-			line_offset = unpacker.read
-			modified_time = unpacker.read
-			
-			self.new(path, code: code, line_offset: line_offset, modified_time: modified_time)
-		end
-	end
-	
 	class Coverage
 		include Ratio
 		
 		def self.for(path, **options)
-			self.new(Source.new(path, **options))
+			self.new(Source.for(path, **options))
 		end
 		
 		def initialize(source, counts = [], annotations = {}, total = nil)
@@ -110,8 +57,8 @@ module Covered
 		
 		def fresh?
 			if @source.modified_time.nil?
-				# We don't know when the file was last modified, so we assume it is fresh:
-				return true
+				# We don't know when the file was last modified, so we assume it is stale:
+				return false
 			end
 			
 			unless File.exist?(@source.path)
