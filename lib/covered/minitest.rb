@@ -21,9 +21,7 @@ module Covered
 end
 
 if $covered.record?
-	class << Minitest
-		prepend Covered::Minitest
-	end
+	Minitest.singleton_class.prepend(Covered::Minitest)
 	
 	Minitest.after_run do
 		$covered.finish
