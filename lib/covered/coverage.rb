@@ -67,6 +67,8 @@ module Covered
 		end
 		
 		def merge!(other)
+			# If the counts are non-zero and don't match, that can indicate a problem.
+			
 			other.counts.each_with_index do |count, index|
 				if count
 					@counts[index] ||= 0
