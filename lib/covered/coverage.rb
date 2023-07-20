@@ -29,22 +29,65 @@ module Covered
 			self.new(Source.for(path, **options))
 		end
 		
-		def initialize(source, counts = [], annotations = {}, total = nil)
+		def initialize(source, counts = [], annotations = {})
 			@source = source
 			@counts = counts
 			@annotations = annotations
+		end
+		
+		attr_accessor :source
+		attr :counts
+		attr :annotations
+		
+		def total
+			counts.sum{|count| count || 0}
+		end
+		
+		# Create an empty coverage with the same source.
+		def empty
+			self.class.new(@source, [nil] * @counts.size)
+		end
+		
+		def annotate(line_number, annotation)
+			@annotations[line_number] ||= []
+			@annotations[line_number] << annotation
+		end
+		
+		def mark(line_number, value = 1)
+			# As currently implemented, @counts is base-zero rather than base-one.
+			# Line numbers generally start at line 1, so the first line, line 1, is at index 1. This means that index[0] is usually nil.
+			Array(value).each_with_index do |value, index|
+				offset = line_number + index
+				if @counts[offset]
+					@counts[offset] += value
+				else
+					@counts[offset] = value
+				end
+			end
+		end
+		
+		def merge!(other)
+			other.counts.each_with_index do |count, index|
+				if count
+					@counts[index] ||= 0
+					@counts[index] += count
+				end
+			end
 			
-			@total = total || counts.sum{|count| count || 0}
-			
-			# Memoized metrics:
-			@executable_lines = nil
-			@executed_lines = nil
+			@annotations.merge!(other.annotations) do |line_number, a, b|
+				Array(a) + Array(b)
+			end
 		end
 		
 		# Construct a new coverage object for the given line numbers. Only the given line numbers will be considered for the purposes of computing coverage.
 		# @parameter line_numbers [Array(Integer)] The line numbers to include in the new coverage object.
 		def for_lines(line_numbers)
-			self.class.new(@source, @counts.values_at(*line_numbers), @annotations)
+			counts = [nil] * @counts.size
+			line_numbers.each do |line_number|
+				counts[line_number] = @counts[line_number]
+			end
+			
+			self.class.new(@source, counts, @annotations)
 		end
 		
 		def path
@@ -74,13 +117,6 @@ module Covered
 			return false
 		end
 		
-		attr_accessor :source
-		
-		attr :counts
-		attr :total
-		
-		attr :annotations
-		
 		def read(&block)
 			@source.read(&block)
 		end
@@ -99,15 +135,15 @@ module Covered
 		end
 		
 		def zero?
-			@total.zero?
+			total.zero?
 		end
 		
-		def [] lineno
-			@counts[lineno]
+		def [] line_number
+			@counts[line_number]
 		end
 		
 		def executable_lines
-			@executable_lines ||= @counts.compact
+			@counts.compact
 		end
 		
 		def executable_count
@@ -115,7 +151,7 @@ module Covered
 		end
 		
 		def executed_lines
-			@executed_lines ||= executable_lines.reject(&:zero?)
+			executable_lines.reject(&:zero?)
 		end
 		
 		def executed_count
@@ -131,23 +167,30 @@ module Covered
 		end
 		
 		def to_s
-			"\#<#{self.class} path=#{self.path} #{self.summary.percentage.to_f.round(2)}% covered>"
+			"\#<#{self.class} path=#{self.path} #{self.percentage.to_f.round(2)}% covered>"
+		end
+		
+		def as_json
+			{
+				counts: counts,
+				executable_count: executable_count,
+				executed_count: executed_count,
+				percentage: percentage.to_f.round(2),
+			}
 		end
 		
 		def serialize(packer)
 			packer.write(@source)
 			packer.write(@counts)
 			packer.write(@annotations)
-			packer.write(@total)
 		end
 		
 		def self.deserialize(unpacker)
 			source = unpacker.read
 			counts = unpacker.read
 			annotations = unpacker.read
-			total = unpacker.read
 			
-			self.new(source, counts, annotations, total)
+			self.new(source, counts, annotations)
 		end
 	end
 end

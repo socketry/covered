@@ -10,60 +10,6 @@ require 'set'
 
 module Covered
 	class Files < Base
-		class State
-			def self.for(path, **options)
-				self.new(Source.for(path, **options))
-			end
-			
-			def initialize(source)
-				@source = source
-				@counts = []
-				@annotations = {}
-			end
-			
-			def [](lineno)
-				@counts[lineno]
-			end
-			
-			attr :counts
-			attr :annotations
-			
-			def annotate(lineno, annotation)
-				@annotations[lineno] ||= []
-				@annotations[lineno] << annotation
-			end
-			
-			def mark(lineno, value = 1)
-				# As currently implemented, @counts is base-zero rather than base-one.
-				# Line numbers generally start at line 1, so the first line, line 1, is at index 1. This means that index[0] is usually nil.
-				Array(value).each_with_index do |value, index|
-					offset = lineno + index
-					if @counts[offset]
-						@counts[offset] += value
-					else
-						@counts[offset] = value
-					end
-				end
-			end
-			
-			def merge!(coverage)
-				coverage.counts.each_with_index do |count, index|
-					if count
-						@counts[index] ||= 0
-						@counts[index] += count
-					end
-				end
-				
-				@annotations.merge!(coverage.annotations) do |lineno, a, b|
-					Array(a) + Array(b)
-				end
-			end
-			
-			def coverage
-				Coverage.new(@source, @counts, @annotations)
-			end
-		end
-		
 		def initialize(*)
 			super
 			
@@ -73,19 +19,19 @@ module Covered
 		attr_accessor :paths
 		
 		def [](path)
-			@paths[path] ||= State.for(path)
+			@paths[path] ||= Coverage.for(path)
 		end
 		
 		def empty?
 			@paths.empty?
 		end
 		
-		def mark(path, lineno, value)
-			self[path].mark(lineno, value)
+		def mark(path, line_number, value)
+			self[path].mark(line_number, value)
 		end
 		
-		def annotate(path, lineno, value)
-			self[path].annotate(lineno, value)
+		def annotate(path, line_number, value)
+			self[path].annotate(line_number, value)
 		end
 		
 		def add(coverage)
@@ -95,8 +41,8 @@ module Covered
 		def each
 			return to_enum unless block_given?
 			
-			@paths.each_value do |state|
-				yield state.coverage
+			@paths.each_value do |coverage|
+				yield coverage
 			end
 		end
 		
