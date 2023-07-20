@@ -11,6 +11,12 @@ module Covered
 	end
 	
 	class Statistics < Wrapper
+		def self.for(coverage)
+			self.new.tap do |statistics|
+				statistics << coverage
+			end
+		end
+		
 		def initialize
 			@count = 0
 			@executable_count = 0
@@ -25,6 +31,19 @@ module Covered
 		
 		# The number of lines that were executed.
 		attr :executed_count
+		
+		def as_json
+			{
+				count: count,
+				executable_count: executable_count,
+				executed_count: executed_count,
+				percentage: percentage.to_f.round(2),
+			}
+		end
+		
+		def to_json(options)
+			as_json.to_json(options)
+		end
 		
 		def << coverage
 			@count += 1
