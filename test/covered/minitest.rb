@@ -16,6 +16,6 @@ describe "Covered::Minitest" do
 		output.close
 
 		buffer = input.read
-		expect(buffer).to be =~ /\* (.*?) files checked; (.*?) lines executed; (.*?)% covered/
+		expect(buffer).to be =~ /(.*?) files checked; (.*?) lines executed; (.*?)% covered/
 	end
 end

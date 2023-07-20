@@ -8,7 +8,7 @@ require_relative 'source'
 module Covered
 	module Ratio
 		def ratio
-			return 0 if executable_count.zero?
+			return 1.0 if executable_count.zero?
 			
 			Rational(executed_count, executable_count)
 		end
