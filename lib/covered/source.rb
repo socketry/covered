@@ -7,7 +7,7 @@ module Covered
 	class Source
 		def self.for(path, **options)
 			if File.exist?(path)
-				options[:code] ||= File.read(path)
+				# options[:code] ||= File.read(path)
 				options[:modified_time] ||= File.mtime(path)
 			end
 			
