@@ -94,6 +94,12 @@ module Covered
 			@executed_lines = nil
 		end
 		
+		# Construct a new coverage object for the given line numbers. Only the given line numbers will be considered for the purposes of computing coverage.
+		# @parameter line_numbers [Array(Integer)] The line numbers to include in the new coverage object.
+		def for_lines(line_numbers)
+			self.class.new(@source, @counts.values_at(*line_numbers), @annotations)
+		end
+		
 		def path
 			@source.path
 		end
