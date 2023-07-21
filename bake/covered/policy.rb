@@ -10,6 +10,8 @@ def initialize(context)
 end
 
 # Load the current coverage policy.
+# Defaults to the default coverage path if no paths are specified.
+# @parameter paths [Array(String)] The coverage database paths.
 def current(paths: nil)
 	policy = Covered::Policy.new
 	
