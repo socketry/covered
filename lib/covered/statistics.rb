@@ -63,6 +63,9 @@ module Covered
 			@paths = Hash.new
 		end
 		
+		attr :total
+		attr :paths
+		
 		def count
 			@paths.size
 		end
