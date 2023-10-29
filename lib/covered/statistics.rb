@@ -83,8 +83,6 @@ module Covered
 			(@paths[coverage.path] ||= coverage.empty).merge!(coverage)
 		end
 		
-		attr :total
-		
 		def [](path)
 			@paths[path]
 		end
