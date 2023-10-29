@@ -13,7 +13,7 @@ def test(value = nil, default: "World", path: 'template.erb')
 end
 
 # The order changes coverage, previous results are discarded.
-test("World")
+test("Ruby")
 test
 
 puts Coverage.result
