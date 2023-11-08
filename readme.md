@@ -27,7 +27,7 @@ After this concept prooved useful, [it was integrated directly into Ruby](https:
 
 Please see the [project documentation](https://github.com/ioquatix/covered) for more details.
 
-  - [Getting Started](https://github.com/ioquatix/coveredguides/getting-started/index) - This guide explains how to get
+  - [Getting Started](https://github.com/ioquatix/covered/blob/main/guides/getting-started/readme.md) - This guide explains how to get
     started with `covered` and integrate it with your test suite.
 
 ## See Also
