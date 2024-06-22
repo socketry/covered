@@ -10,6 +10,15 @@ Add this line to your application's `Gemfile`:
 gem 'covered'
 ```
 
+### Sus Integration
+
+In your `config/sus.rb` add the following:
+
+``` ruby
+require 'covered/sus'
+include Covered::Sus
+```
+
 ### RSpec Integration
 
 In your `spec/spec_helper.rb` add the following before loading any other code:
