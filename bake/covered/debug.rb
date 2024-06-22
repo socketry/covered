@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2022-2023, by Samuel Williams.
+# Copyright, 2022-2024, by Samuel Williams.
 
 def initialize(context)
 	super
@@ -15,7 +15,6 @@ end
 # @parameter execute [Boolean] Whether to execute the code.
 def parse(paths: [], execute: false)
 	files = output = Covered::Files.new
-	output = Covered::Source.new(output)
 	
 	paths.each do |path|
 		output.mark(path, 0, 0)

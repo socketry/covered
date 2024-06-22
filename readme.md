@@ -11,8 +11,7 @@ into Ruby.
     platforms.
   - Supports coverage of views - templates compiled to Ruby code can be tracked for coverage reporting.
 
-[![Development
-Status](https://github.com/ioquatix/covered/workflows/Test/badge.svg)](https://github.com/ioquatix/covered/actions?workflow=Test)
+[![Development Status](https://github.com/ioquatix/covered/workflows/Test/badge.svg)](https://github.com/ioquatix/covered/actions?workflow=Test)
 
 ## Motivation
 
@@ -25,10 +24,9 @@ After this concept prooved useful, [it was integrated directly into Ruby](https:
 
 ## Usage
 
-Please see the [project documentation](https://github.com/ioquatix/covered) for more details.
+Please see the [project documentation](https://ioquatix.github.io/covered/) for more details.
 
-  - [Getting Started](https://github.com/ioquatix/coveredguides/getting-started/index) - This guide explains how to get
-    started with `covered` and integrate it with your test suite.
+  - [Getting Started](https://ioquatix.github.io/covered/guides/getting-started/index) - This guide explains how to get started with `covered` and integrate it with your test suite.
 
 ## See Also
 
@@ -48,10 +46,8 @@ We welcome contributions to this project.
 
 ### Developer Certificate of Origin
 
-This project uses the [Developer Certificate of Origin](https://developercertificate.org/). All contributors to this
-project must agree to this document to have their contributions accepted.
+This project uses the [Developer Certificate of Origin](https://developercertificate.org/). All contributors to this project must agree to this document to have their contributions accepted.
 
 ### Contributor Covenant
 
-This project is governed by [Contributor Covenant](https://www.contributor-covenant.org/). All contributors and
-participants agree to abide by its terms.
+This project is governed by the [Contributor Covenant](https://www.contributor-covenant.org/). All contributors and participants agree to abide by its terms.
