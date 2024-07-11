@@ -1,2 +1,4 @@
 getting-started:
   order: 1
+configuration:
+  order: 2

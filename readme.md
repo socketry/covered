@@ -28,6 +28,8 @@ Please see the [project documentation](https://ioquatix.github.io/covered/) for 
 
   - [Getting Started](https://ioquatix.github.io/covered/guides/getting-started/index) - This guide explains how to get started with `covered` and integrate it with your test suite.
 
+  - [Configuration](https://ioquatix.github.io/covered/guides/configuration/index) - This guide will help you to configure covered for your project's specific requirements.
+
 ## See Also
 
   - [simplecov](https://github.com/colszowka/simplecov) – one of the original coverage implementations for Ruby, uses

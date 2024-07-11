@@ -63,6 +63,7 @@ module Covered
 			policy.output
 		end
 		
+		# Start coverage tracking.
 		def start
 			# Save and setup the environment:
 			@environment = ENV.to_h
@@ -72,6 +73,7 @@ module Covered
 			policy.start
 		end
 		
+		# Finish coverage tracking.
 		def finish
 			# Finish coverage tracking:
 			policy.finish
@@ -81,6 +83,8 @@ module Covered
 			@environment = nil
 		end
 		
+		# Generate coverage reports to the given output.
+		# @param output [IO] The output stream to write the coverage report to.
 		def call(output)
 			policy.call(output)
 		end
@@ -89,8 +93,16 @@ module Covered
 			policy.each(&block)
 		end
 		
+		# Which paths to ignore when computing coverage for a given project.
+		# @returns [Array(String)] An array of relative paths to ignore.
 		def ignore_paths
 			['test/', 'fixtures/', 'spec/', 'vendor/', 'config/']
+		end
+		
+		# Which paths to include when computing coverage for a given project.
+		# @returns [Array(String)] An array of relative patterns to include, e.g. `"lib/**/*.rb"`.
+		def include_patterns
+			["lib/**/*.rb"]
 		end
 		
 		# Override this method to implement your own policy.
@@ -106,7 +118,9 @@ module Covered
 			policy.skip(Regexp.union(patterns))
 			
 			# We will include all files under lib, even if they aren't loaded:
-			policy.include("lib/**/*.rb")
+			include_patterns.each do |pattern|
+				policy.include(pattern)
+			end
 			
 			policy.persist!
 			
