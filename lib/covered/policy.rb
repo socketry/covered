@@ -101,9 +101,9 @@ module Covered
 			end
 		end
 		
-		def reports!(coverage)
-			if coverage.is_a?(String)
-				names = coverage.split(',')
+		def reports!(reports)
+			if reports.is_a?(String)
+				names = reports.split(',')
 				
 				names.each do |name|
 					begin
@@ -113,8 +113,14 @@ module Covered
 						@reports << Autoload.new(name)
 					end
 				end
-			elsif coverage
+			elsif reports == true
 				@reports << Covered::BriefSummary.new
+			elsif reports == false
+				@reports.clear
+			elsif reports.is_a?(Array)
+				@reports.concat(reports)
+			else
+				@reports << reports
 			end
 		end
 		

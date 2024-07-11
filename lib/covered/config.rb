@@ -21,11 +21,13 @@ module Covered
 			end
 		end
 		
-		def self.coverage
-			ENV['COVERAGE']
+		def self.reports
+			ENV.fetch('COVERED_REPORTS') do
+				ENV['COVERAGE']
+			end
 		end
 		
-		def self.load(root: self.root, coverage: self.coverage)
+		def self.load(root: self.root, reports: self.reports)
 			derived = Class.new(self)
 			
 			if path = self.path(root)
@@ -34,19 +36,19 @@ module Covered
 				derived.prepend(config)
 			end
 			
-			return derived.new(root, coverage)
+			return derived.new(root, reports)
 		end
 		
-		def initialize(root, coverage)
+		def initialize(root, reports)
 			@root = root
-			@coverage = coverage
+			@reports = reports
 			@policy = nil
 			
 			@environment = nil
 		end
 		
 		def report?
-			!!@coverage
+			!!@reports
 		end
 		
 		alias :record? :report?
@@ -108,7 +110,7 @@ module Covered
 			
 			policy.persist!
 			
-			policy.reports!(@coverage)
+			policy.reports!(@reports)
 		end
 		
 		protected
