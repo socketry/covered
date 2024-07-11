@@ -22,9 +22,7 @@ module Covered
 		end
 		
 		def self.reports
-			ENV.fetch('COVERED_REPORTS') do
-				ENV['COVERAGE']
-			end
+			ENV['COVERAGE']
 		end
 		
 		def self.load(root: self.root, reports: self.reports)
