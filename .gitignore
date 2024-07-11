@@ -5,3 +5,5 @@
 /external
 
 .covered.db
+/.github/workflows/coverage.yaml
+/.github/workflows/test-external.yaml
