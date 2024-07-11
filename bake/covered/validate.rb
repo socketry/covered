@@ -26,6 +26,8 @@ def validate(paths: nil, minimum: 1.0, input:)
 	# Print statistics:
 	statistics.print($stderr)
 	
+	policy.call(STDOUT)
+	
 	# Validate statistics and raise an error if they are not met:
 	statistics.validate!(minimum)
 end
