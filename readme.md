@@ -11,7 +11,7 @@ into Ruby.
     platforms.
   - Supports coverage of views - templates compiled to Ruby code can be tracked for coverage reporting.
 
-[![Development Status](https://github.com/ioquatix/covered/workflows/Test/badge.svg)](https://github.com/ioquatix/covered/actions?workflow=Test)
+[![Development Status](https://github.com/socketry/covered/workflows/Test/badge.svg)](https://github.com/socketry/covered/actions?workflow=Test)
 
 ## Motivation
 
@@ -24,17 +24,17 @@ After this concept prooved useful, [it was integrated directly into Ruby](https:
 
 ## Usage
 
-Please see the [project documentation](https://ioquatix.github.io/covered/) for more details.
+Please see the [project documentation](https://socketry.github.io/covered/) for more details.
 
-  - [Getting Started](https://ioquatix.github.io/covered/guides/getting-started/index) - This guide explains how to get started with `covered` and integrate it with your test suite.
+  - [Getting Started](https://socketry.github.io/covered/guides/getting-started/index) - This guide explains how to get started with `covered` and integrate it with your test suite.
 
-  - [Configuration](https://ioquatix.github.io/covered/guides/configuration/index) - This guide will help you to configure covered for your project's specific requirements.
+  - [Configuration](https://socketry.github.io/covered/guides/configuration/index) - This guide will help you to configure covered for your project's specific requirements.
 
 ## See Also
 
   - [simplecov](https://github.com/colszowka/simplecov) – one of the original coverage implementations for Ruby, uses
     the built-in `coverage` library.
-  - [sus](https://github.com/ioquatix/sus) - a test framework which uses `covered` to generate coverage reports.
+  - [sus](https://github.com/socketry/sus) - a test framework which uses `covered` to generate coverage reports.
 
 ## Contributing
 
