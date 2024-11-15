@@ -12,6 +12,9 @@ $covered = Covered::Config.load
 
 module Covered
 	module Minitest
+		MINIMUM_COVERAGE =
+			Float(ENV.fetch('MINIMUM_COVERAGE', 100.0))
+
 		def run(*)
 			$covered.start
 			
@@ -26,5 +29,11 @@ if $covered.record?
 	Minitest.after_run do
 		$covered.finish
 		$covered.call($stderr)
+
+		stats = Covered::Statistics.new
+
+		$covered.policy.each { stats << _1 }
+
+		stats.validate! Covered::Minitest::MINIMUM_COVERAGE / 100.0
 	end
 end
