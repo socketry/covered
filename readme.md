@@ -32,6 +32,12 @@ Please see the [project documentation](https://socketry.github.io/covered/) for 
 
 ## Releases
 
+Please see the [project releases](https://socketry.github.io/covered/releases/index) for all releases.
+
+### v0.27.0
+
+  - Drop development dependeny on `trenni` and add dependeny on `xrb`.
+
 ## See Also
 
   - [simplecov](https://github.com/colszowka/simplecov) – one of the original coverage implementations for Ruby, uses
