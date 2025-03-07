@@ -30,6 +30,8 @@ Please see the [project documentation](https://socketry.github.io/covered/) for 
 
   - [Configuration](https://socketry.github.io/covered/guides/configuration/index) - This guide will help you to configure covered for your project's specific requirements.
 
+## Releases
+
 ## See Also
 
   - [simplecov](https://github.com/colszowka/simplecov) – one of the original coverage implementations for Ruby, uses

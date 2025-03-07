@@ -10,6 +10,7 @@ gemspec
 group :maintenance do
 	gem "bake-modernize"
 	gem "bake-gem"
+	gem "bake-releases"
 	
 	gem "utopia-project"
 end
