@@ -11,7 +11,7 @@ into Ruby.
     platforms.
   - Supports coverage of views - templates compiled to Ruby code can be tracked for coverage reporting.
 
-[![Development Status](https://github.com/socketry/covered/workflows/Test/badge.svg)](https://github.com/socketry/covered/actions?workflow=Test)
+[![Development Status](https://github.com/ioquatix/covered/workflows/Test/badge.svg)](https://github.com/ioquatix/covered/actions?workflow=Test)
 
 ## Motivation
 
@@ -48,8 +48,8 @@ We welcome contributions to this project.
 
 ### Developer Certificate of Origin
 
-This project uses the [Developer Certificate of Origin](https://developercertificate.org/). All contributors to this project must agree to this document to have their contributions accepted.
+In order to protect users of this project, we require all contributors to comply with the [Developer Certificate of Origin](https://developercertificate.org/). This ensures that all contributions are properly licensed and attributed.
 
-### Contributor Covenant
+### Community Guidelines
 
-This project is governed by the [Contributor Covenant](https://www.contributor-covenant.org/). All contributors and participants agree to abide by its terms.
+This project is best served by a collaborative and respectful environment. Treat each other professionally, respect differing viewpoints, and engage constructively. Harassment, discrimination, or harmful behavior is not tolerated. Communicate clearly, listen actively, and support one another. If any issues arise, please inform the project maintainers.

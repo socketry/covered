@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2019-2023, by Samuel Williams.
+# Copyright, 2019-2025, by Samuel Williams.
 # Copyright, 2022, by Adam Daniels.
 
-require_relative 'config'
+require_relative "config"
 
-require 'minitest'
+require "minitest"
 
 $covered = Covered::Config.load
 

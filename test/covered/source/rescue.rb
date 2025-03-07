@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2022-2023, by Samuel Williams.
+# Copyright, 2022-2025, by Samuel Williams.
 
-require 'covered/files'
-require 'covered/capture'
-require 'covered/summary'
+require "covered/files"
+require "covered/capture"
+require "covered/summary"
 
 let(:code) {<<~RUBY}
 begin

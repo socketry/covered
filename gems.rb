@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2018-2023, by Samuel Williams.
+# Copyright, 2018-2025, by Samuel Williams.
 
 source "https://rubygems.org"
 
@@ -16,6 +16,9 @@ end
 
 group :test do
 	gem "sus"
+	gem "decode"
+	gem "rubocop"
+	
 	gem "xrb"
 	
 	gem "bake-test"

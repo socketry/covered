@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2018-2023, by Samuel Williams.
+# Copyright, 2018-2025, by Samuel Williams.
 
-require 'covered/statistics'
+require "covered/statistics"
 
 describe Covered::Statistics do
 	let(:statistics) {subject.new}
 	let(:source) {Covered::Source.new("foo.rb")}
 	
-	with 'initial state' do
+	with "initial state" do
 		it "is zero" do
 			expect(statistics.count).to be == 0
 			expect(statistics.executable_count).to be == 0
@@ -21,7 +21,7 @@ describe Covered::Statistics do
 		end
 	end
 	
-	with 'after adding full coverage' do
+	with "after adding full coverage" do
 		let(:coverage) {Covered::Coverage.new(source, [nil, 1])}
 		
 		def before
@@ -40,7 +40,7 @@ describe Covered::Statistics do
 		end
 	end
 	
-	with 'after adding partial coverage' do
+	with "after adding partial coverage" do
 		let(:coverage) {Covered::Coverage.new(source, [nil, 1, 0])}
 		
 		def before

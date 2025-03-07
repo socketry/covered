@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2018-2023, by Samuel Williams.
+# Copyright, 2018-2025, by Samuel Williams.
 
 require_relative "summary"
 require_relative "files"
@@ -93,7 +93,7 @@ module Covered
 			private
 			
 			def snake_case(string)
-				return string.gsub(/::/, '/').
+				return string.gsub(/::/, "/").
 					gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
 					gsub(/([a-z\d])([A-Z])/,'\1_\2').
 					tr("-", "_").
@@ -103,7 +103,7 @@ module Covered
 		
 		def reports!(reports)
 			if reports.is_a?(String)
-				names = reports.split(',')
+				names = reports.split(",")
 				
 				names.each do |name|
 					begin

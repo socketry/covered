@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2023-2024, by Samuel Williams.
+# Copyright, 2023-2025, by Samuel Williams.
 # Copyright, 2023, by Michael Adams.
 
 def initialize(context)
 	super
 	
-	require_relative '../../lib/covered/config'
+	require_relative "../../lib/covered/config"
 end
 
 # Load the current coverage policy.

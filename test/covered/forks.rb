@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2023, by Samuel Williams.
+# Copyright, 2023-2025, by Samuel Williams.
 
-require 'covered/config'
-require 'tmpdir'
+require "covered/config"
+require "tmpdir"
 
 describe Covered::Forks do
 	def measure_coverage(code)

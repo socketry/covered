@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2021-2023, by Samuel Williams.
+# Copyright, 2021-2025, by Samuel Williams.
 
-require_relative 'statistics'
-require_relative 'wrapper'
+require_relative "statistics"
+require_relative "wrapper"
 
-require 'console/output'
+require "console/output"
 
 module Covered
 	class MarkdownSummary
@@ -56,7 +56,7 @@ module Covered
 		
 		# A coverage array gives, for each line, the number of line execution by the interpreter. A nil value means coverage is finishd for this line (lines like else and end).
 		def call(wrapper, output = $stdout)
-			output.puts '# Coverage Report'
+			output.puts "# Coverage Report"
 			output.puts
 			
 			ordered = []

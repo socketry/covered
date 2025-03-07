@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2019-2023, by Samuel Williams.
+# Copyright, 2019-2025, by Samuel Williams.
 
-require_relative 'policy'
+require_relative "policy"
 
 module Covered
 	class Config
 		PATH = "config/covered.rb"
 		
 		def self.root
-			ENV['COVERED_ROOT'] || Dir.pwd
+			ENV["COVERED_ROOT"] || Dir.pwd
 		end
 		
 		def self.path(root)
@@ -22,7 +22,7 @@ module Covered
 		end
 		
 		def self.reports
-			ENV['COVERAGE']
+			ENV["COVERAGE"]
 		end
 		
 		def self.load(root: self.root, reports: self.reports)
@@ -94,7 +94,7 @@ module Covered
 		# Which paths to ignore when computing coverage for a given project.
 		# @returns [Array(String)] An array of relative paths to ignore.
 		def ignore_paths
-			['test/', 'fixtures/', 'spec/', 'vendor/', 'config/']
+			["test/", "fixtures/", "spec/", "vendor/", "config/"]
 		end
 		
 		# Which paths to include when computing coverage for a given project.
@@ -127,23 +127,23 @@ module Covered
 		
 		protected
 		
-		REQUIRE_COVERED_AUTOSTART = '-rcovered/autostart'
+		REQUIRE_COVERED_AUTOSTART = "-rcovered/autostart"
 		
 		def autostart!
-			if rubyopt = ENV['RUBYOPT'] and !rubyopt.empty?
-				rubyopt = [rubyopt.strip, REQUIRE_COVERED_AUTOSTART].join(' ')
+			if rubyopt = ENV["RUBYOPT"] and !rubyopt.empty?
+				rubyopt = [rubyopt.strip, REQUIRE_COVERED_AUTOSTART].join(" ")
 			else
 				rubyopt = REQUIRE_COVERED_AUTOSTART
 			end
 			
-			ENV['RUBYOPT'] = rubyopt
+			ENV["RUBYOPT"] = rubyopt
 			
-			unless ENV['COVERED_ROOT']
-				ENV['COVERED_ROOT'] = @root
+			unless ENV["COVERED_ROOT"]
+				ENV["COVERED_ROOT"] = @root
 			end
 			
 			# Don't report coverage in child processes:
-			ENV.delete('COVERAGE')
+			ENV.delete("COVERAGE")
 		end
 	end
 end

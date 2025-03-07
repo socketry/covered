@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2018-2023, by Samuel Williams.
+# Copyright, 2018-2025, by Samuel Williams.
 
-require_relative 'statistics'
-require_relative 'wrapper'
+require_relative "statistics"
+require_relative "wrapper"
 
 module Covered
 	class Summary
@@ -13,7 +13,7 @@ module Covered
 		end
 		
 		def terminal(output)
-			require 'console/terminal'
+			require "console/terminal"
 			
 			Console::Terminal.for(output).tap do |terminal|
 				terminal[:path] ||= terminal.style(nil, nil, :bold, :underline)

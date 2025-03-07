@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2022-2024, by Samuel Williams.
+# Copyright, 2022-2025, by Samuel Williams.
 
 def initialize(context)
 	super
 	
-	require_relative '../../lib/covered'
+	require_relative "../../lib/covered"
 end
 
 # Debug the coverage of a file. Show which lines should be executable.

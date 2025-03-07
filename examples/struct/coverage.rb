@@ -2,12 +2,12 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2022, by Samuel Williams.
+# Copyright, 2022-2025, by Samuel Williams.
 
 require "coverage"
 
 Coverage.start
 
-require_relative 'struct'
+require_relative "struct"
 
 p Coverage.result

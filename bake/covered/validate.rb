@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2022-2023, by Samuel Williams.
+# Copyright, 2022-2025, by Samuel Williams.
 
 def initialize(context)
 	super
 	
-	require_relative '../../lib/covered/config'
+	require_relative "../../lib/covered/config"
 end
 
 # Validate the coverage of multiple test runs.
