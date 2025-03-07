@@ -7,10 +7,10 @@ require 'covered/files'
 require 'covered/summary'
 require 'covered/capture'
 
-require 'trenni/template'
+require 'xrb/template'
 
-let(:template_path) {File.expand_path("template.trenni", __dir__)}
-let(:template) {Trenni::Template.load_file(template_path)}
+let(:template_path) {File.expand_path("template.xrb", __dir__)}
+let(:template) {XRB::Template.load_file(template_path)}
 
 let(:files) {Covered::Files.new}
 let(:only) {Covered::Only.new(template_path, files)}

@@ -16,7 +16,7 @@ end
 
 group :test do
 	gem "sus"
-	gem "trenni"
+	gem "xrb"
 	
 	gem "bake-test"
 	gem "bake-test-external"
