@@ -250,10 +250,10 @@ A step by step scenario when trying to increase the codebase's coverage would be
 		- Minitest on Rails - `COVERAGE=FullSummary bin/rails test`
 		- Sus - `COVERAGE=FullSummary bundle exec sus`
 	- to run specific files:
-		- RSpec - `COVERAGE=FullSummary bundle exec rspec file1 file2 file3` 
-		- RSpec on Rails - `COVERAGE=FullSummary bin/rails spec file1 file2 file3`
-		- Minitest on Rails - `COVERAGE=FullSummary bin/rails test file1 file2 file3`
-		- Sus - `COVERAGE=FullSummary bundle exec sus file1 file2 file3
+    - RSpec - `COVERAGE=FullSummary bundle exec rspec file1 file2 file3` 
+    - RSpec on Rails - `COVERAGE=FullSummary bin/rails spec file1 file2 file3`
+    - Minitest on Rails - `COVERAGE=FullSummary bin/rails test file1 file2 file3`
+    - Sus - `COVERAGE=FullSummary bundle exec sus file1 file2 file3
 8. After you have finished writing the tests, you should run the test suite again with `PartialSummary` and look if the coverage for the previously uncovered lines in the aforementioned files has increased. You should keep iterating through this until you reach a satisfactory coverage percentage (let's say 90-95% unless explicitly mentioned otherwise), or until you cannot improve the coverage any further.
 
 ### Code Writing Best Practices
@@ -262,9 +262,9 @@ A step by step scenario when trying to increase the codebase's coverage would be
 2. Look for a Rubocop config file in the codebase and follow the mentioned rules if possible. Rubocop rules live in `.rubocop.yml`.
 3. Every spec file mirrors the class path (`app/services/foo/bar.rb` > `spec/services/foo/bar_spec.rb`).
 4. A quick bullet list eliminates guesswork:  
-	-  100-char lines  
-	-  single quotes except when string interpolation needed  
-	-  parentheses on multi-line method calls
+    -  100-char lines  
+    -  single quotes except when string interpolation needed  
+    -  parentheses on multi-line method calls
 5. Make code as modularized as possible.
 ## Security Considerations
 
