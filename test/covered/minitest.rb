@@ -14,7 +14,7 @@ describe "Covered::Minitest" do
 		
 		system({"COVERAGE" => "PartialSummary"}, test_path, out: output, err: output)
 		output.close
-
+		
 		buffer = input.read
 		expect(buffer).to be =~ /(.*?) files checked; (.*?) lines executed; (.*?)% covered/
 	end

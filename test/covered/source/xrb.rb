@@ -26,7 +26,7 @@ it "correctly generates coverage for template" do
 	capture.finish
 	
 	expect(files.paths).to be(:include?, template_path)
-
+	
 	io = StringIO.new
 	summary.call(files, io)
 	

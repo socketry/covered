@@ -7,6 +7,7 @@ Copyright, 2022, by Adam Daniels.
 Copyright, 2022, by Felix Yan.  
 Copyright, 2023, by Stephen Ierodiaconou.  
 Copyright, 2023, by Michael Adams.  
+Copyright, 2025, by Aron Latis.  
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

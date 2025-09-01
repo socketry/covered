@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
 	spec.version = Covered::VERSION
 	
 	spec.summary = "A modern approach to code coverage."
-	spec.authors = ["Samuel Williams", "Adam Daniels", "Cyril Roelandt", "Felix Yan", "Michael Adams", "Shannon Skipper", "Stephen Ierodiaconou"]
+	spec.authors = ["Samuel Williams", "Adam Daniels", "Aron Latis", "Cyril Roelandt", "Felix Yan", "Michael Adams", "Shannon Skipper", "Stephen Ierodiaconou"]
 	spec.license = "MIT"
 	
 	spec.cert_chain  = ["release.cert"]
@@ -21,9 +21,9 @@ Gem::Specification.new do |spec|
 		"source_code_uri" => "https://github.com/socketry/covered.git",
 	}
 	
-	spec.files = Dir.glob(["{bake,lib}/**/*", "*.md"], File::FNM_DOTMATCH, base: __dir__)
+	spec.files = Dir.glob(["{bake,context,lib}/**/*", "*.md"], File::FNM_DOTMATCH, base: __dir__)
 	
-	spec.required_ruby_version = ">= 3.1"
+	spec.required_ruby_version = ">= 3.2"
 	
 	spec.add_dependency "console", "~> 1.0"
 	spec.add_dependency "msgpack", "~> 1.0"

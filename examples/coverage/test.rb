@@ -19,4 +19,5 @@ trace_point.start
 
 begin
 	output << "
-".freezer; end
+".freezer; 
+end

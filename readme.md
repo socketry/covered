@@ -11,7 +11,7 @@ into Ruby.
     platforms.
   - Supports coverage of views - templates compiled to Ruby code can be tracked for coverage reporting.
 
-[![Development Status](https://github.com/ioquatix/covered/workflows/Test/badge.svg)](https://github.com/ioquatix/covered/actions?workflow=Test)
+[![Development Status](https://github.com/socketry/covered/workflows/Test/badge.svg)](https://github.com/socketry/covered/actions?workflow=Test)
 
 ## Motivation
 

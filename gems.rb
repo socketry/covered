@@ -12,13 +12,17 @@ group :maintenance do
 	gem "bake-gem"
 	gem "bake-releases"
 	
+	gem "agent-context"
+	
 	gem "utopia-project"
 end
 
 group :test do
 	gem "sus"
 	gem "decode"
+	
 	gem "rubocop"
+	gem "rubocop-socketry"
 	
 	gem "xrb"
 	

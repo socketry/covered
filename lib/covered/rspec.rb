@@ -30,7 +30,7 @@ end
 
 if $covered.record?
 	RSpec::Core::Configuration.prepend(Covered::RSpec::Policy)
-
+	
 	RSpec.configure do |config|
 		config.after(:suite) do
 			$covered.finish
