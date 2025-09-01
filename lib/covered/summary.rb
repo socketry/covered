@@ -194,6 +194,50 @@ module Covered
 				end
 			end
 		end
+		
+		def call(wrapper, output = $stdout, **options)
+			terminal = self.terminal(output)
+			complete_files = []
+			
+			statistics = self.each(wrapper) do |coverage|
+				path = wrapper.relative_path(coverage.path)
+				terminal.puts ""
+				terminal.puts path, style: :path
+				
+				begin
+					print_coverage(terminal, coverage, **options)
+				rescue => error
+					print_error(terminal, error)
+				end
+				
+				coverage.print(output)
+			end
+			
+			# Collect files with 100% coverage that were not shown
+			wrapper.each do |coverage|
+				if coverage.ratio >= 1.0
+					complete_files << wrapper.relative_path(coverage.path)
+				end
+			end
+			
+			terminal.puts
+			statistics.print(output)
+			
+			# Show information about files with 100% coverage
+			if complete_files.any?
+				terminal.puts ""
+				if complete_files.size == 1
+					terminal.puts "1 file has 100% coverage and is not shown above:"
+				else
+					terminal.puts "#{complete_files.size} files have 100% coverage and are not shown above:"
+				end
+				
+				complete_files.sort.each do |path|
+					terminal.write "  - ", style: :covered_prefix
+					terminal.puts path, style: :brief_path
+				end
+			end
+		end
 	end
 	
 	class Quiet
