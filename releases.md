@@ -1,6 +1,6 @@
 # Releases
 
-## Unreleased
+## v0.28.0
 
   - List files that have 100% coverage in `PartialSummary` output.
 
