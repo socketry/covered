@@ -3,7 +3,7 @@
 # Released under the MIT License.
 # Copyright, 2018-2025, by Samuel Williams.
 
-require "covered/summary"
+require "covered/brief_summary"
 require "covered/files"
 
 describe Covered::BriefSummary do

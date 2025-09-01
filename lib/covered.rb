@@ -5,3 +5,6 @@
 
 require_relative "covered/version"
 require_relative "covered/policy"
+
+require_relative "covered/brief_summary"
+require_relative "covered/partial_summary"
