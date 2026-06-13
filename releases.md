@@ -1,6 +1,6 @@
 # Releases
 
-## Unreleased
+## v0.28.3
 
   - Ignore nil coverage reports so validation can run without `COVERAGE` configured.
 

@@ -34,6 +34,10 @@ Please see the [project documentation](https://socketry.github.io/covered/) for 
 
 Please see the [project releases](https://socketry.github.io/covered/releases/index) for all releases.
 
+### v0.28.3
+
+  - Ignore nil coverage reports so validation can run without `COVERAGE` configured.
+
 ### v0.28.2
 
   - Ensure bake coverage validation loads persisted coverage using project configuration.
