@@ -13,7 +13,7 @@ more accurate than classic line-count tools like SimpleCov.
 Add this line to your application's `Gemfile`:
 
 ```ruby
-gem 'covered'
+gem "covered"
 ```
 
 ## Configuration
@@ -65,7 +65,7 @@ One possibly helpful functionality to take note of is that you can override the 
 In your `config/sus.rb` add the following:
 
 ```ruby
-require 'covered/sus'
+require "covered/sus"
 include Covered::Sus
 ```
 ### RSpec Integration
@@ -73,7 +73,7 @@ include Covered::Sus
 In your `spec/spec_helper.rb` add the following before loading any other code:
 
 ```ruby
-require 'covered/rspec'
+require "covered/rspec"
 ```
 
 Ensure that you have a `.rspec` file with `--require spec_helper`:
@@ -89,14 +89,14 @@ Ensure that you have a `.rspec` file with `--require spec_helper`:
 In your `test/test_helper.rb` add the following before loading any other code:
 
 ```ruby
-require 'covered/minitest'
-require 'minitest/autorun'
+require "covered/minitest"
+require "minitest/autorun"
 ```
 
 In your test files, e.g. `test/dummy_test.rb` add the following at the top:
 
 ```ruby
-require_relative 'test_helper'
+require_relative "test_helper"
 ```
 
 

@@ -18,9 +18,9 @@ jobs:
           - macos
         
         ruby:
-          - "3.2"
           - "3.3"
           - "3.4"
+          - "4.0"
         
         experimental: [false]
         
@@ -36,7 +36,7 @@ jobs:
             experimental: true
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{matrix.ruby}}

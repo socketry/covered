@@ -146,13 +146,13 @@ def make_policy(policy)
 	policy.only(/^app\//)
 	
 	# Set custom root
-	policy.root(File.expand_path('..', __dir__))
+	policy.root(File.expand_path("..", __dir__))
 	
 	# Enable persistent coverage across runs
 	policy.persist!
 	
 	# Configure reports programmatically
-	if ENV['CI']
+	if ENV["CI"]
 		policy.reports << Covered::MarkdownSummary.new
 	else
 		policy.reports << Covered::PartialSummary.new
@@ -245,7 +245,7 @@ def make_policy(policy)
 	super
 	
 	# Ensure template coverage is enabled
-	require 'covered/erb' if defined?(ERB)
+	require "covered/erb" if defined?(ERB)
 end
 ```
 
@@ -257,14 +257,14 @@ end
 def make_policy(policy)
 	super
 	
-	if ENV['GITHUB_ACTIONS']
+	if ENV["GITHUB_ACTIONS"]
 		# Use markdown format for GitHub
 		policy.reports << Covered::MarkdownSummary.new
 		
 		# Fail build on low coverage
 		policy.reports << Class.new do
 			def call(wrapper, output = $stdout)
-				statistics = wrapper.each.inject(Statistics.new) { |s, c| s << c }
+				statistics = wrapper.each.inject(Statistics.new){|s, c| s << c}
 				if statistics.ratio < 0.90
 					exit 1
 				end
@@ -281,9 +281,9 @@ def make_policy(policy)
 	super
 	
 	# Different thresholds for different environments
-	threshold = case ENV['RAILS_ENV']
-	when 'production' then 0.95
-	when 'staging' then 0.90
+	threshold = case ENV["RAILS_ENV"]
+	when "production" then 0.95
+	when "staging" then 0.90
 	else 0.80
 	end
 	
@@ -305,7 +305,7 @@ def make_policy(policy)
 	policy.skip(/\/coverage\//)
 	
 	# Use more efficient reports for large projects
-	if Dir['**/*.rb'].length > 1000
+	if Dir["**/*.rb"].length > 1000
 		policy.reports << Covered::BriefSummary.new
 	else
 		policy.reports << Covered::PartialSummary.new
@@ -344,7 +344,7 @@ def make_policy(policy)
 	super
 	
 	# Debug: print current configuration
-	if ENV['DEBUG_COVERAGE']
+	if ENV["DEBUG_COVERAGE"]
 		puts "Ignore paths: #{ignore_paths}"
 		puts "Include patterns: #{include_patterns}"
 		puts "Root: #{@root}"

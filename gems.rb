@@ -15,16 +15,16 @@ group :maintenance do
 	gem "agent-context"
 	
 	gem "utopia-project"
+	gem "decode"
 end
 
 group :test do
 	gem "sus"
-	gem "decode"
+	gem "xrb"
 	
 	gem "rubocop"
+	gem "rubocop-md"
 	gem "rubocop-socketry"
-	
-	gem "xrb"
 	
 	gem "bake-test"
 	gem "bake-test-external"
