@@ -91,6 +91,27 @@ module Covered
 			policy.each(&block)
 		end
 		
+		# Build a configured policy using coverage data from persistent storage.
+		#
+		# @parameter paths [Array(String)] The coverage database paths.
+		# @parameter ignore_mtime [Boolean] Whether to ignore source file modification times.
+		# @returns [Covered::Policy] The configured policy with loaded coverage data.
+		def policy_for(paths = nil, ignore_mtime: true)
+			paths ||= Dir.glob(Persist::DEFAULT_PATH, base: @root)
+			paths = Array(paths)
+			
+			if paths.empty?
+				raise ArgumentError, "No coverage paths specified!"
+			end
+			
+			paths.each do |path|
+				# It would be nice to have a better algorithm here than just ignoring mtime - perhaps using checksums?
+				Persist.new(policy.output, path).load!(ignore_mtime: ignore_mtime)
+			end
+			
+			return policy
+		end
+		
 		# Which paths to ignore when computing coverage for a given project.
 		# @returns [Array(String)] An array of relative paths to ignore.
 		def ignore_paths
