@@ -133,7 +133,9 @@ module Covered
 		# Configure reports from names, booleans, arrays or report objects.
 		# @parameter reports [String | Boolean | Array | Object | Nil] The reports to configure.
 		def reports!(reports)
-			if reports.is_a?(String)
+			if reports.nil?
+				return
+			elsif reports.is_a?(String)
 				names = reports.split(",")
 				
 				names.each do |name|

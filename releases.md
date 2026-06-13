@@ -1,5 +1,9 @@
 # Releases
 
+## Unreleased
+
+  - Ignore nil coverage reports so validation can run without `COVERAGE` configured.
+
 ## v0.28.2
 
   - Ensure bake coverage validation loads persisted coverage using project configuration.
