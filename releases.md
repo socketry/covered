@@ -1,6 +1,6 @@
 # Releases
 
-## Unreleased
+## v0.28.2
 
   - Ensure bake coverage validation loads persisted coverage using project configuration.
 

@@ -34,6 +34,10 @@ Please see the [project documentation](https://socketry.github.io/covered/) for 
 
 Please see the [project releases](https://socketry.github.io/covered/releases/index) for all releases.
 
+### v0.28.2
+
+  - Ensure bake coverage validation loads persisted coverage using project configuration.
+
 ### v0.28.0
 
   - List files that have 100% coverage in `PartialSummary` output.
