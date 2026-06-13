@@ -5,10 +5,13 @@
 
 require_relative "config"
 
+# @namespace
 module Coverage
+	# Integrates `covered` with Ruby's `Coverage.autostart!` hook.
 	module Autostart
 		# Start recording coverage information.
 		# Usage: RUBYOPT=-rcovered/autostart ruby my_script.rb
+		# Registers an `at_exit` hook which finishes coverage and writes reports for the original process.
 		def self.autostart!
 			config = Covered::Config.load
 			config.start

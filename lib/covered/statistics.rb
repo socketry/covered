@@ -7,21 +7,28 @@ require_relative "wrapper"
 require_relative "coverage"
 
 module Covered
+	# Raised when coverage does not meet the configured minimum.
 	class CoverageError < StandardError
 	end
 	
+	# Aggregates coverage statistics across files.
 	class Statistics
 		include Ratio
 		
+		# Build statistics for a single coverage object.
+		# @parameter coverage [Covered::Coverage] The coverage object to summarize.
+		# @returns [Covered::Statistics] Statistics containing the given coverage.
 		def self.for(coverage)
 			self.new.tap do |statistics|
 				statistics << coverage
 			end
 		end
 		
+		# Aggregate coverage totals.
 		class Aggregate
 			include Ratio
 			
+			# Initialize empty aggregate statistics.
 			def initialize
 				@count = 0
 				@executable_count = 0
@@ -29,14 +36,19 @@ module Covered
 			end
 			
 			# Total number of files added.
+			# @returns [Integer] The number of coverage objects added.
 			attr :count
 			
 			# The number of lines which could have been executed.
+			# @returns [Integer] The executable line count.
 			attr :executable_count
 			
 			# The number of lines that were executed.
+			# @returns [Integer] The executed line count.
 			attr :executed_count
 			
+			# A JSON-compatible representation of these aggregate statistics.
+			# @returns [Hash] The aggregate count, line counts and percentage.
 			def as_json
 				{
 					count: count,
@@ -46,10 +58,15 @@ module Covered
 				}
 			end
 			
+			# Convert these aggregate statistics to JSON.
+			# @parameter options [Hash] Options forwarded to `to_json`.
+			# @returns [String] The JSON representation.
 			def to_json(options)
 				as_json.to_json(options)
 			end
 			
+			# Add coverage to these aggregate statistics.
+			# @parameter coverage [Covered::Coverage] The coverage object to add.
 			def << coverage
 				@count += 1
 				
@@ -58,35 +75,52 @@ module Covered
 			end
 		end
 		
+		# Initialize empty coverage statistics.
 		def initialize
 			@total = Aggregate.new
 			@paths = Hash.new
 		end
 		
+		# @attribute [Covered::Statistics::Aggregate] The total aggregate statistics.
 		attr :total
+		
+		# @attribute [Hash(String, Covered::Coverage)] Coverage statistics indexed by path.
 		attr :paths
 		
+		# The number of unique paths with coverage data.
+		# @returns [Integer] The number of unique paths.
 		def count
 			@paths.size
 		end
 		
+		# The total number of executable lines.
+		# @returns [Integer] The total executable line count.
 		def executable_count
 			@total.executable_count
 		end
 		
+		# The total number of executed lines.
+		# @returns [Integer] The total executed line count.
 		def executed_count
 			@total.executed_count
 		end
 		
+		# Add coverage to these statistics.
+		# @parameter coverage [Covered::Coverage] The coverage object to add.
 		def << coverage
 			@total << coverage
 			(@paths[coverage.path] ||= coverage.empty).merge!(coverage)
 		end
 		
+		# Get coverage for the given path.
+		# @parameter path [String] The source path.
+		# @returns [Covered::Coverage | Nil] The merged coverage for the path.
 		def [](path)
 			@paths[path]
 		end
 		
+		# A JSON-compatible representation of these statistics.
+		# @returns [Hash] The total statistics and path statistics.
 		def as_json
 			{
 				total: total.as_json,
@@ -94,6 +128,9 @@ module Covered
 			}
 		end
 		
+		# Convert these statistics to JSON.
+		# @parameter options [Hash] Options forwarded to `to_json`.
+		# @returns [String] The JSON representation.
 		def to_json(options)
 			as_json.to_json(options)
 		end
@@ -111,6 +148,8 @@ module Covered
 			"100% code coverage: Zen achieved! Bugs in harmony, code at peace.",
 		]
 		
+		# Print a human-readable coverage summary.
+		# @parameter output [IO] The output stream.
 		def print(output)
 			output.puts "#{count} files checked; #{@total.executed_count}/#{@total.executable_count} lines executed; #{@total.percentage.to_f.round(2)}% covered."
 			
@@ -119,6 +158,9 @@ module Covered
 			end
 		end
 		
+		# Validate that coverage meets the given minimum ratio.
+		# @parameter minimum [Numeric] The minimum accepted coverage ratio.
+		# @raises [Covered::CoverageError] If coverage is below the minimum ratio.
 		def validate!(minimum = 1.0)
 			if total.ratio < minimum
 				raise CoverageError, "Coverage of #{self.percentage.to_f.round(2)}% is less than required minimum of #{(minimum * 100.0).round(2)}%!"

@@ -8,13 +8,16 @@ require_relative "wrapper"
 require "coverage"
 
 module Covered
+	# Captures Ruby coverage data and forwards it to another coverage output.
 	class Capture < Wrapper
+		# Start Ruby coverage collection.
 		def start
 			super
 			
 			::Coverage.start(lines: true, eval: true)
 		end
 		
+		# Clear any collected coverage data without stopping coverage.
 		def clear
 			super
 			
@@ -27,6 +30,8 @@ module Covered
 			"eval" => true
 		}
 		
+		# Stop coverage collection and add the collected results to the output.
+		# Ignores Ruby's anonymous eval paths and files that no longer exist.
 		def finish
 			results = ::Coverage.result
 			
@@ -35,7 +40,7 @@ module Covered
 				
 				path = self.expand_path(path)
 				
-				# Skip files which don't exist. This can happen if `eval` is used with an invalid/incorrect path.
+				# Skip files which don't exist. This can happen if `eval` is used with an invalid/incorrect path:
 				if File.exist?(path)
 					@output.mark(path, 1, result[:lines])
 				else
@@ -47,6 +52,10 @@ module Covered
 			super
 		end
 		
+		# Execute the given source while capturing coverage for it.
+		# @parameter source [Covered::Source] The source to execute.
+		# @parameter binding [Binding] The binding used to evaluate the source.
+		# @returns [Object] The result of evaluating the source.
 		def execute(source, binding: TOPLEVEL_BINDING)
 			start
 			

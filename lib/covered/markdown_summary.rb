@@ -9,11 +9,19 @@ require_relative "wrapper"
 require "console/output"
 
 module Covered
+	# Generates a Markdown coverage summary.
 	class MarkdownSummary
+		# Initialize the report with an optional coverage threshold.
+		# @parameter threshold [Numeric | Nil] The minimum ratio a file must meet to be omitted from the detailed output.
 		def initialize(threshold: 1.0)
 			@threshold = threshold
 		end
 		
+		# Enumerate coverage below the threshold and return aggregate statistics.
+		# @parameter wrapper [Covered::Base] The coverage wrapper to enumerate.
+		# @yields {|coverage| ...} Coverage whose ratio is below the configured threshold.
+		# 	@parameter coverage [Covered::Coverage] The coverage object below the threshold.
+		# @returns [Covered::Statistics] Statistics for all coverage objects, including omitted ones.
 		def each(wrapper)
 			statistics = Statistics.new
 			
@@ -28,6 +36,11 @@ module Covered
 			return statistics
 		end
 		
+		# Print any annotations for the given line.
+		# @parameter output [IO] The output stream.
+		# @parameter coverage [Covered::Coverage] The coverage being rendered.
+		# @parameter line [String] The source line.
+		# @parameter line_offset [Integer] The current line number.
 		def print_annotations(output, coverage, line, line_offset)
 			if annotations = coverage.annotations[line_offset]
 				prefix = "#{line_offset}|".rjust(8) + "*|".rjust(8)
@@ -38,10 +51,17 @@ module Covered
 			end
 		end
 		
+		# Print the line and hit-count header.
+		# @parameter output [IO] The output stream.
 		def print_line_header(output)
 			output.puts "Line|".rjust(8) + "Hits|".rjust(8)
 		end
 		
+		# Print a single source line.
+		# @parameter output [IO] The output stream.
+		# @parameter line [String] The source line.
+		# @parameter line_offset [Integer] The current line number.
+		# @parameter count [Integer | Nil] The execution count for the line.
 		def print_line(output, line, line_offset, count)
 			prefix = "#{line_offset}|".rjust(8) + "#{count}|".rjust(8)
 			
@@ -54,7 +74,9 @@ module Covered
 			end
 		end
 		
-		# A coverage array gives, for each line, the number of line execution by the interpreter. A nil value means coverage is finishd for this line (lines like else and end).
+		# A coverage array gives, for each line, the number of line executions by the interpreter. A `nil` value means coverage is finished for this line (lines like `else` and `end`).
+		# @parameter wrapper [Covered::Base] The coverage wrapper to report.
+		# @parameter output [IO] The output stream.
 		def call(wrapper, output = $stdout)
 			output.puts "# Coverage Report"
 			output.puts

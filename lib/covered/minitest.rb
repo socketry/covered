@@ -11,7 +11,10 @@ require "minitest"
 $covered = Covered::Config.load
 
 module Covered
+	# Integrates coverage tracking with Minitest.
 	module Minitest
+		# Start coverage before running the Minitest suite.
+		# @returns [Object] The result of Minitest's original `run` method.
 		def run(*)
 			$covered.start
 			

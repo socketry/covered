@@ -6,7 +6,13 @@
 require_relative "summary"
 
 module Covered
+	# Generates a report containing only lines near missing coverage.
 	class PartialSummary < Summary
+		# Print coverage snippets around uncovered lines.
+		# @parameter terminal [Console::Terminal] The terminal to write to.
+		# @parameter coverage [Covered::Coverage] The coverage to render.
+		# @parameter before [Integer] The number of lines before an uncovered line to show.
+		# @parameter after [Integer] The number of lines after an uncovered line to show.
 		def print_coverage(terminal, coverage, before: 4, after: 4)
 			return if coverage.zero?
 			
@@ -38,6 +44,10 @@ module Covered
 			end
 		end
 		
+		# Print the partial coverage report.
+		# @parameter wrapper [Covered::Base] The coverage wrapper to report.
+		# @parameter output [IO] The output stream.
+		# @parameter options [Hash] Options forwarded to {print_coverage}.
 		def call(wrapper, output = $stdout, **options)
 			terminal = self.terminal(output)
 			complete_files = []
@@ -59,7 +69,7 @@ module Covered
 				coverage.print(output)
 			end
 			
-			# Collect files with 100% coverage that were not shown
+			# Collect files with 100% coverage that were not shown:
 			wrapper.each do |coverage|
 				if coverage.ratio >= 1.0
 					complete_files << wrapper.relative_path(coverage.path)
@@ -69,7 +79,7 @@ module Covered
 			terminal.puts
 			statistics.print(output)
 			
-			# Only show information about files with 100% coverage if there were files with partial coverage shown above
+			# Only show information about files with 100% coverage if there were files with partial coverage shown above:
 			if complete_files.any? && partial_files_count > 0
 				terminal.puts ""
 				if complete_files.size == 1

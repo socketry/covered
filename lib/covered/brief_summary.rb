@@ -6,7 +6,13 @@
 require_relative "summary"
 
 module Covered
+	# Generates a short coverage report with the least-covered files.
 	class BriefSummary < Summary
+		# Print aggregate statistics and the files with the most missing lines.
+		# @parameter wrapper [Covered::Base] The coverage wrapper to report.
+		# @parameter output [IO] The output stream.
+		# @parameter before [Integer] Reserved for compatibility with other summaries.
+		# @parameter after [Integer] Reserved for compatibility with other summaries.
 		def call(wrapper, output = $stdout, before: 4, after: 4)
 			terminal = self.terminal(output)
 			

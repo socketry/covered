@@ -7,11 +7,17 @@ require_relative "statistics"
 require_relative "wrapper"
 
 module Covered
+	# Generates a detailed terminal coverage report.
 	class Summary
+		# Initialize the report with an optional coverage threshold.
+		# @parameter threshold [Numeric | Nil] The minimum ratio a file must meet to be omitted from the detailed output.
 		def initialize(threshold: 1.0)
 			@threshold = threshold
 		end
 		
+		# Build a styled terminal for the given output.
+		# @parameter output [IO] The output stream.
+		# @returns [Console::Terminal] The styled terminal wrapper.
 		def terminal(output)
 			require "console/terminal"
 			
@@ -33,6 +39,11 @@ module Covered
 			end
 		end
 		
+		# Enumerate coverage below the threshold and return aggregate statistics.
+		# @parameter wrapper [Covered::Base] The coverage wrapper to enumerate.
+		# @yields {|coverage| ...} Coverage whose ratio is below the configured threshold.
+		# 	@parameter coverage [Covered::Coverage] The coverage object below the threshold.
+		# @returns [Covered::Statistics] Statistics for all coverage objects, including omitted ones.
 		def each(wrapper)
 			statistics = Statistics.new
 			
@@ -47,6 +58,11 @@ module Covered
 			return statistics
 		end
 		
+		# Print any annotations for the given line.
+		# @parameter terminal [Console::Terminal] The terminal to write to.
+		# @parameter coverage [Covered::Coverage] The coverage being rendered.
+		# @parameter line [String] The source line.
+		# @parameter line_offset [Integer] The current line number.
 		def print_annotations(terminal, coverage, line, line_offset)
 			if annotations = coverage.annotations[line_offset]
 				prefix = "#{line_offset}|".rjust(8) + "*|".rjust(8)
@@ -57,12 +73,19 @@ module Covered
 			end
 		end
 		
+		# Print the line and hit-count header.
+		# @parameter terminal [Console::Terminal] The terminal to write to.
 		def print_line_header(terminal)
 			prefix = "Line|".rjust(8) + "Hits|".rjust(8)
 			
 			terminal.puts prefix, style: :header_prefix
 		end
 		
+		# Print a single source line with coverage styling.
+		# @parameter terminal [Console::Terminal] The terminal to write to.
+		# @parameter line [String] The source line.
+		# @parameter line_offset [Integer] The current line number.
+		# @parameter count [Integer | Nil] The execution count for the line.
 		def print_line(terminal, line, line_offset, count)
 			prefix = "#{line_offset}|".rjust(8) + "#{count}|".rjust(8)
 			
@@ -83,6 +106,9 @@ module Covered
 			end
 		end
 		
+		# Print line-by-line coverage for one source file.
+		# @parameter terminal [Console::Terminal] The terminal to write to.
+		# @parameter coverage [Covered::Coverage] The coverage to render.
 		def print_coverage(terminal, coverage)
 			line_offset = 1
 			counts = coverage.counts
@@ -102,12 +128,19 @@ module Covered
 			end
 		end
 		
+		# Print an error raised while rendering coverage.
+		# @parameter terminal [Console::Terminal] The terminal to write to.
+		# @parameter error [Exception] The rendering error.
 		def print_error(terminal, error)
 			terminal.puts "Error: #{error.message}", style: :error
 			terminal.puts error.backtrace
 		end
 		
-		# A coverage array gives, for each line, the number of line execution by the interpreter. A nil value means coverage is finishd for this line (lines like else and end).
+		# Print the detailed coverage report.
+		# A coverage array gives, for each line, the number of line executions by the interpreter. A `nil` value means coverage is finished for this line (lines like `else` and `end`).
+		# @parameter wrapper [Covered::Base] The coverage wrapper to report.
+		# @parameter output [IO] The output stream.
+		# @parameter options [Hash] Options forwarded to {print_coverage}.
 		def call(wrapper, output = $stdout, **options)
 			terminal = self.terminal(output)
 			
@@ -130,13 +163,19 @@ module Covered
 		end
 	end
 	
+	# Generates a detailed report without applying a coverage threshold.
 	class FullSummary < Summary
+		# Initialize a full summary report.
 		def initialize
 			super(threshold: nil)
 		end
 	end
 	
+	# Suppresses coverage report output.
 	class Quiet
+		# Generate no output.
+		# @parameter wrapper [Covered::Base] The coverage wrapper to ignore.
+		# @parameter output [IO] The output stream to ignore.
 		def call(wrapper, output = $stdout)
 			# Silent.
 		end
