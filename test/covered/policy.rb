@@ -4,6 +4,7 @@
 # Copyright, 2018-2025, by Samuel Williams.
 
 require "covered/policy"
+require "covered/brief_summary"
 
 describe Covered::Policy do
 	let(:pattern) {"**/*.rb"}
@@ -55,6 +56,13 @@ describe Covered::Policy do
 		policy.reports!("BriefSummary,PartialSummary")
 		
 		expect(policy.reports.count).to be == 2
+	end
+	
+	it "ignores nil reports" do
+		policy.reports!(nil)
+		
+		expect(policy.reports).to be(:empty?)
+		expect{policy.call(StringIO.new)}.not.to raise_exception
 	end
 	
 	it "can #call" do
