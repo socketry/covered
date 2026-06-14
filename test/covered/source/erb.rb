@@ -32,7 +32,7 @@ it "can parse multi-line methods" do
 	template.result_with_hash(items: [1, 2, 3])
 	capture.finish
 	
-	expect(files.paths[__FILE__].counts).not.to be(:include?, 0)
+	expect(files.paths[__FILE__].counts).to be(:include?, 0)
 	
 	# Show the actual coverage:
 	# Covered::Summary.new(threshold: nil).call(files, $stderr)

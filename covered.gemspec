@@ -27,4 +27,5 @@ Gem::Specification.new do |spec|
 	
 	spec.add_dependency "console", "~> 1.0"
 	spec.add_dependency "msgpack", "~> 1.0"
+	spec.add_dependency "ruby-coverage", "~> 0.0.1"
 end

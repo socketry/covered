@@ -84,10 +84,10 @@ module Covered
 		# @parameter line_number [Integer] The first line number to mark.
 		# @parameter value [Integer | Array(Integer)] The execution count or counts to add.
 		def mark(line_number, value = 1)
-			# As currently implemented, @counts is base-zero rather than base-one.
-			# Line numbers generally start at line 1, so the first line, line 1, is at index 1. This means that index[0] is usually nil.
 			Array(value).each_with_index do |value, index|
 				offset = line_number + index
+				next if offset < 1
+				
 				if @counts[offset]
 					@counts[offset] += value
 				else

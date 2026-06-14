@@ -44,8 +44,8 @@ describe Covered::Config do
 		File.write(lib_path, "puts :lib\n")
 		
 		output = Covered::Files.new
-		output.add(Covered::Coverage.new(Covered::Source.new(example_path), [1]))
-		output.add(Covered::Coverage.new(Covered::Source.new(lib_path), [1]))
+		output.add(Covered::Coverage.new(Covered::Source.new(example_path), [nil, 1]))
+		output.add(Covered::Coverage.new(Covered::Source.new(lib_path), [nil, 1]))
 		
 		database_path = File.join(root, Covered::Persist::DEFAULT_PATH)
 		Covered::Persist.new(output, database_path).save!
@@ -65,7 +65,7 @@ describe Covered::Config do
 		File.write(lib_path, "puts :lib\n")
 		
 		output = Covered::Files.new
-		output.add(Covered::Coverage.new(Covered::Source.new(lib_path), [1]))
+		output.add(Covered::Coverage.new(Covered::Source.new(lib_path), [nil, 1]))
 		
 		database_path = File.join(root, "coverage", "artifact.covered.db")
 		Covered::Persist.new(output, database_path).save!
