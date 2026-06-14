@@ -34,6 +34,10 @@ Please see the [project documentation](https://socketry.github.io/covered/) for 
 
 Please see the [project releases](https://socketry.github.io/covered/releases/index) for all releases.
 
+### v0.28.5
+
+  - Make coverage validation quiet when no reports are configured.
+
 ### v0.28.4
 
   - Ensure coverage validation loads explicit coverage databases without reloading the default persisted database.

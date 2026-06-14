@@ -1,6 +1,6 @@
 # Releases
 
-## Unreleased
+## v0.28.5
 
   - Make coverage validation quiet when no reports are configured.
 
