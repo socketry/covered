@@ -34,6 +34,10 @@ Please see the [project documentation](https://socketry.github.io/covered/) for 
 
 Please see the [project releases](https://socketry.github.io/covered/releases/index) for all releases.
 
+### v0.28.4
+
+  - Ensure coverage validation loads explicit coverage databases without reloading the default persisted database.
+
 ### v0.28.3
 
   - Ignore nil coverage reports so validation can run without `COVERAGE` configured.
