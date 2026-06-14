@@ -23,8 +23,9 @@ def validate(paths: nil, minimum: 1.0, input:)
 		statistics << coverage
 	end
 	
-	# Print statistics:
-	statistics.print($stderr)
+	if input.reports.empty?
+		statistics.print($stderr)
+	end
 	
 	input.call(STDOUT)
 	
