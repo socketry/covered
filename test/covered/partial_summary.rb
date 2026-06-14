@@ -54,6 +54,33 @@ describe Covered::PartialSummary do
 		expect(io.string).to be(:include?, "summary.rb")
 	end
 	
+	it "shows multiple 100% coverage files when there are partial files" do
+		partial_file = __FILE__
+		complete_file1 = File.join(__dir__, "../covered/summary.rb")
+		complete_file2 = File.join(__dir__, "../covered/brief_summary.rb")
+		
+		files.mark(partial_file, 1, 1)
+		files.mark(partial_file, 2, 0)
+		
+		files.mark(complete_file1, 1, 1)
+		files.mark(complete_file2, 1, 1)
+		
+		summary.call(files, io)
+		
+		expect(io.string).to be(:include?, "2 files have 100% coverage and are not shown above:")
+		expect(io.string).to be(:include?, "summary.rb")
+		expect(io.string).to be(:include?, "brief_summary.rb")
+	end
+	
+	it "prints rendering errors" do
+		coverage = Covered::Coverage.new(Covered::Source.new("missing.rb"), [nil, 1, 0])
+		files.add(coverage)
+		
+		summary.call(files, io)
+		
+		expect(io.string).to be(:include?, "Error: No such file or directory")
+	end
+	
 	it "does not show 100% coverage files when all files are 100%" do
 		# Create a scenario where all files have 100% coverage
 		file1 = __FILE__
