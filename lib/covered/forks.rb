@@ -17,7 +17,7 @@ module Covered
 		
 		# Stop tracking coverage and remove the fork handler state.
 		def finish
-			Handler.finish
+			Handler.finish(self)
 			
 			super
 		end
@@ -27,26 +27,30 @@ module Covered
 			LOCK = Mutex.new
 			
 			class << self
-				# @attribute [Covered::Forks | Nil] The currently registered coverage wrapper.
-				attr :coverage
+				# The currently registered coverage wrapper.
+				# @returns [Covered::Forks | Nil]
+				def coverage
+					LOCK.synchronize do
+						@coverages&.last
+					end
+				end
 				
 				# Register coverage for fork handling.
 				# @parameter coverage [Covered::Forks] The coverage wrapper to use in forked children.
-				# @raises [ArgumentError] If coverage is already registered.
 				def start(coverage)
 					LOCK.synchronize do
-						if @coverage
-							raise ArgumentError, "Coverage is already being tracked!"
-						end
-						
-						@coverage = coverage
+						(@coverages ||= []) << coverage
 					end
 				end
 				
 				# Clear the registered coverage.
-				def finish
+				def finish(coverage = nil)
 					LOCK.synchronize do
-						@coverage = nil
+						if coverage
+							@coverages&.delete(coverage)
+						else
+							@coverages&.pop
+						end
 					end
 				end
 				

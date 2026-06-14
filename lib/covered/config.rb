@@ -190,9 +190,7 @@ module Covered
 			
 			ENV["RUBYOPT"] = rubyopt
 			
-			unless ENV["COVERED_ROOT"]
-				ENV["COVERED_ROOT"] = @root
-			end
+			ENV["COVERED_ROOT"] = @root
 			
 			# Don't report coverage in child processes:
 			ENV.delete("COVERAGE")

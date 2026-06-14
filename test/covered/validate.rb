@@ -12,7 +12,7 @@ describe "covered:validate" do
 	let(:recipe) {context.lookup("covered:validate")}
 	let(:validate) {recipe.instance}
 	let(:file) {__FILE__}
-	let(:coverage) {Covered::Coverage.new(Covered::Source.new(file), [1])}
+	let(:coverage) {Covered::Coverage.new(Covered::Source.new(file), [nil, 1])}
 	let(:policy) do
 		Covered::Policy.new.tap do |policy|
 			policy.add(coverage)
