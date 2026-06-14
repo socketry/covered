@@ -1,5 +1,9 @@
 # Releases
 
+## Unreleased
+
+  - Avoid duplicate coverage summaries when validation uses a configured coverage report.
+
 ## v0.28.4
 
   - Ensure coverage validation loads explicit coverage databases without reloading the default persisted database.
