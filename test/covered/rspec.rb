@@ -19,6 +19,7 @@ describe "Covered::RSpec" do
 		
 		buffer = input.read
 		expect(buffer).to be =~ /(.*?) files checked; (.*?) lines executed; (.*?)% covered/
+		expect(buffer).to be(:include?, "1 example, 0 failures")
 	end
 	
 	it "starts coverage before loading spec files" do
