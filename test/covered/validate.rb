@@ -19,18 +19,26 @@ describe "covered:validate" do
 		end
 	end
 	
-	it "prints statistics when there are no configured reports" do
+	it "does not print statistics when there are no configured reports" do
 		output = []
+		errors = []
 		
-		mock($stderr) do |mock|
+		mock(STDOUT) do |mock|
 			mock.replace(:puts) do |line|
 				output << line
 			end
 		end
 		
+		mock($stderr) do |mock|
+			mock.replace(:puts) do |line|
+				errors << line
+			end
+		end
+		
 		validate.validate(input: policy)
 		
-		expect(output.first).to be == "1 files checked; 1/1 lines executed; 100.0% covered."
+		expect(output).to be(:empty?)
+		expect(errors).to be(:empty?)
 	end
 	
 	it "delegates output to configured reports" do

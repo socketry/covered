@@ -23,10 +23,6 @@ def validate(paths: nil, minimum: 1.0, input:)
 		statistics << coverage
 	end
 	
-	if input.reports.empty?
-		statistics.print($stderr)
-	end
-	
 	input.call(STDOUT)
 	
 	# Validate statistics and raise an error if they are not met:

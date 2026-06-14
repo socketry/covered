@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+  - Make coverage validation quiet when no reports are configured.
   - Avoid duplicate coverage summaries when validation uses a configured coverage report.
 
 ## v0.28.4
