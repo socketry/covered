@@ -36,8 +36,9 @@ module Covered
 		# Load the project coverage configuration for the given root.
 		# @parameter root [String] The project root.
 		# @parameter reports [String | Boolean | Array | Object | Nil] The report configuration.
+		# @parameter persist [Boolean] Whether the configured policy should persist coverage to the default database.
 		# @returns [Covered::Config] The loaded configuration instance.
-		def self.load(root: self.root, reports: self.reports)
+		def self.load(root: self.root, reports: self.reports, persist: true)
 			derived = Class.new(self)
 			
 			if path = self.path(root)
@@ -46,16 +47,18 @@ module Covered
 				derived.prepend(config)
 			end
 			
-			return derived.new(root, reports)
+			return derived.new(root, reports, persist)
 		end
 		
 		# Initialize the configuration for a project root and reports.
 		# @parameter root [String] The project root.
 		# @parameter reports [String | Boolean | Array | Object | Nil] The report configuration.
-		def initialize(root, reports)
+		# @parameter persist [Boolean] Whether the configured policy should persist coverage to the default database.
+		def initialize(root, reports, persist = true)
 			@root = root
 			@reports = reports
 			@policy = nil
+			@persist = persist
 			
 			@environment = nil
 		end
@@ -169,7 +172,7 @@ module Covered
 				policy.include(pattern)
 			end
 			
-			policy.persist!
+			policy.persist! if @persist
 			
 			policy.reports!(@reports)
 		end

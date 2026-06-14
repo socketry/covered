@@ -56,4 +56,23 @@ describe Covered::Config do
 		expect(policy.to_h).to have_keys(lib_path)
 		expect(policy.to_h).not.to have_keys(example_path)
 	end
+	
+	it "loads persisted coverage from an explicit path without reloading the default database" do
+		FileUtils.mkdir_p(File.join(root, "coverage"))
+		FileUtils.mkdir_p(File.join(root, "lib"))
+		
+		lib_path = File.join(root, "lib", "example.rb")
+		File.write(lib_path, "puts :lib\n")
+		
+		output = Covered::Files.new
+		output.add(Covered::Coverage.new(Covered::Source.new(lib_path), [1]))
+		
+		database_path = File.join(root, "coverage", "artifact.covered.db")
+		Covered::Persist.new(output, database_path).save!
+		
+		config = subject.load(root: root, reports: false, persist: false)
+		policy = config.policy_for(database_path)
+		
+		expect(policy.to_h.fetch(lib_path).executable_count).to be == 1
+	end
 end

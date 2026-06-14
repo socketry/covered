@@ -1,5 +1,9 @@
 # Releases
 
+## Unreleased
+
+  - Ensure coverage validation loads explicit coverage databases without reloading the default persisted database.
+
 ## v0.28.3
 
   - Ignore nil coverage reports so validation can run without `COVERAGE` configured.

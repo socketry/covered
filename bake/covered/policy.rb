@@ -14,7 +14,7 @@ end
 # Defaults to the default coverage path if no paths are specified.
 # @parameter paths [Array(String)] The coverage database paths.
 def current(paths: nil, reports: Covered::Config.reports)
-	return Covered::Config.load(root: context.root, reports: reports).policy_for(paths)
+	return Covered::Config.load(root: context.root, reports: reports, persist: false).policy_for(paths)
 end
 
 # Validate the coverage of multiple test runs.
