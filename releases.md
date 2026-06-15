@@ -1,5 +1,9 @@
 # Releases
 
+## Unreleased
+
+  - Prefer `ruby-coverage` over `coverage` for improved coverage tracking.
+
 ## v0.28.5
 
   - Make coverage validation quiet when no reports are configured.
