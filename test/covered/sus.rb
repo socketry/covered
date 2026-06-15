@@ -5,6 +5,11 @@
 
 require "covered/sus"
 
+require "covered/config"
+
+require "fileutils"
+require "tmpdir"
+
 describe Covered::Sus do
 	let(:coverage) do
 		Class.new do
@@ -125,5 +130,18 @@ describe Covered::Sus do
 		runner.after_tests(:assertions)
 		
 		expect(runner.covered).to be_nil
+	end
+	
+	it "does not require ruby-coverage when coverage is not requested" do
+		Dir.mktmpdir do |root|
+			FileUtils.mkdir_p(File.join(root, "ruby"))
+			File.write(File.join(root, "ruby", "coverage.rb"), "abort 'ruby-coverage was required'")
+			
+			code = <<~RUBY
+			require "covered/sus"
+			RUBY
+			
+			expect(system({"COVERAGE" => nil, "RUBYOPT" => nil}, Gem.ruby, "-Ilib", "-I#{root}", "-e", code)).to be == true
+		end
 	end
 end

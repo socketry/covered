@@ -5,7 +5,11 @@
 
 require_relative "wrapper"
 
-require "ruby/coverage"
+begin
+	require "ruby/coverage"
+rescue LoadError => error
+	raise error.exception("Covered::Capture requires the `ruby-coverage` gem. Add `gem \"ruby-coverage\", \"~> 0.1\"` to your bundle to record coverage.")
+end
 
 module Covered
 	# Captures Ruby coverage data and forwards it to another coverage output.

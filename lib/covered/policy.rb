@@ -5,7 +5,6 @@
 
 require_relative "summary"
 require_relative "files"
-require_relative "capture"
 require_relative "persist"
 require_relative "forks"
 
@@ -67,6 +66,8 @@ module Covered
 		# The runtime capture pipeline for this policy.
 		# @returns [Covered::Forks] The memoized capture pipeline.
 		def capture
+			require_relative "capture"
+			
 			@capture ||= Forks.new(
 				Capture.new(@output)
 			)
