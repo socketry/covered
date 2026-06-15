@@ -34,6 +34,10 @@ Please see the [project documentation](https://socketry.github.io/covered/) for 
 
 Please see the [project releases](https://socketry.github.io/covered/releases/index) for all releases.
 
+### v0.29.0
+
+  - Prefer `ruby-coverage` over `coverage` for improved coverage tracking.
+
 ### v0.28.5
 
   - Make coverage validation quiet when no reports are configured.

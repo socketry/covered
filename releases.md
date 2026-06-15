@@ -1,6 +1,6 @@
 # Releases
 
-## Unreleased
+## v0.29.0
 
   - Prefer `ruby-coverage` over `coverage` for improved coverage tracking.
 

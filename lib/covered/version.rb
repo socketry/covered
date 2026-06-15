@@ -5,5 +5,5 @@
 
 # @namespace
 module Covered
-	VERSION = "0.28.5"
+	VERSION = "0.29.0"
 end
