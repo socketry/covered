@@ -36,7 +36,7 @@ module Covered
 			end
 			
 			# Total number of files added.
-			# @returns [Integer] The number of coverage objects added.
+			# @returns [Integer] The number of covered files.
 			attr :count
 			
 			# The number of lines which could have been executed.
@@ -68,10 +68,17 @@ module Covered
 			# Add coverage to these aggregate statistics.
 			# @parameter coverage [Covered::Coverage] The coverage object to add.
 			def << coverage
-				@count += 1
-				
-				@executable_count += coverage.executable_count
-				@executed_count += coverage.executed_count
+				add(1, coverage.executable_count, coverage.executed_count)
+			end
+			
+			# Add counts to these aggregate statistics.
+			# @parameter count [Integer] The number of files to add.
+			# @parameter executable_count [Integer] The number of executable lines to add.
+			# @parameter executed_count [Integer] The number of executed lines to add.
+			def add(count, executable_count, executed_count)
+				@count += count
+				@executable_count += executable_count
+				@executed_count += executed_count
 			end
 		end
 		
@@ -96,20 +103,36 @@ module Covered
 		# The total number of executable lines.
 		# @returns [Integer] The total executable line count.
 		def executable_count
-			@total.executable_count
+			total.executable_count
 		end
 		
 		# The total number of executed lines.
 		# @returns [Integer] The total executed line count.
 		def executed_count
-			@total.executed_count
+			total.executed_count
 		end
 		
 		# Add coverage to these statistics.
 		# @parameter coverage [Covered::Coverage] The coverage object to add.
 		def << coverage
-			@total << coverage
-			(@paths[coverage.path] ||= coverage.empty).merge!(coverage)
+			current = @paths[coverage.path]
+			count = 0
+			
+			unless current
+				current = @paths[coverage.path] = coverage.empty
+				count = 1
+			end
+			
+			executable_count = current.executable_count
+			executed_count = current.executed_count
+			
+			current.merge!(coverage)
+			
+			@total.add(
+				count,
+				current.executable_count - executable_count,
+				current.executed_count - executed_count
+			)
 		end
 		
 		# Get coverage for the given path.

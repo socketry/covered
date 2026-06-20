@@ -58,4 +58,25 @@ describe Covered::Statistics do
 			expect(statistics).not.to be(:complete?)
 		end
 	end
+	
+	with "after adding overlapping coverage" do
+		let(:complete_coverage) {Covered::Coverage.new(source, [nil, 1, 1])}
+		let(:partial_coverage) {Covered::Coverage.new(source, [nil, 1, 0])}
+		
+		def before
+			statistics << complete_coverage
+			statistics << partial_coverage
+			super
+		end
+		
+		it "merges coverage for the same path" do
+			expect(statistics.count).to be == 1
+			expect(statistics.executable_count).to be == 2
+			expect(statistics.executed_count).to be == 2
+		end
+		
+		it "is complete" do
+			expect(statistics).to be(:complete?)
+		end
+	end
 end
