@@ -23,17 +23,17 @@ module Covered
 		# 	@parameter coverage [Covered::Coverage] The coverage object below the threshold.
 		# @returns [Covered::Statistics] Statistics for all coverage objects, including omitted ones.
 		def each(wrapper)
-			statistics = Statistics.new
+			coverages = []
 			
 			wrapper.each do |coverage|
-				statistics << coverage
+				coverages << coverage
 				
 				if @threshold.nil? or coverage.ratio < @threshold
 					yield coverage
 				end
 			end
 			
-			return statistics
+			return Statistics.new(Statistics::Aggregate.new(coverages))
 		end
 		
 		# Print any annotations for the given line.
