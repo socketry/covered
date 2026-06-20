@@ -19,7 +19,9 @@ module Covered
 		# @parameter coverage [Covered::Coverage] The coverage object to summarize.
 		# @returns [Covered::Statistics] Statistics containing the given coverage.
 		def self.for(coverage)
-			self.new(Aggregate.new([coverage]))
+			self.new.tap do |statistics|
+				statistics << coverage
+			end
 		end
 		
 		# Immutable aggregate coverage statistics.
@@ -42,7 +44,6 @@ module Covered
 				end
 				
 				paths.each_value(&:freeze)
-				@paths = paths.freeze
 				
 				@count = paths.size
 				@executable_count = paths.sum{|_path, coverage| coverage.executable_count}
@@ -63,23 +64,6 @@ module Covered
 			# @returns [Integer] The executed line count.
 			attr :executed_count
 			
-			# @attribute [Hash(String, Covered::Coverage)] Coverage statistics indexed by path.
-			attr :paths
-			
-			# Add coverage to a new aggregate statistics object.
-			# @parameter coverage [Covered::Coverage] The coverage object to add.
-			# @returns [Covered::Statistics::Aggregate] The new aggregate statistics.
-			def with(coverage)
-				self.class.new(@paths.values + [coverage])
-			end
-			
-			# Get coverage for the given path.
-			# @parameter path [String] The source path.
-			# @returns [Covered::Coverage | Nil] The merged coverage for the path.
-			def [](path)
-				@paths[path]
-			end
-			
 			# A JSON-compatible representation of these aggregate statistics.
 			# @returns [Hash] The aggregate count, line counts and percentage.
 			def as_json
@@ -99,31 +83,25 @@ module Covered
 			end
 		end
 		
-		# Initialize coverage statistics.
-		# @parameter aggregate [Covered::Statistics::Aggregate] The aggregate coverage statistics.
-		def initialize(aggregate = Aggregate.new)
-			@aggregate = aggregate
+		# Initialize empty coverage statistics.
+		def initialize
+			@total = nil
+			@paths = Hash.new
 		end
-		
-		# @attribute [Covered::Statistics::Aggregate] The aggregate coverage statistics.
-		attr :aggregate
 		
 		# The total aggregate statistics.
 		# @returns [Covered::Statistics::Aggregate] The total aggregate statistics.
 		def total
-			@aggregate
+			@total ||= Aggregate.new(@paths.values)
 		end
 		
-		# Coverage statistics indexed by path.
-		# @returns [Hash(String, Covered::Coverage)] The coverage statistics indexed by path.
-		def paths
-			@aggregate.paths
-		end
+		# @attribute [Hash(String, Covered::Coverage)] Coverage statistics indexed by path.
+		attr :paths
 		
 		# The number of unique paths with coverage data.
 		# @returns [Integer] The number of unique paths.
 		def count
-			@aggregate.count
+			@paths.size
 		end
 		
 		# The total number of executable lines.
@@ -141,7 +119,15 @@ module Covered
 		# Add coverage to these statistics.
 		# @parameter coverage [Covered::Coverage] The coverage object to add.
 		def << coverage
-			@aggregate = @aggregate.with(coverage)
+			current = @paths[coverage.path]
+			
+			unless current
+				current = @paths[coverage.path] = coverage.empty
+			end
+			
+			current.merge!(coverage)
+			
+			@total = nil
 			
 			return self
 		end
@@ -150,7 +136,7 @@ module Covered
 		# @parameter path [String] The source path.
 		# @returns [Covered::Coverage | Nil] The merged coverage for the path.
 		def [](path)
-			@aggregate[path]
+			@paths[path]
 		end
 		
 		# A JSON-compatible representation of these statistics.
