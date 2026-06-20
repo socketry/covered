@@ -3,9 +3,12 @@
 # Released under the MIT License.
 # Copyright, 2026, by Samuel Williams.
 
+require "covered"
 require "covered/sus"
 
 describe Covered::Sus do
+	let(:test_path) {File.expand_path("../../fixtures/sus/dummy.rb", __dir__)}
+	
 	let(:coverage) do
 		Class.new do
 			attr :events
@@ -66,6 +69,17 @@ describe Covered::Sus do
 				super
 			end
 		end
+	end
+	
+	it "can run sus test suite with coverage" do
+		input, output = IO.pipe
+		
+		system({"COVERAGE" => "PartialSummary"}, "sus", test_path, out: output, err: output)
+		output.close
+		
+		buffer = input.read
+		expect(buffer).to be =~ /(.*?) files checked; (.*?) lines executed; (.*?)% covered/
+		expect(buffer).to be(:include?, "1 passed out of 1 total")
 	end
 	
 	it "starts and finishes configured coverage" do

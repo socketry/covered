@@ -3,10 +3,24 @@
 # Released under the MIT License.
 # Copyright, 2026, by Samuel Williams.
 
+require "covered"
 require "covered/config"
 
 describe "Coverage::Autostart" do
+	let(:script_path) {File.expand_path("../../fixtures/autostart/report.rb", __dir__)}
+	
 	it "reports at exit when reports are enabled" do
+		input, output = IO.pipe
+		
+		system({"COVERAGE" => "PartialSummary"}, "ruby", "-rcovered/autostart", script_path, out: output, err: output)
+		output.close
+		
+		buffer = input.read
+		expect(buffer).to be(:include?, "autostart fixture")
+		expect(buffer).to be =~ /(.*?) files checked; (.*?) lines executed; (.*?)% covered/
+	end
+	
+	it "starts coverage and reports at exit" do
 		events = []
 		exit_hook = nil
 		
