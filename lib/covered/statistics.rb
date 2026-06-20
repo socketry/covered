@@ -28,6 +28,17 @@ module Covered
 		class Aggregate
 			include Ratio
 			
+			# Build aggregate statistics from coverage objects.
+			# @parameter coverages [Enumerable(Covered::Coverage)] The coverage objects to summarize.
+			# @returns [Covered::Statistics::Aggregate] The aggregate statistics.
+			def self.for(coverages)
+				self.new.tap do |aggregate|
+					coverages.each do |coverage|
+						aggregate << coverage
+					end
+				end
+			end
+			
 			# Initialize empty aggregate statistics.
 			def initialize
 				@count = 0
@@ -35,8 +46,7 @@ module Covered
 				@executed_count = 0
 			end
 			
-			# Total number of files added.
-			# @returns [Integer] The number of coverage objects added.
+			# @attribute [Integer] The total number of coverage instances added.
 			attr :count
 			
 			# The number of lines which could have been executed.
@@ -67,22 +77,28 @@ module Covered
 			
 			# Add coverage to these aggregate statistics.
 			# @parameter coverage [Covered::Coverage] The coverage object to add.
+			# @returns [Covered::Statistics::Aggregate] This aggregate.
 			def << coverage
 				@count += 1
 				
 				@executable_count += coverage.executable_count
 				@executed_count += coverage.executed_count
+				
+				self
 			end
 		end
 		
 		# Initialize empty coverage statistics.
 		def initialize
-			@total = Aggregate.new
+			@total = nil
 			@paths = Hash.new
 		end
 		
-		# @attribute [Covered::Statistics::Aggregate] The total aggregate statistics.
-		attr :total
+		# The total aggregate statistics.
+		# @returns [Covered::Statistics::Aggregate] The total aggregate statistics.
+		def total
+			@total ||= Aggregate.for(@paths.values)
+		end
 		
 		# @attribute [Hash(String, Covered::Coverage)] Coverage statistics indexed by path.
 		attr :paths
@@ -96,20 +112,29 @@ module Covered
 		# The total number of executable lines.
 		# @returns [Integer] The total executable line count.
 		def executable_count
-			@total.executable_count
+			total.executable_count
 		end
 		
 		# The total number of executed lines.
 		# @returns [Integer] The total executed line count.
 		def executed_count
-			@total.executed_count
+			total.executed_count
 		end
 		
 		# Add coverage to these statistics.
 		# @parameter coverage [Covered::Coverage] The coverage object to add.
 		def << coverage
-			@total << coverage
-			(@paths[coverage.path] ||= coverage.empty).merge!(coverage)
+			if current = @paths[coverage.path]
+				current.merge!(coverage)
+				
+				@total = nil
+			else
+				coverage = @paths[coverage.path] = coverage.dup
+				
+				@total << coverage if @total
+			end
+			
+			self
 		end
 		
 		# Get coverage for the given path.
@@ -124,7 +149,7 @@ module Covered
 		def as_json
 			{
 				total: total.as_json,
-				paths: @paths.map{|path, coverage| [path, coverage.as_json]}.to_h,
+				paths: paths.map{|path, coverage| [path, coverage.as_json]}.to_h,
 			}
 		end
 		
@@ -151,7 +176,7 @@ module Covered
 		# Print a human-readable coverage summary.
 		# @parameter output [IO] The output stream.
 		def print(output)
-			output.puts "#{count} files checked; #{@total.executed_count}/#{@total.executable_count} lines executed; #{@total.percentage.to_f.round(2)}% covered."
+			output.puts "#{count} files checked; #{total.executed_count}/#{total.executable_count} lines executed; #{total.percentage.to_f.round(2)}% covered."
 			
 			if self.complete?
 				output.puts "🧘 #{COMPLETE.sample}"
