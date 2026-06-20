@@ -51,6 +51,16 @@ module Covered
 			@annotations = annotations
 		end
 		
+		# Initialize a copy of this coverage object.
+		# @parameter other [Covered::Coverage] The coverage object to copy.
+		def initialize_copy(other)
+			super
+			
+			@source = other.source.dup
+			@counts = other.counts.dup
+			@annotations = other.annotations.transform_values(&:dup)
+		end
+		
 		# @attribute [Covered::Source] The covered source metadata.
 		attr_accessor :source
 		
