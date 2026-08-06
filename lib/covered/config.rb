@@ -145,7 +145,7 @@ module Covered
 		# Which paths to ignore when computing coverage for a given project.
 		# @returns [Array(String)] An array of relative paths to ignore.
 		def ignore_paths
-			["test/", "fixtures/", "spec/", "vendor/", "config/"]
+			["test/", "fixtures/", "spec/", "integration/", "vendor/", "config/"]
 		end
 		
 		# Which paths to include when computing coverage for a given project.
