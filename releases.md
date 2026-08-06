@@ -1,5 +1,9 @@
 # Releases
 
+## Unreleased
+
+  - Ignore files under `integration/` when evaluating coverage.
+
 ## v0.29.0
 
   - Prefer `ruby-coverage` over `coverage` for improved coverage tracking.
