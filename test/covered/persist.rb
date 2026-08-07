@@ -26,6 +26,30 @@ end
 describe Covered::Config do
 	include Sus::Fixtures::TemporaryDirectoryContext
 	
+	it "ignores integration test paths by default" do
+		FileUtils.mkdir_p(File.join(root, "integration"))
+		FileUtils.mkdir_p(File.join(root, "lib"))
+		
+		integration_path = File.join(root, "integration", "example.rb")
+		lib_path = File.join(root, "lib", "example.rb")
+		
+		File.write(integration_path, "puts :integration\n")
+		File.write(lib_path, "puts :lib\n")
+		
+		output = Covered::Files.new
+		output.add(Covered::Coverage.new(Covered::Source.new(integration_path), [nil, 1]))
+		output.add(Covered::Coverage.new(Covered::Source.new(lib_path), [nil, 1]))
+		
+		database_path = File.join(root, Covered::Persist::DEFAULT_PATH)
+		Covered::Persist.new(output, database_path).save!
+		
+		config = subject.load(root: root, reports: false)
+		policy = config.policy_for(database_path)
+		
+		expect(policy.to_h).to have_keys(lib_path)
+		expect(policy.to_h).not.to have_keys(integration_path)
+	end
+	
 	it "loads persisted coverage using the configured policy" do
 		FileUtils.mkdir_p(File.join(root, "config"))
 		FileUtils.mkdir_p(File.join(root, "examples"))
