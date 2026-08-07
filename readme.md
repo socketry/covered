@@ -34,6 +34,10 @@ Please see the [project documentation](https://socketry.github.io/covered/) for 
 
 Please see the [project releases](https://socketry.github.io/covered/releases/index) for all releases.
 
+### v0.30.0
+
+  - Ignore files under `integration/` when evaluating coverage.
+
 ### v0.29.0
 
   - Prefer `ruby-coverage` over `coverage` for improved coverage tracking.

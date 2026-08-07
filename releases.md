@@ -1,6 +1,6 @@
 # Releases
 
-## Unreleased
+## v0.30.0
 
   - Ignore files under `integration/` when evaluating coverage.
 
