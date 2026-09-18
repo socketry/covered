@@ -18,6 +18,7 @@ describe "Covered::Minitest" do
 		
 		buffer = input.read
 		expect(buffer).to be =~ /(.*?) files checked; (.*?) lines executed; (.*?)% covered/
+		expect(buffer).to be(:include?, "1 runs, 1 assertions, 0 failures, 0 errors, 0 skips")
 	end
 	
 	it "starts coverage before running minitest" do
